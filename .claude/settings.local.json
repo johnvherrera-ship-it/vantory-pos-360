@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"^  const LoginPage = \\\\|^  \\\\\\);$\" \"c:/Users/Bodega/Downloads/vantory-pos-360/src/App.tsx\")",
+      "Bash(rm -f src/components/history/SalesHistory.tsx)",
+      "Bash(rm -f src/components/fiados/FiadosDashboard.tsx)",
+      "Bash(rm -f src/components/analytics/KPIsDashboard.tsx)",
+      "Bash(rm -f src/components/common/Logo.tsx)",
+      "Bash(wc -l \"c:\\\\\\\\Users\\\\\\\\Bodega\\\\\\\\Downloads\\\\\\\\vantory-pos-360\\\\\\\\src\\\\\\\\App.tsx\")",
+      "Bash(cd \"c:\\\\\\\\Users\\\\\\\\Bodega\\\\\\\\Downloads\\\\\\\\vantory-pos-360\")",
+      "Bash(npm run *)"
+    ]
+  }
+}

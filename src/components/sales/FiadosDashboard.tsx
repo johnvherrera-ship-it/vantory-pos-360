@@ -1,33 +1,20 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, 
   Printer, 
   X 
 } from 'lucide-react';
 import { SideNavBar } from '../layout/SideNavBar';
+import { useAppContexts } from '../../hooks/useAppContexts';
 
-interface FiadosDashboardProps {
-  setCurrentPage: (page: any) => void;
-  fiados: any[];
-  setFiados: (fiados: any[]) => void;
-  currentUser: any;
-  users: any[];
-  setCurrentUser: (user: any) => void;
-  currentStore: any;
-  currentPOS: any;
-}
+interface FiadosDashboardProps {}
 
-export const FiadosDashboard = ({ 
-  setCurrentPage, 
-  fiados, 
-  setFiados, 
-  currentUser, 
-  users, 
-  setCurrentUser, 
-  currentStore, 
-  currentPOS 
-}: FiadosDashboardProps) => {
+export const FiadosDashboard = ({}: FiadosDashboardProps) => {
+  const { ui, pos, app } = useAppContexts();
+  const { setCurrentPage } = ui;
+  const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
+  const { clientFiados: fiados, setClientFiados: setFiados, clientUsers: users } = app;
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<any>(null);

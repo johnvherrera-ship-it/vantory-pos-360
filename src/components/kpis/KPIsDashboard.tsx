@@ -1,14 +1,19 @@
 
 import React, { useState, useMemo } from 'react';
-import { 
-  Receipt, Zap, Bell, Banknote, TrendingUp, Calendar, 
-  ArrowRight, Download, History, X, Info, CheckCircle, 
-  ArrowUp, ArrowDown, Settings 
+import {
+  Receipt, Zap, Bell, Banknote, TrendingUp, Calendar,
+  ArrowRight, Download, History, X, Info, CheckCircle,
+  ArrowUp, ArrowDown, Settings, CreditCard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SideNavBar } from '../layout/SideNavBar';
+import { useAppContexts } from '../../hooks/useAppContexts';
 
-export const KPIsDashboard = ({ setCurrentPage, inventory, salesHistory, cashRegister, setShowCashRegisterModal, currentUser, users, setCurrentUser, cashHistory, currentStore, currentPOS }: { setCurrentPage: (page: any) => void, inventory: any[], salesHistory: any[], cashRegister: any, setShowCashRegisterModal: any, currentUser: any, users: any[], setCurrentUser: any, cashHistory: any[], currentStore: any, currentPOS: any }) => {
+export const KPIsDashboard = () => {
+  const { ui, pos, app } = useAppContexts();
+  const { setCurrentPage, setShowCashRegisterModal } = ui;
+  const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
+  const { clientInventory: inventory, clientSalesHistory: salesHistory, clientCashRegister: cashRegister, clientCashHistory: cashHistory, clientUsers: users } = app;
   const [timeFilter, setTimeFilter] = useState<'day' | 'week' | 'month' | 'custom'>('week');
   const [customDateRange, setCustomDateRange] = useState({ start: '', end: '' });
   const [showTransactionsModal, setShowTransactionsModal] = useState(false);

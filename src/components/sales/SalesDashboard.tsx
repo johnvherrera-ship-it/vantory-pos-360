@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Plus, 
   Search, 
@@ -18,40 +18,18 @@ import {
   LogOut
 } from 'lucide-react';
 import { SideNavBar } from '../layout/SideNavBar';
+import { useAppContexts } from '../../hooks/useAppContexts';
 
 interface SalesDashboardProps {
-  inventory: any[];
-  setInventory: (inv: any[]) => void;
-  onSaleComplete: (sale: any) => void;
-  setCurrentPage: (page: any) => void;
-  cashRegister: any;
-  setCashRegister: any;
-  setShowCashRegisterModal: any;
-  currentUser: any;
-  users: any[];
-  setCurrentUser: (user: any) => void;
-  fiados: any[];
-  setFiados: (fiados: any[]) => void;
-  currentStore: any;
-  currentPOS: any;
+  onSaleComplete?: (sale: any) => void;
 }
 
-export const SalesDashboard = ({ 
-  inventory, 
-  setInventory, 
-  onSaleComplete, 
-  setCurrentPage, 
-  cashRegister, 
-  setCashRegister, 
-  setShowCashRegisterModal, 
-  currentUser, 
-  users, 
-  setCurrentUser, 
-  fiados, 
-  setFiados, 
-  currentStore, 
-  currentPOS 
-}: SalesDashboardProps) => {
+export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
+  const { ui, pos, app } = useAppContexts();
+  const { setCurrentPage, setShowCashRegisterModal } = ui;
+  const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
+  const { clientInventory: inventory, setClientInventory: setInventory, clientFiados: fiados, setClientFiados: setFiados, clientCashRegister: cashRegister, setClientCashRegister: setCashRegister, clientUsers: users } = app;
+
   const [cart, setCart] = useState<any[]>([]);
   const [barcode, setBarcode] = useState('');
   const [showCashModal, setShowCashModal] = useState(false);

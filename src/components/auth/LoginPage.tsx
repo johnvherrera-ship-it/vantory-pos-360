@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { 
   Users, 
   Shield, 
@@ -34,43 +34,54 @@ export const LoginPage = ({
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault(); 
+    e.preventDefault();
     const form = e.target as HTMLFormElement;
     const email = (form.elements.namedItem('usuario') as HTMLInputElement).value;
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
-    
-    // Super Admin Login
-    if (email === 'contacto@vantorydigital.cl' && password === '1234') {
-      setCurrentUser({ name: 'Vantory Admin', email: 'contacto@vantorydigital.cl', role: 'SuperAdmin', modules: [] });
+
+    // Super Admin Login - Uses environment variables for demo credentials
+    const adminEmail = import.meta.env.VITE_DEMO_SUPERADMIN_EMAIL;
+    const adminPassword = import.meta.env.VITE_DEMO_SUPERADMIN_PASSWORD;
+
+    if (adminEmail && adminPassword && email === adminEmail && password === adminPassword) {
+      setCurrentUser({
+        id: 0,
+        name: 'Vantory Admin',
+        email: adminEmail,
+        role: 'SuperAdmin',
+        modules: [],
+        clientId: 0,
+        status: 'active'
+      });
       setCurrentPage('superadmin-dashboard');
       return;
     }
 
-    // Allow duoc@gmail.com / 1234 or existing users
-    let user = users.find(u => u.email === email);
-    if (!user && email === 'duoc@gmail.com') {
-      user = users[0]; // Fallback to admin if not found
-    }
-    
-    if (user) {
-      setCurrentUser(user);
-    } else {
-      setCurrentUser(users[0]);
+    // Regular user login
+    const user = users.find(u => u.email === email);
+
+    if (!user) {
+      // No user found - show error (TODO: add error feedback UI)
+      console.warn('Usuario no encontrado:', email);
+      return;
     }
 
-    // Invisible Scalability Logic
+    // TODO: In production, validate password against hashed value from backend
+    // For now, accept any password if user exists (development only)
+    setCurrentUser(user);
+
+    // Auto-navigate if single store/POS
     if (stores.length === 1) {
       const storePos = posMachines.filter(p => p.storeId === stores[0].id);
       if (storePos.length === 1) {
-        // Auto-bypass
         setCurrentStore(stores[0]);
         setCurrentPOS(storePos[0]);
         setCurrentPage('dashboard');
         return;
       }
     }
-    
-    // Go to Lobby
+
+    // Go to store/POS selection
     setCurrentPage('lobby');
   };
 
@@ -79,7 +90,7 @@ export const LoginPage = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-surface via-surface to-surface-container-low/50 relative overflow-hidden"
+      className="auth-page-wrapper min-h-screen flex items-center justify-center bg-gradient-to-br from-surface via-surface to-surface-container-low/50 relative overflow-hidden"
     >
       {/* Background Elements */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -97,8 +108,8 @@ export const LoginPage = ({
         />
       </div>
 
-      <main className="relative z-10 w-full max-w-lg px-6 py-12 flex flex-col items-center">
-        <div className="mb-12">
+      <main className="relative z-10 w-full max-w-lg px-6 py-4 flex flex-col items-center">
+        <div className="mb-6">
           <Logo onClick={() => setCurrentPage('home')} />
         </div>
         
@@ -106,20 +117,20 @@ export const LoginPage = ({
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full bg-gradient-to-br from-white to-surface-container-lowest/40 rounded-[2.8rem] p-8 md:p-12 shadow-[0_50px_100px_-20px_rgba(38,124,220,0.15)] border border-secondary/15 hover:border-secondary/30 transition-all"
+          className="w-full bg-gradient-to-br from-white to-surface-container-lowest/40 rounded-[2rem] p-6 md:p-8 shadow-[0_40px_80px_-15px_rgba(38,124,220,0.15)] border border-secondary/15 hover:border-secondary/30 transition-all"
         >
-          <header className="mb-10">
-            <motion.h2 className="font-headline font-black text-3xl text-on-surface tracking-tight mb-2">Iniciar Sesión</motion.h2>
-            <p className="text-on-surface-variant text-sm font-medium">Ingrese sus credenciales para continuar.</p>
+          <header className="mb-6">
+            <motion.h2 className="font-headline font-black text-2xl text-on-surface tracking-tight mb-1">Iniciar Sesión</motion.h2>
+            <p className="text-on-surface-variant text-xs font-medium">Ingrese sus credenciales para continuar.</p>
           </header>
           
-          <form className="space-y-6" onSubmit={handleLogin}>
+          <form className="space-y-4" onSubmit={handleLogin}>
             {/* User Field */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="space-y-3"
+              className="space-y-2"
             >
               <label className="font-label font-bold text-xs text-on-surface-variant tracking-widest uppercase" htmlFor="usuario">Correo Electrónico</label>
               <div className="relative group">
@@ -141,11 +152,11 @@ export const LoginPage = ({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="space-y-3"
+              className="space-y-2"
             >
               <div className="flex justify-between items-center">
                 <label className="font-label font-bold text-xs text-on-surface-variant tracking-widest uppercase" htmlFor="password">Contraseña</label>
-                <span className="text-on-surface-variant/60 font-medium text-xs">¿Olvido su contraseña? Contacte a soporte</span>
+                <span className="text-on-surface-variant/60 font-medium text-[10px]">¿Olvido su contraseña?</span>
               </div>
               <div className="relative group">
                 <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/50 group-focus-within:text-secondary w-5 h-5 transition-colors" />
@@ -175,12 +186,12 @@ export const LoginPage = ({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="pt-6"
+              className="pt-4"
             >
               <motion.button
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-gradient-secondary w-full py-5 rounded-xl font-headline font-bold text-white shadow-lg shadow-secondary/30 hover:shadow-2xl hover:shadow-secondary/40 transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
+                className="bg-gradient-secondary w-full py-4 rounded-xl font-headline font-bold text-white shadow-lg shadow-secondary/30 hover:shadow-2xl hover:shadow-secondary/40 transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
                 type="submit"
               >
                 <motion.div
@@ -197,29 +208,28 @@ export const LoginPage = ({
             </motion.div>
           </form>
           
-          <footer className="mt-10 pt-8 border-t border-surface-container-low text-center">
-            <p className="text-on-surface-variant text-sm">
-              ¿No tiene una cuenta? <a className="text-secondary font-bold hover:underline" href="mailto:soporte@vantorydigital.cl">Contactar Soporte</a>
+          <footer className="mt-8 pt-6 border-t border-surface-container-low text-center">
+            <p className="text-on-surface-variant text-xs">
+              ¿No tiene una cuenta? <a className="text-secondary font-bold hover:underline" href="mailto:soporte@vantorydigital.cl">Soporte</a>
             </p>
           </footer>
-        </div>
-        
+        </motion.div>
+
         {/* System Status/Metadata */}
-        <div className="mt-12 flex flex-col items-center gap-6 opacity-60">
-          <div className="flex items-center gap-8 text-xs font-label font-medium text-on-surface-variant">
+        <div className="mt-8 flex flex-col items-center gap-4 opacity-60">
+          <div className="flex items-center gap-6 text-[10px] font-label font-medium text-on-surface-variant">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              <span>Acceso Seguro SSL</span>
+              <Shield className="w-3 h-3" />
+              <span>Acceso Seguro</span>
             </div>
             <div className="flex items-center gap-2">
-              <History className="w-4 h-4" />
-              <span>v2.4.0 Stable</span>
+              <History className="w-3 h-3" />
+              <span>v2.4.0</span>
             </div>
           </div>
-          <div className="h-[1px] w-12 bg-outline-variant/30"></div>
+          <div className="h-[1px] w-8 bg-outline-variant/30"></div>
           <div className="text-center">
-            <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Desarrollado por Vantory Digital</p>
-            <p className="text-[9px] text-on-surface-variant mt-1">Santiago, Chile — 2024</p>
+            <p className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">Vantory Digital</p>
           </div>
         </div>
       </main>

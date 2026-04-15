@@ -8,28 +8,15 @@ import {
   Trash2 
 } from 'lucide-react';
 import { SideNavBar } from '../layout/SideNavBar';
+import { useAppContexts } from '../../hooks/useAppContexts';
 
-interface SalesHistoryProps {
-  setCurrentPage: (page: any) => void;
-  salesHistory: any[];
-  setViewingSale: (product: any) => void;
-  currentUser: any;
-  users: any[];
-  setCurrentUser: (user: any) => void;
-  currentStore: any;
-  currentPOS: any;
-}
+interface SalesHistoryProps {}
 
-export const SalesHistory = ({ 
-  setCurrentPage, 
-  salesHistory, 
-  setViewingSale, 
-  currentUser, 
-  users, 
-  setCurrentUser, 
-  currentStore, 
-  currentPOS 
-}: SalesHistoryProps) => {
+export const SalesHistory = ({}: SalesHistoryProps) => {
+  const { ui, pos, app } = useAppContexts();
+  const { setCurrentPage, setViewingSale } = ui;
+  const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
+  const { clientSalesHistory: salesHistory, clientUsers: users } = app;
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="history" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, 
   Bell, 
@@ -22,32 +22,16 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { SideNavBar } from '../layout/SideNavBar';
+import { useAppContexts } from '../../hooks/useAppContexts';
 
-interface InventoryDashboardProps {
-  setCurrentPage: (page: any) => void;
-  inventory: any[];
-  setInventory: (inv: any[]) => void;
-  currentUser: any;
-  users: any[];
-  setCurrentUser: (user: any) => void;
-  categories: string[];
-  setCategories: (cats: any) => void;
-  currentStore: any;
-  currentPOS: any;
-}
+interface InventoryDashboardProps {}
 
-export const InventoryDashboard = ({ 
-  setCurrentPage, 
-  inventory, 
-  setInventory, 
-  currentUser, 
-  users, 
-  setCurrentUser, 
-  categories, 
-  setCategories, 
-  currentStore, 
-  currentPOS 
-}: InventoryDashboardProps) => {
+export const InventoryDashboard = ({}: InventoryDashboardProps) => {
+  const { ui, pos, app } = useAppContexts();
+  const { setCurrentPage } = ui;
+  const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
+  const { clientInventory: inventory, setClientInventory: setInventory, categories, setCategories, clientUsers: users } = app;
+
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [viewingProduct, setViewingProduct] = useState<any | null>(null);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);

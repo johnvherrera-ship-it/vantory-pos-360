@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Package, 
   Scan, 
@@ -12,34 +12,15 @@ import {
   X 
 } from 'lucide-react';
 import { SideNavBar } from '../layout/SideNavBar';
+import { useAppContexts } from '../../hooks/useAppContexts';
 
-interface StockEntriesProps {
-  setCurrentPage: (page: any) => void;
-  inventory: any[];
-  setInventory: (inv: any[]) => void;
-  stockEntries: any[];
-  setStockEntries: (entries: any[]) => void;
-  setViewingSale: (sale: any) => void;
-  currentUser: any;
-  users: any[];
-  setCurrentUser: (user: any) => void;
-  currentStore: any;
-  currentPOS: any;
-}
+interface StockEntriesProps {}
 
-export const StockEntries = ({ 
-  setCurrentPage, 
-  inventory, 
-  setInventory, 
-  stockEntries, 
-  setStockEntries, 
-  setViewingSale, 
-  currentUser, 
-  users, 
-  setCurrentUser, 
-  currentStore, 
-  currentPOS 
-}: StockEntriesProps) => {
+export const StockEntries = ({}: StockEntriesProps) => {
+  const { ui, pos, app } = useAppContexts();
+  const { setCurrentPage, setViewingSale } = ui;
+  const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
+  const { clientInventory: inventory, setClientInventory: setInventory, clientStockEntries: stockEntries, setClientStockEntries: setStockEntries, clientUsers: users } = app;
   const [barcode, setBarcode] = useState('');
   const [manualProduct, setManualProduct] = useState('');
   const [manualQuantity, setManualQuantity] = useState('');

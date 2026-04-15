@@ -21,30 +21,16 @@ import {
   Bar 
 } from 'recharts';
 import { SideNavBar } from '../layout/SideNavBar';
+import { useAppContexts } from '../../hooks/useAppContexts';
 
-interface DashboardProps {
-  setCurrentPage: (page: any) => void;
-  inventory: any[];
-  salesHistory: any[];
-  setViewingSale: (sale: any) => void;
-  currentUser: any;
-  users: any[];
-  setCurrentUser: (user: any) => void;
-  currentStore: any;
-  currentPOS: any;
-}
+interface DashboardProps {}
 
-export const Dashboard = ({ 
-  setCurrentPage, 
-  inventory, 
-  salesHistory, 
-  setViewingSale, 
-  currentUser, 
-  users, 
-  setCurrentUser, 
-  currentStore, 
-  currentPOS 
-}: DashboardProps) => {
+export const Dashboard = ({}: DashboardProps) => {
+  const { ui, pos, app } = useAppContexts();
+  const { setCurrentPage, setViewingSale } = ui;
+  const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
+  const { clientInventory: inventory, clientSalesHistory: salesHistory, clientUsers: users } = app;
+
   const totalSales = salesHistory.reduce((sum, sale) => sum + sale.total, 0);
   const salesToday = salesHistory.filter(sale => new Date(sale.date).toDateString() === new Date().toDateString()).length;
   const lowStockProducts = inventory.filter(p => p.stock < 10);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Bell, 
   Settings, 
@@ -14,28 +14,15 @@ import {
   Info 
 } from 'lucide-react';
 import { SideNavBar } from '../layout/SideNavBar';
+import { useAppContexts } from '../../hooks/useAppContexts';
 
-interface UsersManagementProps {
-  setCurrentPage: (page: any) => void;
-  users: any[];
-  setUsers: (users: any[]) => void;
-  currentUser: any;
-  setCurrentUser: (user: any) => void;
-  stores: any[];
-  currentStore: any;
-  currentPOS: any;
-}
+interface UsersManagementProps {}
 
-export const UsersManagement = ({ 
-  setCurrentPage, 
-  users, 
-  setUsers, 
-  currentUser, 
-  setCurrentUser, 
-  stores, 
-  currentStore, 
-  currentPOS 
-}: UsersManagementProps) => {
+export const UsersManagement = ({}: UsersManagementProps) => {
+  const { ui, pos, app } = useAppContexts();
+  const { setCurrentPage } = ui;
+  const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
+  const { clientUsers: users, setClientUsers: setUsers, clientStores: stores } = app;
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<any | null>(null);
 
