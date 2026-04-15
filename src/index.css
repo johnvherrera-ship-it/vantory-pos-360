@@ -1,0 +1,77 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-primary-fixed: #dae2fd;
+  --color-secondary: #335f9d;
+  --color-surface-dim: #d2d9f4;
+  --color-on-primary-fixed-variant: #3f465c;
+  --color-tertiary-fixed: #66ff8e;
+  --color-on-secondary-fixed-variant: #134783;
+  --color-on-background: #131b2e;
+  --color-on-tertiary-fixed: #002109;
+  --color-error-container: #ffdad6;
+  --color-on-surface-variant: #45464d;
+  --color-error: #ba1a1a;
+  --color-inverse-primary: #bec6e0;
+  --color-tertiary-fixed-dim: #3de273;
+  --color-on-error-container: #93000a;
+  --color-on-surface: #131b2e;
+  --color-secondary-fixed: #d6e3ff;
+  --color-surface-bright: #faf8ff;
+  --color-surface-container-low: #f2f3ff;
+  --color-on-secondary-container: #174986;
+  --color-surface-container: #eaedff;
+  --color-on-primary-fixed: #131b2e;
+  --color-on-tertiary: #ffffff;
+  --color-outline-variant: #c6c6cd;
+  --color-tertiary: #000000;
+  --color-on-tertiary-fixed-variant: #005322;
+  --color-background: #faf8ff;
+  --color-surface: #faf8ff;
+  --color-on-primary: #ffffff;
+  --color-secondary-fixed-dim: #a8c8ff;
+  --color-surface-container-high: #e2e7ff;
+  --color-outline: #76777d;
+  --color-surface-tint: #565e74;
+  --color-primary-fixed-dim: #bec6e0;
+  --color-on-secondary: #ffffff;
+  --color-surface-container-highest: #dae2fd;
+  --color-surface-container-lowest: #ffffff;
+  --color-inverse-surface: #283044;
+  --color-surface-variant: #dae2fd;
+  --color-on-secondary-fixed: #001b3c;
+  --color-inverse-on-surface: #eef0ff;
+  --color-secondary-container: #91bafe;
+  --color-tertiary-container: #002109;
+  --color-on-tertiary-container: #009844;
+  --color-primary: #000000;
+  --color-on-primary-container: #7c839b;
+  --color-primary-container: #131b2e;
+  --color-on-error: #ffffff;
+
+  --font-headline: "Inter", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, .font-headline {
+  font-family: var(--font-headline);
+}
+
+@keyframes slide-bright {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+.animate-slide-bright {
+  animation: slide-bright 3s ease-in-out infinite;
+}
+
+.bg-gradient-secondary {
+  background: linear-gradient(135deg, #335F9D 0%, #174986 100%);
+}
