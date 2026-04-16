@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { Product, Sale, StockEntry, User, Store, POS, Fiado, CashRegister, CashHistoryRecord, SaaSClient } from '../types';
+import { supabaseService } from '../services/supabaseService';
 
 interface AppContextType {
   // SaaS Clients
@@ -197,13 +198,80 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     localStorage.setItem('vantory_cash_history', JSON.stringify(cashHistory));
   }, [cashHistory]);
 
+  // ===== Data Isolation Helpers =====
+  const activeClientId = currentUser?.clientId || 1;
+  const activePosId = currentPOS?.id || 1;
+
   useEffect(() => {
     localStorage.setItem('vantory_users', JSON.stringify(users));
   }, [users]);
 
   useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const clients = await supabaseService.getClients();
+        if (clients.length > 0) {
+          setVantoryClients(clients);
+        }
+      } catch (error) {
+        console.error('Error loading clients from Supabase:', error);
+      }
+    };
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('vantory_saas_clients', JSON.stringify(vantoryClients));
   }, [vantoryClients]);
+
+  useEffect(() => {
+    const loadInventory = async () => {
+      if (activeClientId) {
+        try {
+          const products = await supabaseService.getProducts(activeClientId);
+          if (products.length > 0) {
+            setInventory(products);
+          }
+        } catch (error) {
+          console.error('Error loading inventory from Supabase:', error);
+        }
+      }
+    };
+    loadInventory();
+  }, [activeClientId]);
+
+  useEffect(() => {
+    const loadSalesHistory = async () => {
+      if (activeClientId) {
+        try {
+          const sales = await supabaseService.getSales(activeClientId);
+          if (sales.length > 0) {
+            setSalesHistory(sales);
+          }
+        } catch (error) {
+          console.error('Error loading sales from Supabase:', error);
+        }
+      }
+    };
+    loadSalesHistory();
+  }, [activeClientId]);
+
+  useEffect(() => {
+    const loadStoresAndPOS = async () => {
+      if (activeClientId && activeClientId !== 0) {
+        try {
+          const fetchedStores = await supabaseService.getStores(activeClientId);
+          if (fetchedStores.length > 0) setStores(fetchedStores);
+
+          const fetchedPOS = await supabaseService.getPOSMachines(activeClientId);
+          if (fetchedPOS.length > 0) setPosMachines(fetchedPOS);
+        } catch (error) {
+          console.error('Error loading stores/POS from Supabase:', error);
+        }
+      }
+    };
+    loadStoresAndPOS();
+  }, [activeClientId]);
 
   useEffect(() => {
     localStorage.setItem('vantory_stores', JSON.stringify(stores));
@@ -212,10 +280,6 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   useEffect(() => {
     localStorage.setItem('vantory_pos', JSON.stringify(posMachines));
   }, [posMachines]);
-
-  // ===== Data Isolation Helpers =====
-  const activeClientId = currentUser?.clientId || 1;
-  const activePosId = currentPOS?.id || 1; // Will be updated when currentPOS is set in POSContext
 
   const createClientSetter = useCallback((globalSetter: any) => (action: any) => {
     globalSetter((prev: any[]) => {

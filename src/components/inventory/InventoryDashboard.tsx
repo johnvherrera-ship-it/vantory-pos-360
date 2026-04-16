@@ -22,13 +22,15 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { SideNavBar } from '../layout/SideNavBar';
+import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
+import { supabaseService } from '../../services/supabaseService';
 
 interface InventoryDashboardProps {}
 
 export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   const { ui, pos, app } = useAppContexts();
-  const { setCurrentPage } = ui;
+  const { setCurrentPage, setShowNotificationsPanel } = ui;
   const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
   const { clientInventory: inventory, setClientInventory: setInventory, categories, setCategories, clientUsers: users } = app;
 
@@ -41,16 +43,23 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   const [filterLowStock, setFilterLowStock] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Todas las Categorías');
 
-  const handleDelete = (id: number) => {
-    setInventory(inventory.filter(p => p.id !== id));
-    setProductToDelete(null);
+  const handleDelete = async (id: number) => {
+    try {
+      await supabaseService.deleteProduct(id);
+      setInventory(inventory.filter(p => p.id !== id));
+    } catch (error) {
+      console.error('Error deleting product from Supabase:', error);
+      alert('Error al eliminar el producto de la base de datos.');
+    } finally {
+      setProductToDelete(null);
+    }
   };
 
   const toggleFavorite = (id: number) => {
     setInventory(inventory.map(p => p.id === id ? { ...p, isFavorite: !p.isFavorite } : p));
   };
 
-  const handleSave = (product: any) => {
+  const handleSave = async (product: any) => {
     if (product.id) {
       setInventory(inventory.map(p => p.id === product.id ? product : p));
     } else {
@@ -58,6 +67,18 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
     }
     setEditingProduct(null);
     setShowAddProduct(false);
+
+    // Sync with Supabase
+    try {
+      if (product.id && product.id > 1000000000000) { // It's a temporary Date.now() ID
+        const { id, ...newProduct } = product;
+        await supabaseService.upsertProduct({ ...newProduct, clientId: pos.currentUser?.clientId || 1 });
+      } else {
+        await supabaseService.upsertProduct({ ...product, clientId: pos.currentUser?.clientId || 1 });
+      }
+    } catch (error) {
+      console.error('Error syncing with Supabase:', error);
+    }
   };
 
   const handleExport = () => {
@@ -149,25 +170,27 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
               <Bell className="w-5 h-5 text-on-surface-variant" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
+              {lowStockCount > 0 && <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-error rounded-full text-white text-[9px] font-black flex items-center justify-center border border-white">{lowStockCount > 9 ? '9+' : lowStockCount}</span>}
             </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
             <div className="flex items-center gap-3">
               <div className="text-right hidden md:block">
-                <p className="text-sm font-black text-[#0F172A]">Admin Vantory</p>
-                <p className="text-xs text-secondary font-bold">Soporte Técnico</p>
+                <p className="text-sm font-black text-[#0F172A]">{currentUser?.name || 'Admin Vantory'}</p>
+                <p className="text-xs text-secondary font-bold">{currentUser?.role || 'Soporte Técnico'}</p>
               </div>
-              <img 
-                className="w-10 h-10 rounded-full border-2 border-surface-container-highest object-cover" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPTOJksruGaNQm6gW0cTKsmHx_gthleGI0Hy70R56Q1oJ4i9lW0iL4JU8oXMoZAshoKE8S3a1-5NvKCV26POVasYgktSZtJpP6RHaMYbMEtqakjdL7rtnYFQso4Kzl5w6R3449pD-nViJIAngGkUqQijX4Zz9xtfKBk4SztlssTnGEGmOQeqPZsahAs-DUJ7tdh68w9VguZXCBAxiCk5XRvvm-GQdW31C8hvfujnZJlbpJ3SVzXGcnVimo2ARlMqv9ks88IY_RN2o_" 
+              <img
+                className="w-10 h-10 rounded-full border-2 border-surface-container-highest object-cover"
+                src={currentUser?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuAPTOJksruGaNQm6gW0cTKsmHx_gthleGI0Hy70R56Q1oJ4i9lW0iL4JU8oXMoZAshoKE8S3a1-5NvKCV26POVasYgktSZtJpP6RHaMYbMEtqakjdL7rtnYFQso4Kzl5w6R3449pD-nViJIAngGkUqQijX4Zz9xtfKBk4SztlssTnGEGmOQeqPZsahAs-DUJ7tdh68w9VguZXCBAxiCk5XRvvm-GQdW31C8hvfujnZJlbpJ3SVzXGcnVimo2ARlMqv9ks88IY_RN2o_"}
+                alt="User"
+                referrerPolicy="no-referrer"
               />
             </div>
-            <button onClick={() => setCurrentUser(null)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2" title="Cerrar Sesión">
+            <button onClick={() => { setCurrentUser(null); setCurrentPage('home'); }} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2" title="Cerrar Sesión">
               <LogOut className="w-5 h-5" />
             </button>
           </div>
@@ -649,6 +672,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
           </div>
         )}
       </AnimatePresence>
+      <NotificationsPanel />
     </div>
   );
 };

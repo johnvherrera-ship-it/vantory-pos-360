@@ -12,9 +12,11 @@ import {
   Edit, 
   MinusCircle, 
   CheckCircle, 
+  Trash2,
   X 
 } from 'lucide-react';
 import { Logo } from '../layout/Logo';
+import { supabaseService } from '../../services/supabaseService';
 
 interface SuperAdminClientsProps {
   setCurrentPage: (page: any) => void;
@@ -24,7 +26,7 @@ interface SuperAdminClientsProps {
   setSelectedClient: (client: any) => void;
 }
 
-export const SuperAdminClients = ({ 
+const SuperAdminClients = ({ 
   setCurrentPage, 
   vantoryClients, 
   setVantoryClients, 
@@ -34,7 +36,7 @@ export const SuperAdminClients = ({
   const [showModal, setShowModal] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
 
-  const handleSaveClient = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSaveClient = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const newClient = {
@@ -53,17 +55,62 @@ export const SuperAdminClients = ({
     } else {
       setVantoryClients([...vantoryClients, newClient]);
     }
+
+    // Sync with Supabase
+    try {
+      if (editingClient) {
+        await supabaseService.upsertClient(newClient);
+      } else {
+        const { id: _, ...supabaseData } = newClient;
+        const savedClient = await supabaseService.upsertClient(supabaseData);
+        // Update local state with the REAL ID from Supabase
+        if (savedClient) {
+          const updated = vantoryClients.map((c: any) => c.email === savedClient.email ? { ...c, id: savedClient.id } : c);
+          setVantoryClients(updated);
+          
+          // Create initial admin user for this client using the REAL ID
+          await supabaseService.createUser({
+            clientId: savedClient.id,
+            name: `Admin ${savedClient.name}`,
+            email: savedClient.email,
+            role: 'Administrador',
+            modules: ['dashboard', 'inventory', 'sales', 'history', 'entries', 'kpis', 'users', 'fiados'],
+            status: 'active',
+            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCfLVv6ohrtIE1tV50hhfzyQoC_-ADrxKzmlZGDV-3q0wsLG0oX1rxHZAoGZubgfK_a8kAW7lNR4uR2hH9puFiqXk8uIk4cma4AtWee_CyfKF6Xp6ht64UImKASzqOvK5H9W5VV4O0aN6kidyheXojT3g5eweScDgb6ozL_VXSkV-76BPplDQ5Tv0RM7pj3-HTx49aYz2-_7Ugx32bVbSsdFpsgKrwX2L-igWxXkTVYVROb1d68R9o1_2kMqMveMbfIrDNeV36iemdh'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error syncing client with Supabase:', error);
+    }
+
     setShowModal(false);
     setEditingClient(null);
   };
 
-  const toggleStatus = (id: number) => {
-    setVantoryClients(vantoryClients.map((c: any) => {
+  const handleDeleteClient = async (clientId: number) => {
+    if (window.confirm('¿Está seguro de eliminar este cliente? Esta acción no se puede deshacer.')) {
+      try {
+        await supabaseService.deleteClient(clientId);
+        setVantoryClients(vantoryClients.filter((c: any) => c.id !== clientId));
+      } catch (error) {
+        console.error('Error deleting client:', error);
+      }
+    }
+  };
+
+  const toggleStatus = async (id: number) => {
+    const updatedClients = vantoryClients.map((c: any) => {
       if (c.id === id) {
-        return { ...c, status: c.status === 'Activo' ? 'Suspendido' : 'Activo' };
+        const newStatus = c.status === 'Activo' ? 'Suspendido' : 'Activo';
+        const updated = { ...c, status: newStatus };
+        // Sync with Supabase
+        supabaseService.upsertClient(updated).catch(err => console.error('Error toggling status in Supabase:', err));
+        return updated;
       }
       return c;
-    }));
+    });
+    setVantoryClients(updatedClients);
   };
 
   const impersonateClient = (client: any) => {
@@ -164,6 +211,9 @@ export const SuperAdminClients = ({
                         <button onClick={() => toggleStatus(client.id)} title={client.status === 'Activo' ? 'Suspender' : 'Activar'} className={`p-2 rounded-lg transition-colors ${client.status === 'Activo' ? 'text-error hover:bg-error/10' : 'text-green-600 hover:bg-green-100'}`}>
                           {client.status === 'Activo' ? <MinusCircle className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
                         </button>
+                        <button onClick={() => handleDeleteClient(client.id)} title="Eliminar Cliente" className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                          <Trash2 className="w-5 h-5" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -238,3 +288,5 @@ export const SuperAdminClients = ({
     </div>
   );
 };
+
+export default SuperAdminClients;

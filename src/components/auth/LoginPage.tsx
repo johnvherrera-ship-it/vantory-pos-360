@@ -11,6 +11,8 @@ import {
   Package 
 } from 'lucide-react';
 import { Logo } from '../layout/Logo';
+import { supabase } from '../../lib/supabase';
+import { supabaseService } from '../../services/supabaseService';
 
 interface LoginPageProps {
   users: any[];
@@ -57,32 +59,79 @@ export const LoginPage = ({
       return;
     }
 
-    // Regular user login
-    const user = users.find(u => u.email === email);
+    // Supabase Auth + Data Fetching
+    const attemptLogin = async () => {
+      try {
+        // Authenticate with Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
 
-    if (!user) {
-      // No user found - show error (TODO: add error feedback UI)
-      console.warn('Usuario no encontrado:', email);
-      return;
-    }
+        if (authError || !authData.user) {
+          alert('Credenciales inválidas. Intente nuevamente.');
+          console.warn('Auth error:', authError?.message);
+          return;
+        }
 
-    // TODO: In production, validate password against hashed value from backend
-    // For now, accept any password if user exists (development only)
-    setCurrentUser(user);
+        // Fetch user profile from users table
+        const { data: dbUsers, error: profileError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .single();
 
-    // Auto-navigate if single store/POS
-    if (stores.length === 1) {
-      const storePos = posMachines.filter(p => p.storeId === stores[0].id);
-      if (storePos.length === 1) {
-        setCurrentStore(stores[0]);
-        setCurrentPOS(storePos[0]);
-        setCurrentPage('dashboard');
-        return;
+        if (profileError || !dbUsers) {
+          alert('Perfil de usuario no encontrado. Contacte a soporte.');
+          console.warn('Profile error:', profileError?.message);
+          return;
+        }
+
+        const authenticatedUser = {
+          ...dbUsers,
+          clientId: dbUsers.client_id,
+          modules: dbUsers.modules || []
+        };
+
+        // Check if client is active
+        const { data: clientData } = await supabase
+          .from('saas_clients')
+          .select('status')
+          .eq('id', authenticatedUser.clientId)
+          .single();
+
+        if (clientData && clientData.status !== 'Activo') {
+          alert('Este negocio se encuentra SUSPENDIDO. Contacte a soporte.');
+          return;
+        }
+
+        // Fetch stores/POS for this user IMMEDIATELY to decide navigation
+        const userStores = await supabaseService.getStores(authenticatedUser.clientId);
+        const userPOS = await supabaseService.getPOSMachines(authenticatedUser.clientId);
+
+        setCurrentUser(authenticatedUser);
+        navigateAfterLogin(authenticatedUser, userStores, userPOS);
+      } catch (err) {
+        console.error('Error during login:', err);
+        alert('Error durante el inicio de sesión. Intente nuevamente.');
       }
-    }
+    };
 
-    // Go to store/POS selection
-    setCurrentPage('lobby');
+    const navigateAfterLogin = (user: any, userStores: any[], userPOS: any[]) => {
+      // Auto-navigate if single store/POS
+      if (userStores.length === 1) {
+        const storePos = userPOS.filter(p => p.storeId === userStores[0].id);
+        if (storePos.length === 1) {
+          setCurrentStore(userStores[0]);
+          setCurrentPOS(storePos[0]);
+          setCurrentPage('dashboard');
+          return;
+        }
+      }
+      setCurrentPage('lobby');
+    };
+
+    attemptLogin();
   };
 
   return (
@@ -117,7 +166,7 @@ export const LoginPage = ({
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full bg-gradient-to-br from-white to-surface-container-lowest/40 rounded-[2rem] p-6 md:p-8 shadow-[0_40px_80px_-15px_rgba(38,124,220,0.15)] border border-secondary/15 hover:border-secondary/30 transition-all"
+          className="w-full bg-gradient-to-br from-white to-surface-container-lowest/40 rounded-[2rem] p-6 md:p-8 shadow-[0_40px_80px_-15px_rgba(38,124,220,0.15)] border-2 border-secondary/25 hover:border-secondary/60 transition-all card-hover-enhance"
         >
           <header className="mb-6">
             <motion.h2 className="font-headline font-black text-2xl text-on-surface tracking-tight mb-1">Iniciar Sesión</motion.h2>
@@ -137,7 +186,7 @@ export const LoginPage = ({
                 <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/50 group-focus-within:text-secondary w-5 h-5 transition-colors" />
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
-                  className="w-full bg-surface-container-highest/30 border-2 border-surface-container-high/50 hover:border-secondary/30 focus:border-secondary rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-white transition-all duration-200 outline-none font-medium"
+                  className="w-full bg-surface-container-highest/30 border-2 border-secondary/20 hover:border-secondary/40 focus:border-secondary focus:shadow-[0_0_0_4px_rgba(51,95,157,0.2)] rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-white transition-all duration-200 outline-none font-medium"
                   id="usuario"
                   name="usuario"
                   placeholder="correo@empresa.com"
@@ -162,7 +211,7 @@ export const LoginPage = ({
                 <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/50 group-focus-within:text-secondary w-5 h-5 transition-colors" />
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
-                  className="w-full bg-surface-container-highest/30 border-2 border-surface-container-high/50 hover:border-secondary/30 focus:border-secondary rounded-xl py-4 pl-12 pr-12 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-white transition-all duration-200 outline-none font-medium"
+                  className="w-full bg-surface-container-highest/30 border-2 border-surface-container-high/50 hover:border-secondary/30 focus:border-secondary focus:shadow-[0_0_0_3px_rgba(51,95,157,0.1)] rounded-xl py-4 pl-12 pr-12 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-white transition-all duration-200 outline-none font-medium"
                   id="password"
                   name="password"
                   placeholder="••••••••"
@@ -189,16 +238,15 @@ export const LoginPage = ({
               className="pt-4"
             >
               <motion.button
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-gradient-secondary w-full py-4 rounded-xl font-headline font-bold text-white shadow-lg shadow-secondary/30 hover:shadow-2xl hover:shadow-secondary/40 transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group"
+                whileHover={{ scale: 1.08, y: -3 }}
+                whileTap={{ scale: 0.92 }}
+                className="bg-gradient-secondary w-full py-4 rounded-xl font-headline font-bold text-white shadow-lg shadow-secondary/30 hover:shadow-2xl hover:shadow-secondary/50 transition-all duration-300 flex items-center justify-center gap-3 relative overflow-hidden group animate-glow"
                 type="submit"
               >
                 <motion.div
-                  initial={{ opacity: 0, x: -100 }}
-                  animate={{ opacity: 0.1, x: 0 }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  className="absolute inset-0 bg-white/10"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0"
+                  animate={{ x: ['-100%', '100%'], opacity: [0, 0.3, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
                 />
                 <span className="relative text-lg">Ingresar</span>
                 <motion.div className="relative" whileHover={{ x: 4 }}>

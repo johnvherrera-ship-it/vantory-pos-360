@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   LayoutDashboard, 
@@ -14,6 +14,7 @@ import {
   Info 
 } from 'lucide-react';
 import { Logo } from '../layout/Logo';
+import { supabaseService } from '../../services/supabaseService';
 
 interface SuperAdminClientProfileProps {
   client: any;
@@ -28,7 +29,7 @@ interface SuperAdminClientProfileProps {
   setUsers: (users: any[]) => void;
 }
 
-export const SuperAdminClientProfile = ({ 
+const SuperAdminClientProfile = ({ 
   client, 
   setCurrentPage, 
   stores, 
@@ -43,10 +44,6 @@ export const SuperAdminClientProfile = ({
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [showPosModal, setShowPosModal] = useState(false);
   const [selectedStoreForPos, setSelectedStoreForPos] = useState<number | null>(null);
-
-  // Ensure stores have clientId (for backward compatibility with existing localstorage)
-  const clientStores = stores.filter((s: any) => s.clientId === client.id || (!s.clientId && client.id === 1));
-  const clientUsers = users.filter((u: any) => u.clientId === client.id);
   
   const [storeError, setStoreError] = useState('');
   const [posError, setPosError] = useState('');
@@ -54,7 +51,34 @@ export const SuperAdminClientProfile = ({
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<any | null>(null);
 
-  const handleSaveUser = (e: React.FormEvent) => {
+  // Local state for this client's data (separate from global app state)
+  const [localStores, setLocalStores] = useState<any[]>([]);
+  const [localPos, setLocalPos] = useState<any[]>([]);
+  const [localUsers, setLocalUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadClientData = async () => {
+      setLoading(true);
+      try {
+        const [storesData, posData, usersData] = await Promise.all([
+          supabaseService.getStores(client.id),
+          supabaseService.getPOSMachines(client.id),
+          supabaseService.getUsers(client.id)
+        ]);
+        setLocalStores(storesData);
+        setLocalPos(posData);
+        setLocalUsers(usersData);
+      } catch (error) {
+        console.error('Error loading client data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadClientData();
+  }, [client.id]);
+
+  const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const name = (form.elements.namedItem('name') as HTMLInputElement).value;
@@ -63,68 +87,73 @@ export const SuperAdminClientProfile = ({
     const role = (form.elements.namedItem('role') as HTMLSelectElement).value;
     const status = (form.elements.namedItem('status') as HTMLSelectElement).value;
     const storeId = (form.elements.namedItem('storeId') as HTMLSelectElement).value;
-    
+
     const modulesCheckboxes = form.querySelectorAll('input[name="modules"]:checked') as NodeListOf<HTMLInputElement>;
     const modules = Array.from(modulesCheckboxes).map(cb => cb.value);
 
     if (editingUser) {
-      setUsers(users.map((u: any) => u.id === editingUser.id ? { ...u, name, email, role, status, modules, storeId: storeId ? parseInt(storeId) : null, ...(password ? { password } : {}) } : u));
+      await supabaseService.updateUser(editingUser.id, { name, email, role, status, modules, storeId: storeId ? parseInt(storeId) : null });
+      setLocalUsers(localUsers.map((u: any) => u.id === editingUser.id ? { ...u, name, email, role, status, modules, storeId: storeId ? parseInt(storeId) : null } : u));
     } else {
-      setUsers([...users, { 
-        id: Date.now(), 
+      const newUser = {
         clientId: client.id,
         storeId: storeId ? parseInt(storeId) : null,
-        name, 
-        email, 
+        name,
+        email,
         password,
-        role, 
-        status, 
+        role,
+        status,
         modules,
-        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80' 
-      }]);
+        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80'
+      };
+      const saved = await supabaseService.createUser(newUser);
+      setLocalUsers([...localUsers, { ...newUser, id: saved.id }]);
     }
     setShowUserModal(false);
     setEditingUser(null);
   };
 
-  const handleAddStore = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddStore = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (clientStores.length >= client.maxStores) {
-      setStoreError("Límite de locales alcanzado. Aumente el límite en el plan del cliente.");
-      return;
-    }
     const form = e.currentTarget;
-    const newStore = {
-      id: Date.now(),
-      clientId: client.id,
+    const storeData = {
+      client_id: client.id,
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
       address: (form.elements.namedItem('address') as HTMLInputElement).value,
       pin: (form.elements.namedItem('pin') as HTMLInputElement).value,
     };
-    setStores([...stores, newStore]);
-    setShowStoreModal(false);
-    setStoreError('');
+    
+    try {
+      const savedStore = await supabaseService.createStore(storeData);
+      setLocalStores([...localStores, savedStore]);
+      setShowStoreModal(false);
+      setStoreError('');
+    } catch (error) {
+      console.error('Error creating store:', error);
+      setStoreError('Error al guardar el local en la base de datos.');
+    }
   };
 
-  const handleAddPos = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddPos = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedStoreForPos) return;
     
-    const storePos = posMachines.filter((p: any) => p.storeId === selectedStoreForPos);
-    if (storePos.length >= client.maxPosPerStore) {
-      setPosError("Límite de cajas por local alcanzado. Aumente el límite en el plan del cliente.");
-      return;
-    }
-
     const form = e.currentTarget;
-    const newPos = {
-      id: Date.now(),
+    const posData = {
+      client_id: client.id,
       storeId: selectedStoreForPos,
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
     };
-    setPosMachines([...posMachines, newPos]);
-    setShowPosModal(false);
-    setPosError('');
+
+    try {
+      const savedPos = await supabaseService.createPOS(posData);
+      setLocalPos([...localPos, savedPos]);
+      setShowPosModal(false);
+      setPosError('');
+    } catch (error) {
+      console.error('Error creating POS:', error);
+      setPosError('Error al guardar la caja en la base de datos.');
+    }
   };
 
   return (
@@ -171,35 +200,34 @@ export const SuperAdminClientProfile = ({
           <div className="flex gap-3">
              <button 
                 onClick={() => { setStoreError(''); setShowStoreModal(true); }} 
-                disabled={clientStores.length >= client.maxStores}
-                title={clientStores.length >= client.maxStores ? "Límite de locales alcanzado" : "Crear nuevo local"}
-                className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg ${clientStores.length >= client.maxStores ? 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed' : 'bg-secondary text-white hover:bg-secondary/90'}`}
+                disabled={localStores.length >= client.maxStores}
+                title={localStores.length >= client.maxStores ? "Límite de locales alcanzado" : "Crear nuevo local"}
+                className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg ${localStores.length >= client.maxStores ? 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed' : 'bg-secondary text-white hover:bg-secondary/90'}`}
              >
                 <Plus className="w-5 h-5" />
                 Nuevo Local
              </button>
           </div>
         </header>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/20">
             <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-wider mb-4">Suscripción</h3>
-            <p className="text-2xl font-black text-on-surface mb-1">${client.mrr.toLocaleString('es-CL')}/mes</p>
+            <p className="text-2xl font-black text-on-surface mb-1">${(client?.mrr || 0).toLocaleString('es-CL')}/mes</p>
             <p className="text-sm font-medium text-on-surface-variant">Facturación mensual</p>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/20">
             <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-wider mb-4">Locales (Uso / Límite)</h3>
             <div className="flex items-end gap-2">
-              <p className="text-3xl font-black text-on-surface">{clientStores.length}</p>
-              <p className="text-xl font-bold text-on-surface-variant mb-1">/ {client.maxStores}</p>
+              <p className="text-3xl font-black text-on-surface">{localStores.length}</p>
+              <p className="text-xl font-bold text-on-surface-variant mb-1">/ {client?.maxStores || 0}</p>
             </div>
             <div className="w-full bg-surface-container-highest h-2 rounded-full mt-3 overflow-hidden">
-              <div className="bg-secondary h-full rounded-full" style={{ width: `${(clientStores.length / client.maxStores) * 100}%` }}></div>
+              <div className="bg-secondary h-full rounded-full" style={{ width: `${((localStores.length || 0) / (client?.maxStores || 1)) * 100}%` }}></div>
             </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/20">
             <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-wider mb-4">Cajas por Local (Límite)</h3>
-            <p className="text-3xl font-black text-on-surface mb-1">{client.maxPosPerStore}</p>
+            <p className="text-3xl font-black text-on-surface mb-1">{client?.maxPosPerStore || 0}</p>
             <p className="text-sm font-medium text-on-surface-variant">Máximo permitido por sucursal</p>
           </div>
         </div>
@@ -207,8 +235,8 @@ export const SuperAdminClientProfile = ({
         <h3 className="text-xl font-black font-headline mb-6">Infraestructura del Cliente</h3>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {clientStores.map((store: any) => {
-            const storePos = posMachines.filter((p: any) => p.storeId === store.id);
+          {localStores.map((store: any) => {
+            const storePos = localPos.filter((p: any) => p.storeId === store.id);
             return (
               <div key={store.id} className="bg-white rounded-2xl shadow-sm border border-outline-variant/20 p-6">
                 <div className="flex justify-between items-start mb-4">
@@ -250,7 +278,7 @@ export const SuperAdminClientProfile = ({
             );
           })}
           
-          {clientStores.length === 0 && (
+          {localStores.length === 0 && (
             <div className="col-span-full bg-surface-container-lowest border-2 border-dashed border-outline-variant/30 rounded-2xl p-12 text-center">
               <Globe className="w-12 h-12 text-on-surface-variant mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-bold text-on-surface mb-2">Sin locales configurados</h3>
@@ -281,7 +309,7 @@ export const SuperAdminClientProfile = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container-low">
-              {clientUsers.map((user: any) => (
+              {localUsers.map((user: any) => (
                 <tr key={user.id} className="hover:bg-surface-container-lowest transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -314,7 +342,7 @@ export const SuperAdminClientProfile = ({
                   </td>
                 </tr>
               ))}
-              {clientUsers.length === 0 && (
+              {localUsers.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-on-surface-variant">
                     No hay usuarios registrados para este cliente.
@@ -326,7 +354,6 @@ export const SuperAdminClientProfile = ({
         </div>
       </main>
 
-      {/* Modals for Store and POS */}
       <AnimatePresence>
         {showStoreModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -351,7 +378,7 @@ export const SuperAdminClientProfile = ({
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-on-surface-variant mb-1">PIN de Acceso (4 dígitos)</label>
-                  <input name="pin" required pattern="\\d{4}" maxLength={4} className="w-full p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-secondary outline-none font-medium font-mono" placeholder="1234" />
+                  <input name="pin" required pattern="[0-9]{4}" maxLength={4} className="w-full p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-secondary outline-none font-medium font-mono" placeholder="1234" />
                 </div>
                 <div className="pt-4 flex gap-3">
                   <button type="button" onClick={() => setShowStoreModal(false)} className="flex-1 py-3 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold transition-colors">Cancelar</button>
@@ -388,7 +415,6 @@ export const SuperAdminClientProfile = ({
           </motion.div>
         )}
 
-        {/* User Modal */}
         {showUserModal && (
           <motion.div 
             initial={{ opacity: 0 }}
@@ -465,8 +491,8 @@ export const SuperAdminClientProfile = ({
                       className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
                     >
                       <option value="">Todos los locales (Global)</option>
-                      {clientStores.map((store: any) => (
-                        <option key={store.id} value={store.id}>{store.name}</option>
+                      {localStores.map((s: any) => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
                       ))}
                     </select>
                   </div>
@@ -527,3 +553,5 @@ export const SuperAdminClientProfile = ({
     </div>
   );
 };
+
+export default SuperAdminClientProfile;
