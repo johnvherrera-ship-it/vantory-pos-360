@@ -118,21 +118,21 @@ export const KPIsDashboard = () => {
   const lowStockProducts = stockProjections.filter(p => p.stock < 10 || p.daysUntilDepletion <= 7);
   const totalInventoryValue = inventory.reduce((sum, p) => sum + (p.cost * p.stock), 0);
   
-  const totalProfit = filteredSales.reduce((sum, sale) => {
+  // Calcula utilidad usando el profit guardado en la venta (costo al momento de vender)
+  // Fallback: usa item.cost del carrito, o costo actual del inventario
+  const calcSaleProfit = (sale: any) => {
+    if (typeof sale.profit === 'number') return sale.profit;
     const saleCost = sale.cart.reduce((cSum: number, item: any) => {
-      const product = inventory.find(p => p.id === item.id);
-      return cSum + (product ? product.cost * item.quantity : 0);
+      const cost = typeof item.cost === 'number'
+        ? item.cost
+        : (inventory.find((p: any) => p.id === item.id)?.cost ?? 0);
+      return cSum + cost * item.quantity;
     }, 0);
-    return sum + (sale.total - saleCost);
-  }, 0);
+    return sale.total - saleCost;
+  };
 
-  const prevTotalProfit = previousFilteredSales.reduce((sum, sale) => {
-    const saleCost = sale.cart.reduce((cSum: number, item: any) => {
-      const product = inventory.find(p => p.id === item.id);
-      return cSum + (product ? product.cost * item.quantity : 0);
-    }, 0);
-    return sum + (sale.total - saleCost);
-  }, 0);
+  const totalProfit = filteredSales.reduce((sum, sale) => sum + calcSaleProfit(sale), 0);
+  const prevTotalProfit = previousFilteredSales.reduce((sum, sale) => sum + calcSaleProfit(sale), 0);
 
   const profitMargin = totalSales > 0 ? Math.round((totalProfit / totalSales) * 100) : 0;
 
@@ -172,15 +172,21 @@ export const KPIsDashboard = () => {
     const productProfits: Record<number, { name: string, profit: number, quantity: number, image: string }> = {};
     filteredSales.forEach(sale => {
       sale.cart.forEach((item: any) => {
-        const product = inventory.find(p => p.id === item.id);
-        if (product) {
-          const profit = (item.price - product.cost) * item.quantity;
-          if (!productProfits[item.id]) {
-            productProfits[item.id] = { name: product.name, profit: 0, quantity: 0, image: product.image };
-          }
-          productProfits[item.id].profit += profit;
-          productProfits[item.id].quantity += item.quantity;
+        const product = inventory.find((p: any) => p.id === item.id);
+        const cost = typeof item.cost === 'number'
+          ? item.cost
+          : (product?.cost ?? 0);
+        const profit = (item.price - cost) * item.quantity;
+        if (!productProfits[item.id]) {
+          productProfits[item.id] = {
+            name: item.name || product?.name || 'Desconocido',
+            profit: 0,
+            quantity: 0,
+            image: product?.image || item.image || ''
+          };
         }
+        productProfits[item.id].profit += profit;
+        productProfits[item.id].quantity += item.quantity;
       });
     });
     return Object.values(productProfits).sort((a, b) => b.profit - a.profit);
@@ -708,21 +714,32 @@ export const KPIsDashboard = () => {
 
         {showRevenueModal && (
           <Modal title={<>Ingresos <span className="text-secondary">Totales</span></>} subtitle="Desglose de ingresos por método de pago" onClose={() => setShowRevenueModal(false)}>
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-               <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10">
-                 <div className="flex items-center gap-3 mb-4">
-                   <div className="p-2 bg-green-100 rounded-lg"><Banknote className="w-5 h-5 text-green-700" /></div>
-                   <h4 className="font-black text-[#0F172A]">Efectivo</h4>
-                 </div>
-                 <p className="text-3xl font-black font-headline tabular-nums text-[#0F172A]">${(revenueByMethod['Efectivo'] || 0).toLocaleString('es-CL')}</p>
-               </div>
-               <div className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/10">
-                 <div className="flex items-center gap-3 mb-4">
-                   <div className="p-2 bg-blue-100 rounded-lg"><CreditCard className="w-5 h-5 text-blue-700" /></div>
-                   <h4 className="font-black text-[#0F172A]">Débito / Tarjeta</h4>
-                 </div>
-                 <p className="text-3xl font-black font-headline tabular-nums text-[#0F172A]">${(revenueByMethod['Débito'] || 0).toLocaleString('es-CL')}</p>
-               </div>
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+               {Object.entries(revenueByMethod).length === 0 ? (
+                 <p className="col-span-2 text-center py-6 text-[#0F172A]/60 font-bold">No hay ventas en este período.</p>
+               ) : Object.entries(revenueByMethod).sort((a, b) => b[1] - a[1]).map(([method, amount]) => {
+                 const cfg: Record<string, { icon: React.ReactNode, bg: string, iconBg: string }> = {
+                   'Efectivo': { icon: <Banknote className="w-5 h-5 text-green-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-green-100' },
+                   'Débito': { icon: <CreditCard className="w-5 h-5 text-blue-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-blue-100' },
+                   'Fiado': { icon: <Receipt className="w-5 h-5 text-orange-700" />, bg: 'bg-orange-50', iconBg: 'bg-orange-100' },
+                   'Pluxee': { icon: <CreditCard className="w-5 h-5 text-[#ff5e00]" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-orange-50' },
+                   'AmiPass': { icon: <CreditCard className="w-5 h-5 text-pink-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-pink-100' },
+                 };
+                 const style = cfg[method] || { icon: <CreditCard className="w-5 h-5 text-secondary" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-secondary/10' };
+                 const pct = totalSales > 0 ? Math.round(((amount as number) / totalSales) * 100) : 0;
+                 return (
+                   <div key={method} className={`${style.bg} p-6 rounded-2xl border border-outline-variant/10`}>
+                     <div className="flex items-center justify-between mb-3">
+                       <div className="flex items-center gap-3">
+                         <div className={`p-2 ${style.iconBg} rounded-lg`}>{style.icon}</div>
+                         <h4 className="font-black text-[#0F172A]">{method}</h4>
+                       </div>
+                       <span className="text-xs font-black text-[#0F172A]/40 bg-surface-container-low px-2 py-1 rounded-full">{pct}%</span>
+                     </div>
+                     <p className="text-3xl font-black font-headline tabular-nums text-[#0F172A]">${(amount as number).toLocaleString('es-CL')}</p>
+                   </div>
+                 );
+               })}
              </div>
              <div className="bg-[#0F172A] p-6 rounded-2xl text-white flex justify-between items-center">
                <div>

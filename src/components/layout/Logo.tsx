@@ -23,14 +23,14 @@ export const Logo = ({ onClick, className = "", light = false }: LogoProps) => (
         className={`absolute -inset-1 ${light ? 'bg-white/20' : 'bg-secondary/30'} blur-md rounded-xl -z-10`}
       ></motion.div>
     </div>
-    <div className="flex flex-col leading-none">
-      <span className={`text-2xl font-black tracking-tighter ${light ? 'text-white' : 'text-[#0F172A]'} group-hover:text-secondary transition-colors`}>VANTORY</span>
-      <div className="flex items-center gap-1">
-        <span className={`text-[11px] font-bold tracking-[0.2em] ${light ? 'text-white/80' : 'text-secondary'} uppercase`}>POS 360</span>
-        <motion.div 
-          animate={{ width: [8, 24, 8] }}
+    <div className="flex flex-col leading-tight">
+      <span className={`text-2xl font-black tracking-tighter whitespace-nowrap ${light ? 'text-white' : 'text-[#0F172A]'} group-hover:text-secondary transition-colors`}>VANTORY</span>
+      <div className="flex items-center gap-2">
+        <span className={`text-[11px] font-bold tracking-[0.2em] whitespace-nowrap ${light ? 'text-white/80' : 'text-secondary'} uppercase`}>POS 360</span>
+        <motion.div
+          animate={{ width: [8, 20, 8] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className={`h-0.5 ${light ? 'bg-white/50' : 'bg-secondary'} rounded-full`}
+          className={`h-0.5 ${light ? 'bg-white/50' : 'bg-secondary'} rounded-full flex-shrink-0`}
         ></motion.div>
       </div>
     </div>

@@ -37,6 +37,8 @@ interface UIContextType {
   isScrolled: boolean;
   showBackToTop: boolean;
   scrollToTop: () => void;
+  showNotificationsPanel: boolean;
+  setShowNotificationsPanel: (show: boolean) => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -53,6 +55,7 @@ export const UIContextProvider: React.FC<UIContextProviderProps> = ({ children }
   const [showPassword, setShowPassword] = useState(false);
   const [viewingSale, setViewingSale] = useState<any | null>(null);
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
+  const [showNotificationsPanel, setShowNotificationsPanel] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -109,6 +112,8 @@ export const UIContextProvider: React.FC<UIContextProviderProps> = ({ children }
     isScrolled,
     showBackToTop,
     scrollToTop,
+    showNotificationsPanel,
+    setShowNotificationsPanel,
   };
 
   return (

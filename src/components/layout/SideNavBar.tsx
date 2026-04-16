@@ -105,13 +105,6 @@ export const SideNavBar = ({
         <NavItem page="kpis" icon={LineChart} label="KPIs" />
         <NavItem page="history" icon={History} label="Historial / Salidas" />
 
-        <div className="px-6 mb-2 mt-8 text-[11px] font-black text-white/60 uppercase tracking-[0.25em] flex items-center gap-2 animate-pulse drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
-          Sistema
-          <div className="h-[1px] flex-1 bg-white/10 overflow-hidden relative">
-            <div className="absolute inset-0 bg-white/40 animate-slide-bright"></div>
-          </div>
-        </div>
-        <NavItem page="users" icon={Users} label="Usuarios" />
       </nav>
       
       <div className="mt-auto px-6 border-t border-white/10 pt-6">

@@ -21,13 +21,14 @@ import {
   Bar 
 } from 'recharts';
 import { SideNavBar } from '../layout/SideNavBar';
+import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
 
 interface DashboardProps {}
 
 export const Dashboard = ({}: DashboardProps) => {
   const { ui, pos, app } = useAppContexts();
-  const { setCurrentPage, setViewingSale } = ui;
+  const { setCurrentPage, setViewingSale, setShowNotificationsPanel } = ui;
   const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
   const { clientInventory: inventory, clientSalesHistory: salesHistory, clientUsers: users } = app;
 
@@ -103,11 +104,11 @@ export const Dashboard = ({}: DashboardProps) => {
             <p className="text-[#0F172A]/70 font-bold text-lg">Resumen ejecutivo de tu negocio en tiempo real.</p>
           </div>
           <div className="flex items-center gap-4">
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
               <Bell className="w-5 h-5 text-on-surface-variant" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
+              {lowStockProducts.length > 0 && <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-error rounded-full text-white text-[9px] font-black flex items-center justify-center border border-white">{lowStockProducts.length > 9 ? '9+' : lowStockProducts.length}</span>}
             </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
@@ -136,7 +137,7 @@ export const Dashboard = ({}: DashboardProps) => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow group relative">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border-2 border-secondary/15 hover:border-secondary/60 hover:shadow-lg transition-all group relative card-hover-enhance">
             <div className="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 mb-3">
               <TrendingUp className="w-5 h-5" />
             </div>
@@ -194,16 +195,25 @@ export const Dashboard = ({}: DashboardProps) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Trend Chart */}
-          <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] shadow-sm border border-outline-variant/10">
+          <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] shadow-sm border-2 border-secondary/15 hover:border-secondary/60 hover:shadow-lg transition-all card-hover-enhance">
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h3 className="text-xl font-black text-[#0F172A] font-headline">Tendencia de Ventas</h3>
                 <p className="text-sm text-[#0F172A]/60 font-bold uppercase tracking-widest">Últimos 7 días</p>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-black">
-                <TrendingUp className="w-3 h-3" />
-                <span>+12.5%</span>
-              </div>
+              {(() => {
+                const today = new Date().toISOString().split('T')[0];
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                const todayTotal = salesHistory.filter(s => s.date.split('T')[0] === today).reduce((s, x) => s + x.total, 0);
+                const yesterdayTotal = salesHistory.filter(s => s.date.split('T')[0] === yesterday).reduce((s, x) => s + x.total, 0);
+                const pct = yesterdayTotal > 0 ? Math.round(((todayTotal - yesterdayTotal) / yesterdayTotal) * 100) : (todayTotal > 0 ? 100 : 0);
+                return (
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black ${pct >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    <TrendingUp className="w-3 h-3" />
+                    <span>{pct >= 0 ? '+' : ''}{pct}% hoy</span>
+                  </div>
+                );
+              })()}
             </div>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -246,7 +256,7 @@ export const Dashboard = ({}: DashboardProps) => {
           </div>
 
           {/* Top Products */}
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-outline-variant/10">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border-2 border-secondary/15 hover:border-secondary/60 hover:shadow-lg transition-all card-hover-enhance">
             <h3 className="text-xl font-black text-[#0F172A] font-headline mb-8">Top 5 Productos</h3>
             <div className="h-[300px] w-full">
               {productSales.length > 0 ? (
@@ -284,7 +294,7 @@ export const Dashboard = ({}: DashboardProps) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-outline-variant/10">
+          <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-secondary/15 hover:border-secondary/60 hover:shadow-lg transition-all card-hover-enhance">
             <h3 className="text-xl font-black text-[#0F172A] mb-6 flex items-center gap-2">
               <History className="w-5 h-5 text-secondary" />
               Últimas <span className="text-secondary">Ventas</span>
@@ -314,7 +324,7 @@ export const Dashboard = ({}: DashboardProps) => {
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl shadow-sm border border-outline-variant/10">
+          <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-error/15 hover:border-error/60 hover:shadow-lg transition-all card-hover-enhance">
             <h3 className="text-xl font-black text-[#0F172A] mb-6 flex items-center gap-2">
               <Bell className="w-5 h-5 text-error" />
               Alertas de <span className="text-secondary">Reposición</span>
@@ -342,6 +352,7 @@ export const Dashboard = ({}: DashboardProps) => {
           </div>
         </div>
       </main>
+      <NotificationsPanel />
     </div>
   );
 };

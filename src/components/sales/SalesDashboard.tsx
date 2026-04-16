@@ -18,6 +18,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { SideNavBar } from '../layout/SideNavBar';
+import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
 
 interface SalesDashboardProps {
@@ -26,15 +27,14 @@ interface SalesDashboardProps {
 
 export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   const { ui, pos, app } = useAppContexts();
-  const { setCurrentPage, setShowCashRegisterModal } = ui;
+  const { setCurrentPage, setShowCashRegisterModal, setShowNotificationsPanel } = ui;
   const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
-  const { clientInventory: inventory, setClientInventory: setInventory, clientFiados: fiados, setClientFiados: setFiados, clientCashRegister: cashRegister, setClientCashRegister: setCashRegister, clientUsers: users } = app;
+  const { clientInventory: inventory, setClientInventory: setInventory, clientFiados: fiados, setClientFiados: setFiados, clientCashRegister: cashRegister, setClientCashRegister: setCashRegister, clientUsers: users, setClientSalesHistory, activePosId } = app;
 
   const [cart, setCart] = useState<any[]>([]);
   const [barcode, setBarcode] = useState('');
   const [showCashModal, setShowCashModal] = useState(false);
   const [amountReceived, setAmountReceived] = useState('');
-  const [showCustomerView, setShowCustomerView] = useState(false);
   const [lastScanned, setLastScanned] = useState<{name: string, price: number} | null>(null);
 
   const [showFiadoModal, setShowFiadoModal] = useState(false);
@@ -77,6 +77,36 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const change = amountReceived ? Math.max(0, parseInt(amountReceived.replace(/\D/g, '')) - total) : 0;
 
+  // Sync cart to localStorage for customer view
+  useEffect(() => {
+    localStorage.setItem('pos-cart', JSON.stringify(cart));
+  }, [cart]);
+
+  // Sync payment modal state in real-time to customer screen
+  useEffect(() => {
+    if (showCashModal) {
+      const received = parseInt(amountReceived.replace(/\D/g, '')) || 0;
+      localStorage.setItem('pos-payment', JSON.stringify({
+        method: 'Efectivo',
+        total,
+        amountReceived: received,
+        change: Math.max(0, received - total),
+        sufficient: received >= total
+      }));
+    } else if (showFiadoModal) {
+      const clientName = selectedFiadoClient === 'new'
+        ? newFiadoClient.name
+        : fiados.find(c => c.id.toString() === selectedFiadoClient)?.name || '';
+      localStorage.setItem('pos-payment', JSON.stringify({
+        method: 'Fiado',
+        total,
+        clientName
+      }));
+    } else {
+      localStorage.removeItem('pos-payment');
+    }
+  }, [showCashModal, showFiadoModal, amountReceived, total, selectedFiadoClient, newFiadoClient.name]);
+
   const playBeep = () => {
     const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
     audio.play().catch(() => {});
@@ -84,6 +114,12 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
   const handleAddToCart = (product: any) => {
     playBeep();
+
+    // Limpiar venta completada anterior si comienza una nueva compra
+    if (cart.length === 0) {
+      localStorage.removeItem('pos-sale-completed');
+    }
+
     setLastScanned({ name: product.name, price: product.price });
     const existing = cart.find(item => item.id === product.id);
     if (existing) {
@@ -148,18 +184,22 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     setInventory(updatedInventory);
 
     // Save last sale for ticket
+    const saleId = Date.now();
     const saleData = {
-      id: Date.now(),
+      id: saleId,
+      posId: activePosId,
       cart: [...cart],
       total,
+      subtotal,
       profit: saleProfit,
       change,
       date: new Date().toISOString(),
-      paymentMethod: method
+      paymentMethod: method,
+      user: currentUser?.name || 'Sistema'
     };
-    
+
     if (method === 'Efectivo') {
-      setCashRegister((prev: any) => ({ ...prev, currentCash: prev.currentCash + total }));
+      setCashRegister({ ...cashRegister, currentCash: cashRegister.currentCash + total });
     } else if (method === 'Fiado') {
       let updatedFiados = [...fiados];
       if (selectedFiadoClient === 'new') {
@@ -202,10 +242,34 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     }
 
     setLastSale({ ...saleData, date: new Date(saleData.date) });
-    onSaleComplete(saleData);
+    onSaleComplete?.(saleData);
+
+    // Guardar venta en historial (conecta con KPIs, Dashboard y Historial)
+    setClientSalesHistory((prev: any[]) => [saleData, ...prev]);
+
+    // Limpiar estado de pago en progreso y sincronizar venta completada al panel cliente
+    localStorage.removeItem('pos-payment');
+    const fiadoClientName = selectedFiadoClient === 'new'
+      ? newFiadoClient.name
+      : fiados.find(c => c.id.toString() === selectedFiadoClient)?.name;
+
+    localStorage.setItem('pos-sale-completed', JSON.stringify({
+      id: saleId,
+      cart: [...cart],
+      total,
+      subtotal,
+      change,
+      paymentMethod: method,
+      date: new Date().toISOString(),
+      fiadoInfo: method === 'Fiado' ? {
+        clientName: fiadoClientName,
+        dueDate: fiadoDueDate
+      } : null
+    }));
+
     setShowTicketModal(true);
 
-    // Reset state
+    // Reset state - pero MANTENER caja abierta
     setCart([]);
     setShowCashModal(false);
     setShowFiadoModal(false);
@@ -251,18 +315,23 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
               <Banknote className="w-5 h-5" />
               <span>{cashRegister.isOpen ? 'Caja Abierta' : 'Abrir Caja'}</span>
             </button>
-            <button 
+            <button
               className="flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary font-bold rounded-lg hover:bg-secondary/20 transition-colors"
-              onClick={() => window.open('?view=customer', '_blank')}
+              onClick={() => {
+                localStorage.setItem('pos-store-info', JSON.stringify({
+                  storeName: currentStore?.name,
+                  posName: currentPOS?.name
+                }));
+                window.open('?view=customer', '_blank');
+              }}
             >
               <Monitor className="w-5 h-5" />
               <span className="hidden sm:inline">Pantalla Cliente</span>
             </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
               <Bell className="w-5 h-5 text-on-surface-variant" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
             </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
@@ -568,6 +637,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
         </div>
       </main>
 
+      <NotificationsPanel />
+
       {/* Cash Payment Modal */}
       <AnimatePresence>
         {showCashModal && (
@@ -813,7 +884,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
-              className="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+              className="print-ticket bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col"
             >
               <div className="bg-secondary p-6 text-white text-center relative">
                 <div className="absolute -bottom-3 left-0 right-0 flex justify-around">
@@ -867,7 +938,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 <div className="text-center space-y-4">
                   <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/10">
                     <p className="text-[10px] font-bold text-outline-variant uppercase tracking-widest mb-1">Código de Operación</p>
-                    <p className="text-xs font-mono font-bold">#VT-{Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}</p>
+                    <p className="text-xs font-mono font-bold">#VT-{lastSale?.id?.toString().slice(-6).padStart(6, '0')}</p>
                   </div>
                 </div>
               </div>

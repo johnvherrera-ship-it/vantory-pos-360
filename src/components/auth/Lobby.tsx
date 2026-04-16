@@ -1,6 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Globe, Monitor, ArrowLeft, X } from 'lucide-react';
+
+const useRipple = () => {
+  const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
+
+  const addRipple = (e: React.MouseEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const id = Date.now();
+    setRipples([...ripples, { id, x, y }]);
+    setTimeout(() => setRipples(r => r.filter(ripple => ripple.id !== id)), 600);
+  };
+
+  return { ripples, addRipple };
+};
 
 interface LobbyProps {
   stores: any[];
@@ -11,18 +26,19 @@ interface LobbyProps {
   currentUser: any;
 }
 
-export const Lobby = ({ 
-  stores, 
-  posMachines, 
-  setCurrentStore, 
-  setCurrentPOS, 
-  setCurrentPage, 
-  currentUser 
+export const Lobby = ({
+  stores,
+  posMachines,
+  setCurrentStore,
+  setCurrentPOS,
+  setCurrentPage,
+  currentUser
 }: LobbyProps) => {
   const [step, setStep] = useState<'select-store' | 'enter-pin' | 'select-pos'>('select-store');
   const [selectedStoreTemp, setSelectedStoreTemp] = useState<any>(null);
   const [pinInput, setPinInput] = useState('');
   const [error, setError] = useState('');
+  const { ripples, addRipple } = useRipple();
 
   const handleStoreSelect = (store: any) => {
     setSelectedStoreTemp(store);
@@ -57,20 +73,41 @@ export const Lobby = ({
 
       <div className="relative z-10 w-full max-w-2xl px-6 py-12">
         <div className="flex justify-center items-center gap-2 mb-8">
-          <div className={`flex flex-col items-center gap-1 ${step === 'select-store' ? 'opacity-100' : 'opacity-40'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 'select-store' ? 'bg-secondary text-white' : 'bg-surface-container-low text-on-surface-variant'}`}>1</div>
-            <span className="text-[10px] font-bold uppercase tracking-widest">Sucursal</span>
-          </div>
-          <div className={`h-1 w-8 ${step !== 'select-store' ? 'bg-secondary' : 'bg-surface-container-low'}`}></div>
-          <div className={`flex flex-col items-center gap-1 ${step === 'enter-pin' ? 'opacity-100' : 'opacity-40'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 'enter-pin' ? 'bg-secondary text-white' : 'bg-surface-container-low text-on-surface-variant'}`}>2</div>
-            <span className="text-[10px] font-bold uppercase tracking-widest">PIN</span>
-          </div>
-          <div className={`h-1 w-8 ${step === 'select-pos' ? 'bg-secondary' : 'bg-surface-container-low'}`}></div>
-          <div className={`flex flex-col items-center gap-1 ${step === 'select-pos' ? 'opacity-100' : 'opacity-40'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 'select-pos' ? 'bg-secondary text-white' : 'bg-surface-container-low text-on-surface-variant'}`}>3</div>
-            <span className="text-[10px] font-bold uppercase tracking-widest">Caja</span>
-          </div>
+          {[
+            { label: 'Sucursal', number: 1, key: 'select-store' },
+            { label: 'PIN', number: 2, key: 'enter-pin' },
+            { label: 'Caja', number: 3, key: 'select-pos' }
+          ].map((item, idx) => (
+            <React.Fragment key={item.key}>
+              <motion.div
+                animate={{ opacity: step === item.key ? 1 : 0.4 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col items-center gap-1"
+              >
+                <motion.div
+                  animate={{
+                    backgroundColor: step === item.key ? 'rgb(51, 95, 157)' : 'rgb(242, 243, 255)',
+                    color: step === item.key ? 'white' : 'rgb(69, 70, 77)',
+                    scale: step === item.key ? 1.1 : 1
+                  }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all"
+                >
+                  {item.number}
+                </motion.div>
+                <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+              </motion.div>
+              {idx < 2 && (
+                <motion.div
+                  animate={{
+                    backgroundColor: step !== 'select-store' && idx === 0 || step === 'select-pos' && idx === 1 ? 'rgb(51, 95, 157)' : 'rgb(242, 243, 255)',
+                    width: step !== 'select-store' && idx === 0 || step === 'select-pos' && idx === 1 ? '32px' : '32px'
+                  }}
+                  transition={{ duration: 0.4 }}
+                  className="h-1"
+                />
+              )}
+            </React.Fragment>
+          ))}
         </div>
 
         <div className="text-center mb-10">
@@ -94,22 +131,35 @@ export const Lobby = ({
                 exit={{ opacity: 0, y: -20 }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
-                {stores.map((store: any) => (
-                  <button
+                {stores.map((store: any, idx: number) => (
+                  <motion.button
                     key={store.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
                     onClick={() => handleStoreSelect(store)}
-                    className="p-6 text-left rounded-xl border-2 border-outline-variant/20 hover:border-secondary hover:bg-secondary/5 transition-all group"
+                    whileHover={{ scale: 1.05, y: -4 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-6 text-left rounded-xl border-2 border-secondary/25 hover:border-secondary/70 hover:bg-secondary/5 transition-all group relative overflow-hidden card-hover-enhance"
                   >
-                    <div className="flex items-center gap-4 mb-2">
-                      <div className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center group-hover:bg-secondary group-hover:text-white transition-colors">
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100"
+                      animate={{ opacity: [0, 0.05, 0] }}
+                      transition={{ duration: 4, repeat: Infinity, delay: idx * 0.2 }}
+                    />
+                    <div className="flex items-center gap-4 mb-2 relative z-10">
+                      <motion.div
+                        whileHover={{ scale: 1.2, rotate: 8 }}
+                        className="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center group-hover:bg-secondary group-hover:text-white transition-colors"
+                      >
                         <Globe className="w-6 h-6" />
-                      </div>
+                      </motion.div>
                       <div>
                         <h3 className="font-bold text-lg text-on-surface">{store.name}</h3>
                         <p className="text-sm text-on-surface-variant">{store.address}</p>
                       </div>
                     </div>
-                  </button>
+                  </motion.button>
                 ))}
               </motion.div>
             )}
@@ -139,40 +189,68 @@ export const Lobby = ({
                   {/* Keypad */}
                   <div className="grid grid-cols-3 gap-3">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                      <button
+                      <motion.button
                         key={num}
                         type="button"
-                        onClick={() => {
+                        onClick={(e) => {
                           if (pinInput.length < 4) setPinInput(prev => prev + num);
+                          addRipple(e);
                         }}
-                        className="py-4 text-2xl font-bold bg-surface-container-low hover:bg-surface-container-high rounded-xl transition-colors"
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.92 }}
+                        className="py-4 text-2xl font-bold bg-surface-container-low hover:bg-surface-container-high rounded-xl transition-colors relative overflow-hidden group"
                       >
-                        {num}
-                      </button>
+                        <span className="relative">{num}</span>
+                        {ripples.map(ripple => (
+                          <motion.span
+                            key={ripple.id}
+                            className="absolute w-1 h-1 rounded-full bg-secondary/50"
+                            style={{ left: ripple.x, top: ripple.y }}
+                            animate={{ scale: [1, 40], opacity: [0.6, 0] }}
+                            transition={{ duration: 0.6 }}
+                          />
+                        ))}
+                      </motion.button>
                     ))}
-                    <button
+                    <motion.button
                       type="button"
                       onClick={() => setStep('select-store')}
-                      className="py-4 text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center"
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.92 }}
+                      className="py-4 text-sm font-bold text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center rounded-xl hover:bg-surface-container-low"
                     >
                       <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
                         if (pinInput.length < 4) setPinInput(prev => prev + '0');
+                        addRipple(e);
                       }}
-                      className="py-4 text-2xl font-bold bg-surface-container-low hover:bg-surface-container-high rounded-xl transition-colors"
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.92 }}
+                      className="py-4 text-2xl font-bold bg-surface-container-low hover:bg-surface-container-high rounded-xl transition-colors relative overflow-hidden"
                     >
-                      0
-                    </button>
-                    <button
+                      <span className="relative">0</span>
+                      {ripples.map(ripple => (
+                        <motion.span
+                          key={ripple.id}
+                          className="absolute w-1 h-1 rounded-full bg-secondary/50"
+                          style={{ left: ripple.x, top: ripple.y }}
+                          animate={{ scale: [1, 40], opacity: [0.6, 0] }}
+                          transition={{ duration: 0.6 }}
+                        />
+                      ))}
+                    </motion.button>
+                    <motion.button
                       type="button"
                       onClick={() => setPinInput(prev => prev.slice(0, -1))}
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.92 }}
                       className="py-4 text-sm font-bold text-error hover:bg-error/10 rounded-xl transition-colors flex items-center justify-center"
                     >
                       <X className="w-6 h-6" />
-                    </button>
+                    </motion.button>
                   </div>
 
                   <button
@@ -194,25 +272,43 @@ export const Lobby = ({
                 exit={{ opacity: 0, y: -20 }}
                 className="grid grid-cols-1 sm:grid-cols-2 gap-4"
               >
-                {posMachines.filter((p: any) => p.storeId === selectedStoreTemp?.id).map((pos: any) => (
-                  <button
+                {posMachines.filter((p: any) => p.storeId === selectedStoreTemp?.id).map((pos: any, idx: number) => (
+                  <motion.button
                     key={pos.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
                     onClick={() => handlePosSelect(pos)}
-                    className="p-6 flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-outline-variant/20 hover:border-secondary hover:bg-secondary/5 transition-all group"
+                    whileHover={{ scale: 1.05, y: -4 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-6 flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-secondary/25 hover:border-secondary/70 hover:bg-secondary/5 transition-all group relative overflow-hidden card-hover-enhance"
                   >
-                    <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center group-hover:bg-secondary group-hover:text-white transition-colors">
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100"
+                      animate={{ opacity: [0, 0.05, 0] }}
+                      transition={{ duration: 4, repeat: Infinity, delay: idx * 0.2 }}
+                    />
+                    <motion.div
+                      whileHover={{ scale: 1.2, rotate: -8 }}
+                      className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center group-hover:bg-secondary group-hover:text-white transition-colors relative z-10"
+                    >
                       <Monitor className="w-8 h-8" />
-                    </div>
-                    <h3 className="font-bold text-xl text-on-surface">{pos.name}</h3>
-                  </button>
+                    </motion.div>
+                    <h3 className="font-bold text-xl text-on-surface relative z-10">{pos.name}</h3>
+                  </motion.button>
                 ))}
-                <button
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: posMachines.filter((p: any) => p.storeId === selectedStoreTemp?.id).length * 0.1 }}
                   onClick={() => setStep('select-store')}
-                  className="p-6 flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-outline-variant/30 hover:border-outline-variant transition-all text-on-surface-variant"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-6 flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-outline-variant/30 hover:border-outline-variant hover:bg-surface-container-low/50 transition-all text-on-surface-variant"
                 >
                   <ArrowLeft className="w-8 h-8" />
                   <span className="font-bold">Volver</span>
-                </button>
+                </motion.button>
               </motion.div>
             )}
           </AnimatePresence>

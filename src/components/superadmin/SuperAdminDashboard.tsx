@@ -26,7 +26,7 @@ interface SuperAdminDashboardProps {
   currentUser: any;
 }
 
-export const SuperAdminDashboard = ({ 
+const SuperAdminDashboard = ({ 
   setCurrentPage, 
   vantoryClients, 
   currentUser 
@@ -198,3 +198,5 @@ export const SuperAdminDashboard = ({
     </div>
   );
 };
+
+export default SuperAdminDashboard;

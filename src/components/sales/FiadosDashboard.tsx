@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Search, 
-  Printer, 
-  X 
+import {
+  Search,
+  Printer,
+  X,
+  Bell,
+  Settings,
+  LogOut
 } from 'lucide-react';
 import { SideNavBar } from '../layout/SideNavBar';
+import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
 
 interface FiadosDashboardProps {}
 
 export const FiadosDashboard = ({}: FiadosDashboardProps) => {
   const { ui, pos, app } = useAppContexts();
-  const { setCurrentPage } = ui;
+  const { setCurrentPage, setShowNotificationsPanel } = ui;
   const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
   const { clientFiados: fiados, setClientFiados: setFiados, clientUsers: users } = app;
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -109,10 +113,40 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="fiados" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       <main className="flex-1 ml-64 flex flex-col h-screen overflow-y-auto p-8">
-        <header className="mb-8 flex justify-between items-start">
+        <header className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Gestión de <span className="text-secondary">Fiados</span></h1>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">OPERACIONES &gt; FIADOS</p>
+            <p className="text-[#0F172A]/70 font-bold text-lg">Control de créditos y deudas de clientes.</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+              <Bell className="w-5 h-5 text-on-surface-variant" />
+              {clientsWithDebt > 0 && <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-error rounded-full text-white text-[9px] font-black flex items-center justify-center border border-white">{clientsWithDebt > 9 ? '9+' : clientsWithDebt}</span>}
+            </button>
+            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+              <Settings className="w-5 h-5 text-on-surface-variant" />
+            </button>
+            <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden md:block">
+                <p className="text-sm font-black text-[#0F172A]">{currentUser?.name || 'Admin Vantory'}</p>
+                <p className="text-xs text-secondary font-bold">{currentUser?.role || 'Soporte Técnico'}</p>
+              </div>
+              <img
+                className="w-10 h-10 rounded-full border-2 border-surface-container-highest object-cover"
+                src={currentUser?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuAPTOJksruGaNQm6gW0cTKsmHx_gthleGI0Hy70R56Q1oJ4i9lW0iL4JU8oXMoZAshoKE8S3a1-5NvKCV26POVasYgktSZtJpP6RHaMYbMEtqakjdL7rtnYFQso4Kzl5w6R3449pD-nViJIAngGkUqQijX4Zz9xtfKBk4SztlssTnGEGmOQeqPZsahAs-DUJ7tdh68w9VguZXCBAxiCk5XRvvm-GQdW31C8hvfujnZJlbpJ3SVzXGcnVimo2ARlMqv9ks88IY_RN2o_"}
+                alt="User"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+            <button
+              onClick={() => { setCurrentUser(null); setCurrentPage('home'); }}
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2"
+              title="Cerrar Sesión"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </header>
 
@@ -377,6 +411,7 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
           </motion.div>
         )}
       </AnimatePresence>
+      <NotificationsPanel />
     </div>
   );
 };

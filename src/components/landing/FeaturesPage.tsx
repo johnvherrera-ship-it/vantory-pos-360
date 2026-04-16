@@ -116,17 +116,26 @@ export const FeaturesPage = ({ setCurrentPage = () => {} }: FeaturesPageProps) =
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.12, duration: 0.6 }}
-              whileHover={{ y: -12, boxShadow: '0 40px 80px -20px rgba(38,124,220,0.2)' }}
-              className="bg-gradient-to-br from-white to-surface-container-lowest/40 p-10 rounded-[2.8rem] border border-secondary/10 hover:border-secondary/30 shadow-lg hover:shadow-2xl transition-all group relative overflow-hidden"
+              whileHover={{ y: -16, boxShadow: '0 0 40px rgba(51,95,157,0.5), 0 0 80px rgba(51,95,157,0.3)' }}
+              className="bg-gradient-to-br from-white to-surface-container-lowest/40 p-10 rounded-[2.8rem] border-2 border-secondary/20 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative overflow-hidden card-hover-enhance"
             >
-              {/* Gradient background on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              {/* Gradient background on hover - animated */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                animate={{ opacity: [0, 0.05, 0] }}
+                transition={{ duration: 4, repeat: Infinity, delay: i * 0.2 }}
+              />
 
               <motion.div
-                whileHover={{ scale: 1.15, rotate: 8 }}
-                className="relative w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center text-secondary mb-8 group-hover:bg-secondary group-hover:text-white transition-all shadow-lg"
+                whileHover={{ scale: 1.25, rotate: 12 }}
+                className="relative w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center text-secondary mb-8 group-hover:bg-secondary group-hover:text-white transition-all shadow-lg group-hover:shadow-xl"
               >
                 <feature.icon className="w-8 h-8" />
+                <motion.div
+                  className="absolute inset-0 bg-secondary/20 rounded-2xl opacity-0 group-hover:opacity-20"
+                  animate={{ scale: [1, 1.5, 1] }}
+                  transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                />
               </motion.div>
 
               <h3 className="text-2xl font-black text-[#0F172A] mb-4 font-headline relative z-10">{feature.title}</h3>
@@ -204,8 +213,18 @@ export const FeaturesPage = ({ setCurrentPage = () => {} }: FeaturesPageProps) =
                     viewport={{ once: true }}
                     className="flex items-start gap-4 group"
                   >
-                    <motion.div className="mt-1 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                      <Check className="w-4 h-4 text-green-600" strokeWidth={3} />
+                    <motion.div
+                      className="mt-1 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0 group-hover:scale-125 transition-transform"
+                      whileHover={{ rotate: 12 }}
+                    >
+                      <motion.div
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        transition={{ duration: 0.6, delay: i * 0.1 }}
+                        viewport={{ once: true }}
+                      >
+                        <Check className="w-4 h-4 text-green-600" strokeWidth={3} />
+                      </motion.div>
                     </motion.div>
                     <p className="font-bold text-on-surface text-base leading-relaxed">{item}</p>
                   </motion.li>
@@ -276,15 +295,14 @@ export const FeaturesPage = ({ setCurrentPage = () => {} }: FeaturesPageProps) =
                 href="https://wa.me/56920182313?text=Hola,%20me%20gustaría%20solicitar%20una%20demo%20de%20VANTORY%20POS%20360"
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.08, y: -4 }}
+                whileHover={{ scale: 1.12, y: -6 }}
                 whileTap={{ scale: 0.92 }}
-                className="px-12 py-6 bg-gradient-secondary text-white font-black text-lg rounded-2xl shadow-2xl shadow-secondary/30 hover:shadow-secondary/50 transition-all flex items-center justify-center gap-3 group relative overflow-hidden"
+                className="px-12 py-6 bg-gradient-secondary text-white font-black text-lg rounded-2xl shadow-2xl shadow-secondary/30 hover:shadow-secondary/50 transition-all flex items-center justify-center gap-3 group relative overflow-hidden animate-glow"
               >
                 <motion.div
-                  initial={{ opacity: 0, x: -100 }}
-                  animate={{ opacity: 0.15, x: 0 }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  className="absolute inset-0 bg-white/10"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
+                  animate={{ x: ['-100%', '100%'] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
                 />
                 <span className="relative">Solicitar Demo Gratuita</span>
                 <motion.div className="relative" whileHover={{ x: 4 }}>

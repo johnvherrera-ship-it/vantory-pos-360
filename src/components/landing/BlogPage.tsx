@@ -134,18 +134,26 @@ export const BlogPage = () => {
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.3 }}
-          className="relative h-[600px] rounded-[3.5rem] overflow-hidden mb-20 group cursor-pointer shadow-2xl hover:shadow-2xl transition-all border-2 border-white/10"
+          className="relative h-[600px] rounded-[3.5rem] overflow-hidden mb-20 group cursor-pointer shadow-2xl hover:shadow-3xl transition-all border-3 border-white/20 hover:border-secondary/60 card-hover-enhance"
         >
           <motion.img
-            whileHover={{ scale: 1.08 }}
+            whileHover={{ scale: 1.12 }}
             transition={{ duration: 0.8 }}
             src={posts[0].image}
             alt="Featured"
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/50 to-transparent group-hover:via-[#0F172A]/40 transition-all" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/40 to-transparent opacity-40 group-hover:opacity-30 transition-opacity" />
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/50 to-transparent"
+            animate={{ opacity: [0.5, 0.6, 0.5] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/40 to-transparent opacity-40 group-hover:opacity-20"
+            whileHover={{ opacity: 0.2 }}
+            transition={{ duration: 0.3 }}
+          />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -193,22 +201,27 @@ export const BlogPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.12, duration: 0.6 }}
-              whileHover={{ y: -12 }}
+              whileHover={{ y: -16, rotateX: 2, rotateY: -2 }}
+              style={{ perspective: 1000 }}
               className="group cursor-pointer"
             >
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="relative h-72 rounded-[2.5rem] overflow-hidden mb-8 shadow-lg hover:shadow-xl transition-all border border-secondary/5"
+                whileHover={{ scale: 1.08 }}
+                className="relative h-72 rounded-[2.5rem] overflow-hidden mb-8 shadow-lg hover:shadow-2xl transition-all border-2 border-secondary/15 hover:border-secondary/60 card-hover-enhance"
               >
                 <motion.img
-                  whileHover={{ scale: 1.12 }}
+                  whileHover={{ scale: 1.15 }}
                   transition={{ duration: 0.7 }}
                   src={post.image}
                   alt={post.title}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                  animate={{ opacity: [0, 0.1, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, delay: i * 0.15 }}
+                />
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -254,7 +267,7 @@ export const BlogPage = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-32 bg-gradient-to-br from-secondary via-secondary to-secondary/90 text-white rounded-[3.5rem] p-12 md:p-24 relative overflow-hidden shadow-2xl shadow-secondary/30 border border-white/10"
+          className="mt-32 bg-gradient-to-br from-secondary via-secondary to-secondary/90 text-white rounded-[3.5rem] p-12 md:p-24 relative overflow-hidden shadow-2xl shadow-secondary/30 border border-white/10 animate-glow"
         >
           {/* Animated background elements */}
           <div className="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">

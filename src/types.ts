@@ -2,6 +2,7 @@
 export interface User {
   id: number;
   clientId: number;
+  storeId?: number | null;
   name: string;
   email: string;
   role: string;
@@ -23,6 +24,8 @@ export interface POS {
   storeId: number;
   clientId: number;
   name: string;
+  status?: string;
+  lastSync?: string;
 }
 
 export interface Product {
@@ -33,9 +36,12 @@ export interface Product {
   cost: number;
   price: number;
   stock: number;
+  minStock?: number;
+  unit?: string;
   sku: string;
   isFavorite: boolean;
   image: string;
+  margin?: number;
 }
 
 export interface Sale {
