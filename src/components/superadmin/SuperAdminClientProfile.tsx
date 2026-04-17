@@ -95,19 +95,25 @@ const SuperAdminClientProfile = ({
       await supabaseService.updateUser(editingUser.id, { name, email, role, status, modules, storeId: storeId ? parseInt(storeId) : null });
       setLocalUsers(localUsers.map((u: any) => u.id === editingUser.id ? { ...u, name, email, role, status, modules, storeId: storeId ? parseInt(storeId) : null } : u));
     } else {
-      const newUser = {
-        clientId: client.id,
-        storeId: storeId ? parseInt(storeId) : null,
-        name,
-        email,
-        password,
-        role,
-        status,
-        modules,
-        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80'
-      };
-      const saved = await supabaseService.createUser(newUser);
-      setLocalUsers([...localUsers, { ...newUser, id: saved.id }]);
+      try {
+        const newUser = {
+          clientId: client.id,
+          storeId: storeId ? parseInt(storeId) : null,
+          name,
+          email,
+          password,
+          role,
+          status,
+          modules,
+          image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80'
+        };
+        const saved = await supabaseService.createUser(newUser);
+        setLocalUsers([...localUsers, { ...newUser, id: saved.id }]);
+      } catch (error) {
+        console.error('Error creating user:', error);
+        alert('Error al crear usuario. Revise que el email sea único.');
+        return;
+      }
     }
     setShowUserModal(false);
     setEditingUser(null);

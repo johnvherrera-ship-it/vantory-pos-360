@@ -114,7 +114,7 @@ export const supabaseService = {
     })) as User[];
   },
 
-  async createUser(user: Partial<User> & { clientId: number }) {
+  async createUser(user: Partial<User> & { clientId: number; password?: string }) {
     const { data, error } = await supabase
       .from('users')
       .insert({
@@ -122,13 +122,14 @@ export const supabaseService = {
         store_id: user.storeId,
         name: user.name,
         email: user.email,
+        password: user.password,
         role: user.role,
         modules: user.modules,
         status: user.status || 'active',
         image_url: user.image
       })
       .select();
-    
+
     if (error) throw error;
     return {
       ...data[0],

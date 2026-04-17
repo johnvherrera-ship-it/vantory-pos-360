@@ -76,7 +76,7 @@ export const SideNavBar = ({
         </div>
       )}
       
-      <nav className="flex-1 overflow-y-auto">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden">
         <div className="px-6 mb-2 mt-4 text-[11px] font-black text-white/60 uppercase tracking-[0.25em] flex items-center gap-2 animate-pulse drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
           General
           <div className="h-[1px] flex-1 bg-white/10 overflow-hidden relative">
