@@ -1,3 +1,12 @@
+export interface CartItem {
+  id: number;
+  name: string;
+  sku: string;
+  price: number;
+  cost: number;
+  quantity: number;
+  isFavorite?: boolean;
+}
 
 export interface User {
   id: number;
@@ -50,9 +59,15 @@ export interface Sale {
   posId: number;
   date: string;
   total: number;
+  subtotal?: number;
   paymentMethod: string;
-  cart: any[];
+  cart: CartItem[];
   user?: string;
+  change?: number;
+  fiadoInfo?: {
+    clientName: string;
+    dueDate: string;
+  };
 }
 
 export interface StockEntry {
@@ -67,13 +82,20 @@ export interface StockEntry {
   image: string;
 }
 
+export interface FiadoTransaction {
+  id: number;
+  date: string;
+  amount: number;
+  description: string;
+}
+
 export interface Fiado {
   id: number;
   clientId: number;
   name: string;
   phone: string;
   totalDebt: number;
-  history: any[];
+  history: FiadoTransaction[];
 }
 
 export interface CashRegister {
@@ -108,3 +130,10 @@ export interface SaaSClient {
   mrr: number;
   joinDate: string;
 }
+
+export type PageName =
+  | 'home' | 'features' | 'blog'
+  | 'login' | 'lobby'
+  | 'sales' | 'dashboard' | 'history' | 'entries' | 'kpis' | 'fiados'
+  | 'superadmin-dashboard' | 'superadmin-clients' | 'superadmin-client-profile'
+  | 'customer-view';

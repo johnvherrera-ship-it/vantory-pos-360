@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Plus, 
-  Search, 
-  Package, 
-  CreditCard, 
-  Banknote, 
-  Wallet, 
-  Monitor, 
-  Star, 
-  Filter, 
-  Printer, 
-  X, 
+import {
+  Plus,
+  Search,
+  Package,
+  CreditCard,
+  Banknote,
+  Wallet,
+  Monitor,
+  Star,
+  Filter,
+  Printer,
+  X,
   CheckCircle,
   Bell,
   Settings,
   LogOut
 } from 'lucide-react';
+import { CartItem } from '../../types';
 import { SideNavBar } from '../layout/SideNavBar';
 import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
@@ -31,7 +32,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
   const { clientInventory: inventory, setClientInventory: setInventory, clientFiados: fiados, setClientFiados: setFiados, clientCashRegister: cashRegister, setClientCashRegister: setCashRegister, clientUsers: users, setClientSalesHistory, activePosId } = app;
 
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState('');
   const [showCashModal, setShowCashModal] = useState(false);
   const [amountReceived, setAmountReceived] = useState('');
@@ -46,11 +47,11 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     return date.toISOString().split('T')[0];
   });
   const [surcharge, setSurcharge] = useState('');
-  const [pausedSales, setPausedSales] = useState<{cart: any[], total: number, timestamp: Date}[]>([]);
+  const [pausedSales, setPausedSales] = useState<{cart: CartItem[], total: number, timestamp: Date}[]>([]);
   const [showPausedModal, setShowPausedModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showTicketModal, setShowTicketModal] = useState(false);
-  const [lastSale, setLastSale] = useState<{cart: any[], total: number, change: number, date: Date} | null>(null);
+  const [lastSale, setLastSale] = useState<{cart: CartItem[], total: number, change: number, date: Date} | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
