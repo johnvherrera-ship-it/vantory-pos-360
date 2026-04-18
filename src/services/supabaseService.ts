@@ -297,7 +297,6 @@ export const supabaseService = {
         .from('sales')
         .insert({
           client_id: sale.clientId,
-          store_id: (sale as any).storeId,
           pos_id: sale.posId,
           total: sale.total,
           payment_method: sale.paymentMethod,
@@ -378,12 +377,10 @@ export const supabaseService = {
         .from('fiados')
         .insert({
           client_id: fiado.clientId,
-          store_id: fiado.storeId,
-          customer_name: fiado.customerName,
-          total_amount: fiado.totalAmount,
-          paid_amount: fiado.paidAmount,
-          status: fiado.status || 'pending',
-          created_at: new Date().toISOString()
+          name: fiado.name || fiado.customerName,
+          phone: fiado.phone || '',
+          total_debt: fiado.totalDebt || fiado.total || 0,
+          history: fiado.history || []
         })
         .select();
       if (error) throw error;
