@@ -382,9 +382,6 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
             <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
               <Bell className="w-5 h-5 text-on-surface-variant" />
             </button>
-            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
-              <Settings className="w-5 h-5 text-on-surface-variant" />
-            </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
             <div className="flex items-center gap-3">
               <div className="text-right hidden md:block">
@@ -532,8 +529,67 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
           {/* Right Side: Cart / Summary */}
           <section className="flex-1 bg-surface-container-low p-6 flex flex-col border-l border-outline-variant/20 overflow-hidden">
-            {/* Payment & Checkout - MOVED TO TOP */}
-            <div className="bg-gradient-to-br from-secondary via-[#335f9d] to-[#174986] p-6 rounded-2xl border-2 border-secondary/30 mb-6 shadow-lg">
+            {/* Cart - Grows Dynamically - TOP */}
+            <div className="flex-1 flex flex-col overflow-hidden min-h-0 mb-6">
+              <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border border-outline-variant/20 overflow-hidden flex-1 flex flex-col">
+                {/* Cart Header */}
+                <div className="p-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
+                  <h3 className="text-sm font-black text-[#0F172A] tracking-widest uppercase"><span className="text-secondary">CARRITO</span> <span className="text-[#0F172A]/70">({totalItems})</span></h3>
+                  <div className="flex gap-2">
+                    {pausedSales.length > 0 && (
+                      <button onClick={() => setShowPausedModal(true)} className="text-xs font-bold text-blue-600 border border-blue-600/30 px-3 py-1 rounded-full hover:bg-blue-600/5 transition-colors">
+                        Recuperar ({pausedSales.length})
+                      </button>
+                    )}
+                    <button
+                      onClick={handlePauseSale}
+                      disabled={cart.length === 0}
+                      className="text-xs font-bold text-secondary border border-secondary/30 px-3 py-1 rounded-full hover:bg-secondary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Pausar
+                    </button>
+                    <button onClick={() => setCart([])} className="text-xs font-bold text-error border border-error/30 px-3 py-1 rounded-full hover:bg-error/5 transition-colors">Limpiar</button>
+                  </div>
+                </div>
+
+                {/* Cart Items - Scrollable */}
+                <div className="p-2 overflow-y-auto flex-1 space-y-1">
+                  {cart.map((item, index) => (
+                    <div key={`${item.id}-${index}`} className="flex justify-between items-center group py-1 px-2 border-b border-outline-variant/10 last:border-0">
+                      <div className="flex-1 pr-2 min-w-0">
+                        <p className="font-bold text-on-surface text-xs leading-tight line-clamp-1">{item.name}</p>
+                        <p className="text-[10px] text-[#0F172A] font-black">{formatCurrency(item.price)} c/u</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1 bg-surface-container-low rounded-lg p-0.5 border border-outline-variant/20">
+                          <button onClick={() => updateQuantity(index, -1)} className="w-5 h-5 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-xs">-</button>
+                          <span className="w-3 text-center text-xs font-bold">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(index, 1)} className="w-5 h-5 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-xs">+</button>
+                        </div>
+                        <div className="w-16 text-right">
+                          <p className="font-black text-on-surface text-xs">{formatCurrency(item.price * item.quantity)}</p>
+                        </div>
+                        <button
+                          onClick={() => setCart(cart.filter((_, i) => i !== index))}
+                          className="text-error hover:bg-error/10 p-0.5 rounded transition-colors shrink-0"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {cart.length === 0 && (
+                    <div className="text-center py-10 text-[#0F172A]">
+                      <Package className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <p className="font-black">El carrito está vacío</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Payment & Checkout - BOTTOM */}
+            <div className="bg-gradient-to-br from-secondary via-[#335f9d] to-[#174986] p-6 rounded-2xl border-2 border-secondary/30 shadow-lg">
               <div className="space-y-4">
                 {/* Surcharge */}
                 <div className="flex items-center gap-4 bg-white/10 p-3 rounded-lg border border-white/20 backdrop-blur-sm">
@@ -650,65 +706,6 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     <Wallet className="w-4 h-4" />
                     Fiado
                   </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Cart - Grows Dynamically */}
-            <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-              <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border border-outline-variant/20 overflow-hidden flex-1 flex flex-col">
-                {/* Cart Header */}
-                <div className="p-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
-                  <h3 className="text-sm font-black text-[#0F172A] tracking-widest uppercase"><span className="text-secondary">CARRITO</span> <span className="text-[#0F172A]/70">({totalItems})</span></h3>
-                  <div className="flex gap-2">
-                    {pausedSales.length > 0 && (
-                      <button onClick={() => setShowPausedModal(true)} className="text-xs font-bold text-blue-600 border border-blue-600/30 px-3 py-1 rounded-full hover:bg-blue-600/5 transition-colors">
-                        Recuperar ({pausedSales.length})
-                      </button>
-                    )}
-                    <button
-                      onClick={handlePauseSale}
-                      disabled={cart.length === 0}
-                      className="text-xs font-bold text-secondary border border-secondary/30 px-3 py-1 rounded-full hover:bg-secondary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Pausar
-                    </button>
-                    <button onClick={() => setCart([])} className="text-xs font-bold text-error border border-error/30 px-3 py-1 rounded-full hover:bg-error/5 transition-colors">Limpiar</button>
-                  </div>
-                </div>
-
-                {/* Cart Items - Scrollable */}
-                <div className="p-2 overflow-y-auto flex-1 space-y-1">
-                  {cart.map((item, index) => (
-                    <div key={`${item.id}-${index}`} className="flex justify-between items-center group py-1 px-2 border-b border-outline-variant/10 last:border-0">
-                      <div className="flex-1 pr-2 min-w-0">
-                        <p className="font-bold text-on-surface text-xs leading-tight line-clamp-1">{item.name}</p>
-                        <p className="text-[10px] text-[#0F172A] font-black">{formatCurrency(item.price)} c/u</p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className="flex items-center gap-1 bg-surface-container-low rounded-lg p-0.5 border border-outline-variant/20">
-                          <button onClick={() => updateQuantity(index, -1)} className="w-5 h-5 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-xs">-</button>
-                          <span className="w-3 text-center text-xs font-bold">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(index, 1)} className="w-5 h-5 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-xs">+</button>
-                        </div>
-                        <div className="w-16 text-right">
-                          <p className="font-black text-on-surface text-xs">{formatCurrency(item.price * item.quantity)}</p>
-                        </div>
-                        <button
-                          onClick={() => setCart(cart.filter((_, i) => i !== index))}
-                          className="text-error hover:bg-error/10 p-0.5 rounded transition-colors shrink-0"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  {cart.length === 0 && (
-                    <div className="text-center py-10 text-[#0F172A]">
-                      <Package className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                      <p className="font-black">El carrito está vacío</p>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
