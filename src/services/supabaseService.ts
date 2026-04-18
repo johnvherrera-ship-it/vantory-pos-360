@@ -320,7 +320,7 @@ export const supabaseService = {
         .from('stock_entries')
         .select('*')
         .eq('client_id', clientId)
-        .order('created_at', { ascending: false });
+        .order('date', { ascending: false });
       if (error) throw error;
       return (data || []) as StockEntry[];
     } catch (e) {
