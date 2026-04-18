@@ -104,7 +104,8 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
 
   // ===== Inventory & Stock =====
   const [inventory, setInventory] = useState(() => {
-    const saved = localStorage.getItem('vantory_inventory');
+    const clientId = currentUser?.clientId || 'default';
+    const saved = localStorage.getItem(`vantory_inventory_client_${clientId}`);
     return saved ? JSON.parse(saved) : [
       { id: 1, clientId: 1, name: 'Cerveza Corona 330cc', category: 'Cerveza', cost: 900, price: 1500, stock: 48, sku: '7801', isFavorite: true, image: 'https://images.unsplash.com/photo-1614315584058-2200ed432b4b?auto=format&fit=crop&w=100&q=80' },
       { id: 2, clientId: 1, name: 'Pisco Mistral 35° 750cc', category: 'Licor', cost: 5000, price: 8500, stock: 12, sku: '7802', isFavorite: true, image: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=100&q=80' },
@@ -114,12 +115,14 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   });
 
   const [categories, setCategories] = useState<string[]>(() => {
-    const saved = localStorage.getItem('vantory_categories');
+    const clientId = currentUser?.clientId || 'default';
+    const saved = localStorage.getItem(`vantory_categories_client_${clientId}`);
     return saved ? JSON.parse(saved) : ['Cerveza', 'Licor', 'Bebida', 'Snacks', 'Abarrotes', 'Limpieza'];
   });
 
   const [stockEntries, setStockEntries] = useState(() => {
-    const saved = localStorage.getItem('vantory_stock_entries');
+    const clientId = currentUser?.clientId || 'default';
+    const saved = localStorage.getItem(`vantory_stock_entries_client_${clientId}`);
     return saved ? JSON.parse(saved) : [
       { id: 1, clientId: 1, folio: 'ENT-4829', productName: 'iPhone 15 Pro Max 256GB', productId: 101, quantity: 24, date: '27 Oct, 23', user: 'J. Delgado', image: 'https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=100&q=80' },
       { id: 2, clientId: 1, folio: 'ENT-4828', productName: 'MacBook Air M2 13"', productId: 102, quantity: 10, date: '27 Oct, 23', user: 'A. María', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=100&q=80' },
@@ -128,18 +131,21 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
 
   // ===== Sales =====
   const [salesHistory, setSalesHistory] = useState<any[]>(() => {
-    const saved = localStorage.getItem('vantory_sales_history');
+    const clientId = currentUser?.clientId || 'default';
+    const saved = localStorage.getItem(`vantory_sales_history_client_${clientId}`);
     return saved ? JSON.parse(saved) : [];
   });
 
   // ===== Cash Register =====
   const [cashRegisters, setCashRegisters] = useState<any[]>(() => {
-    const saved = localStorage.getItem('vantory_cash_registers');
+    const clientId = currentUser?.clientId || 'default';
+    const saved = localStorage.getItem(`vantory_cash_registers_client_${clientId}`);
     return saved ? JSON.parse(saved) : [];
   });
 
   const [cashHistory, setCashHistory] = useState<any[]>(() => {
-    const saved = localStorage.getItem('vantory_cash_history');
+    const clientId = currentUser?.clientId || 'default';
+    const saved = localStorage.getItem(`vantory_cash_history_client_${clientId}`);
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -165,7 +171,8 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
 
   // ===== Fiados =====
   const [fiados, setFiados] = useState<any[]>(() => {
-    const saved = localStorage.getItem('vantory_fiados');
+    const clientId = currentUser?.clientId || 'default';
+    const saved = localStorage.getItem(`vantory_fiados_client_${clientId}`);
     return saved ? JSON.parse(saved) : [];
   });
 
