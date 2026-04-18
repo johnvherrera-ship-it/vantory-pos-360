@@ -64,17 +64,18 @@ export const LoginPage = ({
     const attemptLogin = async () => {
       try {
         // Fetch user from users table
-        const { data: dbUsers, error: profileError } = await supabase
+        const { data: dbUsersArray, error: profileError } = await supabase
           .from('users')
           .select('*')
-          .eq('email', email)
-          .single();
+          .eq('email', email);
 
-        if (profileError || !dbUsers) {
+        if (profileError || !dbUsersArray || dbUsersArray.length === 0) {
           alert('Credenciales inválidas. Intente nuevamente.');
           console.warn('Profile error:', profileError?.message);
           return;
         }
+
+        const dbUsers = dbUsersArray[0];
 
         // Validate password
         if (dbUsers.password !== password) {

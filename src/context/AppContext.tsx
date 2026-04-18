@@ -243,6 +243,10 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     const refetchProducts = async () => {
       try {
         const products = await supabaseService.getProducts(activeClientId);
+        if (!products || products.length === 0) {
+          console.warn('getProducts returned empty for clientId:', activeClientId);
+          return;
+        }
         setInventory(prev => {
           const keepLocal = prev.filter(p => p.clientId !== activeClientId);
           return [...keepLocal, ...products];
@@ -255,6 +259,10 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     const refetchSales = async () => {
       try {
         const sales = await supabaseService.getSales(activeClientId);
+        if (!sales || sales.length === 0) {
+          console.warn('getSales returned empty for clientId:', activeClientId);
+          return;
+        }
         setSalesHistory(prev => {
           const keepLocal = prev.filter(s => s.clientId !== activeClientId);
           return [...keepLocal, ...sales];
@@ -267,6 +275,10 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     const refetchStockEntries = async () => {
       try {
         const entries = await supabaseService.getStockEntries(activeClientId);
+        if (!entries || entries.length === 0) {
+          console.warn('getStockEntries returned empty for clientId:', activeClientId);
+          return;
+        }
         setStockEntries(prev => {
           const keepLocal = prev.filter(e => e.clientId !== activeClientId);
           return [...keepLocal, ...entries];
@@ -279,6 +291,10 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     const refetchFiados = async () => {
       try {
         const fiados = await supabaseService.getFiados(activeClientId);
+        if (!fiados || fiados.length === 0) {
+          console.warn('getFiados returned empty for clientId:', activeClientId);
+          return;
+        }
         setFiados(prev => {
           const keepLocal = prev.filter(f => f.clientId !== activeClientId);
           return [...keepLocal, ...fiados];
