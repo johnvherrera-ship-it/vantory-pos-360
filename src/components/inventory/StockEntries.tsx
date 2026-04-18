@@ -267,8 +267,8 @@ export const StockEntries = ({}: StockEntriesProps) => {
           {/* Left Side: Scanning and Cart */}
           <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
             {/* Scanner Area */}
-            <div className={`rounded-3xl p-6 shadow-2xl border-2 transition-all duration-300 shrink-0 ${isScanned ? 'bg-green-900/20 border-green-500 shadow-green-500/20' : 'bg-[#131b2e] border-secondary/30 shadow-secondary/10'}`}>
-              <h2 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-6 flex items-center gap-2">
+            <div className={`rounded-3xl p-4 shadow-2xl border-2 transition-all duration-300 shrink-0 ${isScanned ? 'bg-green-900/20 border-green-500 shadow-green-500/20' : 'bg-[#131b2e] border-secondary/30 shadow-secondary/10'}`}>
+              <h2 className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2">
                 <Scan className="w-4 h-4 text-secondary" /> Escanear Productos
               </h2>
               <form onSubmit={handleBarcodeSubmit} className="relative">
@@ -310,53 +310,49 @@ export const StockEntries = ({}: StockEntriesProps) => {
                 </span>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto p-6">
+              <div className="flex-1 min-h-0 overflow-hidden p-4">
                 {receivingCart.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-slate-300 space-y-4">
-                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center">
-                      <Package className="w-10 h-10" />
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
+                      <Package className="w-8 h-8" />
                     </div>
-                    <p className="font-bold">No hay productos escaneados aún</p>
+                    <p className="text-sm font-bold">No hay productos escaneados</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-2 h-full overflow-y-auto">
                     {receivingCart.map((item) => (
-                      <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-secondary/30 transition-all">
-                        <img src={item.image} alt={item.name} className="w-16 h-16 rounded-xl object-cover border border-white shadow-sm" referrerPolicy="no-referrer" />
+                      <div key={item.id} className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-100 group hover:border-secondary/30 transition-all">
+                        <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover border border-white shadow-sm" referrerPolicy="no-referrer" />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-black text-slate-900 truncate">{item.name}</h3>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase">{item.sku}</p>
-                          <div className="mt-2 flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase">Costo:</span>
+                          <h3 className="font-bold text-slate-900 text-xs truncate">{item.name}</h3>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase">{item.sku}</p>
+                          <div className="mt-1 flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <span className="text-[8px] font-bold text-slate-400 uppercase">$:</span>
                               <div className="relative">
-                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">$</span>
-                                <input 
-                                  type="number" 
+                                <input
+                                  type="number"
                                   value={item.newCost}
                                   onChange={(e) => handleUpdateCartItem(item.id, 'newCost', parseInt(e.target.value))}
-                                  className="w-24 pl-5 pr-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:border-secondary outline-none"
+                                  className="w-14 px-1 py-0.5 bg-white border border-slate-200 rounded text-xs font-bold focus:border-secondary outline-none"
                                 />
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase">Cant:</span>
-                              <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden">
-                                <button 
-                                  onClick={() => handleUpdateCartItem(item.id, 'quantity', Math.max(1, item.quantity - 1))}
-                                  className="px-2 py-1 hover:bg-slate-100 text-slate-400"
-                                >-</button>
-                                <input 
-                                  type="number" 
-                                  value={item.quantity}
-                                  onChange={(e) => handleUpdateCartItem(item.id, 'quantity', parseInt(e.target.value))}
-                                  className="w-12 text-center text-xs font-bold outline-none"
-                                />
-                                <button 
-                                  onClick={() => handleUpdateCartItem(item.id, 'quantity', item.quantity + 1)}
-                                  className="px-2 py-1 hover:bg-slate-100 text-slate-400"
-                                >+</button>
-                              </div>
+                            <div className="flex items-center bg-white border border-slate-200 rounded overflow-hidden">
+                              <button
+                                onClick={() => handleUpdateCartItem(item.id, 'quantity', Math.max(1, item.quantity - 1))}
+                                className="px-1 py-0.5 hover:bg-slate-100 text-slate-400 text-xs"
+                              >-</button>
+                              <input
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => handleUpdateCartItem(item.id, 'quantity', parseInt(e.target.value))}
+                                className="w-8 text-center text-xs font-bold outline-none"
+                              />
+                              <button
+                                onClick={() => handleUpdateCartItem(item.id, 'quantity', item.quantity + 1)}
+                                className="px-1 py-0.5 hover:bg-slate-100 text-slate-400 text-xs"
+                              >+</button>
                             </div>
                           </div>
                         </div>
@@ -364,11 +360,14 @@ export const StockEntries = ({}: StockEntriesProps) => {
                           <p className="text-xs font-bold text-slate-400 mb-1">Subtotal</p>
                           <p className="text-lg font-black text-slate-900">${(item.newCost * item.quantity).toLocaleString()}</p>
                         </div>
-                        <button 
+                        <div className="text-right shrink-0">
+                          <p className="text-[9px] font-bold text-slate-400 leading-none">${(item.newCost * item.quantity).toLocaleString()}</p>
+                        </div>
+                        <button
                           onClick={() => handleRemoveCartItem(item.id)}
-                          className="p-2 text-slate-300 hover:text-error transition-colors"
+                          className="p-1 text-slate-300 hover:text-error transition-colors shrink-0"
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     ))}

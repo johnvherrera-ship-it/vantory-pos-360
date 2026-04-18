@@ -328,7 +328,8 @@ export const supabaseService = {
         storeId: s.store_id,
         posId: s.pos_id,
         date: s.created_at,
-        user: s.user_name
+        user: s.user_name,
+        paymentMethod: s.payment_method
       })) as Sale[];
     } catch (e) {
       console.error('getSales failed:', e);

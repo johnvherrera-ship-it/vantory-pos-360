@@ -178,7 +178,10 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   const inventoryValue = inventory.reduce((sum, item) => sum + (item.cost * item.stock), 0);
   const lowStockCount = inventory.filter(item => item.stock < 10).length;
   const avgMargin = inventory.length > 0
-    ? (inventory.reduce((sum, item) => sum + (item.margin || 0), 0) / inventory.length).toFixed(1)
+    ? (inventory.reduce((sum, item) => {
+        const margin = item.price > 0 ? ((item.price - item.cost) / item.price * 100) : 0;
+        return sum + margin;
+      }, 0) / inventory.length).toFixed(1)
     : 0;
 
   return (
