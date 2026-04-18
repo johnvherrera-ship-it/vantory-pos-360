@@ -236,23 +236,23 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
         </header>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between min-h-[140px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30 group">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30 group">
             <div>
               <span className="text-[#0F172A] font-black text-xs uppercase tracking-widest mb-2 block">Total Productos</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold font-headline tabular-nums text-on-surface">{totalProducts.toLocaleString()}</span>
+                <span className="text-2xl font-extrabold font-headline tabular-nums text-on-surface">{totalProducts.toLocaleString()}</span>
                 <span className="text-tertiary-container text-xs font-bold px-2 py-0.5 rounded-full bg-tertiary-fixed-dim/20">Sincronizado</span>
               </div>
             </div>
             <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Cantidad total de artículos distintos registrados en tu catálogo actual.</p>
           </div>
 
-          <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between min-h-[140px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30">
             <div>
               <span className="text-[#0F172A] font-black text-xs uppercase tracking-widest mb-2 block">Valor Inventario</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold font-headline tabular-nums text-on-surface">
+                <span className="text-2xl font-extrabold font-headline tabular-nums text-on-surface">
                   {inventoryValue >= 1000000 
                     ? `$${(inventoryValue / 1000000).toFixed(1)}M` 
                     : `$${inventoryValue.toLocaleString('es-CL')}`}
@@ -263,11 +263,11 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Inversión total basada en el costo de compra por la cantidad de unidades en stock.</p>
           </div>
 
-          <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between min-h-[140px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30">
             <div>
               <span className="text-[#0F172A] font-black text-xs uppercase tracking-widest mb-2 block">Bajo Stock</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold font-headline tabular-nums text-on-surface">{lowStockCount}</span>
+                <span className="text-2xl font-extrabold font-headline tabular-nums text-on-surface">{lowStockCount}</span>
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${lowStockCount > 0 ? 'text-error bg-error-container/40' : 'text-success bg-success-container/40'}`}>
                   {lowStockCount > 0 ? 'Crítico' : 'Óptimo'}
                 </span>
@@ -276,22 +276,22 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Productos que requieren reposición inmediata (menos de 10 unidades disponibles).</p>
           </div>
 
-          <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between min-h-[140px] transition-all border-2 border-secondary/20 shadow-md">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all border-2 border-secondary/20 shadow-md">
             <div>
               <span className="text-secondary font-black text-xs uppercase tracking-widest mb-2 block">Margen Promedio</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold font-headline tabular-nums text-secondary">{avgMargin}%</span>
+                <span className="text-2xl font-extrabold font-headline tabular-nums text-secondary">{avgMargin}%</span>
                 <TrendingUp className="text-secondary w-4 h-4" />
               </div>
             </div>
             <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Promedio de rentabilidad de tus productos (diferencia entre costo y precio de venta).</p>
           </div>
 
-          <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between min-h-[140px] transition-all border-2 border-green-400/30 shadow-md bg-green-50/30">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all border-2 border-green-400/30 shadow-md bg-green-50/30">
             <div>
               <span className="text-green-700 font-black text-xs uppercase tracking-widest mb-2 block">Ganancia Total</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold font-headline tabular-nums text-green-700">
+                <span className="text-2xl font-extrabold font-headline tabular-nums text-green-700">
                   {totalProfit >= 1000000
                     ? `$${(totalProfit / 1000000).toFixed(1)}M`
                     : `$${totalProfit.toLocaleString('es-CL')}`}
