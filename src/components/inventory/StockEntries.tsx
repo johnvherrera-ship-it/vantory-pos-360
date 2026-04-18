@@ -74,111 +74,165 @@ export const StockEntries = ({}: StockEntriesProps) => {
 
   const handleConfirmReception = async () => {
     if (receivingCart.length === 0) return;
-    console.log('Registering entries...');
+    const clientId = currentUser?.clientId;
+    if (!clientId) {
+      alert('Error: cliente no activo');
+      return;
+    }
 
+    const nowDate = new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' });
     const newEntries = receivingCart.map(item => ({
-      id: Date.now() + Math.random(),
       folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
       productName: item.name,
       productId: item.id,
       quantity: item.quantity,
       cost: item.newCost,
-      date: new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' }),
+      date: nowDate,
       user: currentUser?.name || 'Admin User',
       image: item.image,
-      clientId: currentUser?.clientId,
-      storeId: currentStore?.id
+      clientId,
+      storeId: currentStore?.id ?? 0
     }));
-    console.log('Entries to save:', newEntries);
 
-    for (const entry of newEntries) {
-      try {
-        const result = await supabaseService.createStockEntry(entry);
-        console.log('Saved entry:', result);
-      } catch (err) {
-        console.error('Error saving stock entry:', err);
-      }
-    }
-
-    setStockEntries([...newEntries, ...stockEntries]);
-
-    const updatedInventory = inventory.map(invItem => {
-      const cartItem = receivingCart.find(c => c.id === invItem.id);
-      if (cartItem) {
-        return { ...invItem, stock: invItem.stock + cartItem.quantity, cost: cartItem.newCost };
-      }
-      return invItem;
-    });
-    setInventory(updatedInventory);
-    setReceivingCart([]);
-  };
-
-  const handleNewProductSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const costNum = parseInt(newProductForm.cost);
-    const priceNum = parseInt(newProductForm.price);
-    const stockNum = parseInt(newProductForm.stock) || 0;
-    
-    const newProduct = {
-      id: Date.now(),
-      name: newProductForm.name,
-      sku: newProductForm.sku,
-      category: newProductForm.category,
-      cost: costNum,
-      price: priceNum,
-      stock: stockNum,
-      image: newProductForm.image,
-      margin: Math.round(((priceNum - costNum) / priceNum) * 100)
-    };
-
-    setInventory([...inventory, newProduct]);
-    
-    // Also record the entry
-    const newEntry = {
-      id: Date.now() + 1,
-      folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
-      productName: newProduct.name,
-      productId: newProduct.id,
-      quantity: stockNum,
-      cost: costNum,
-      date: new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' }),
-      user: currentUser?.name || 'Admin User',
-      image: newProduct.image
-    };
-    setStockEntries([newEntry, ...stockEntries]);
-    
-    setShowNewProductModal(false);
-    setNewProductForm({
-      name: '',
-      sku: '',
-      category: 'General',
-      cost: '',
-      price: '',
-      image: 'https://picsum.photos/seed/product/200/200',
-      stock: ''
-    });
-    setBarcode('');
-  };
-
-  const handleManualSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const product = inventory.find(p => p.id === parseInt(manualProduct));
-    if (product && manualQuantity) {
-      const quantity = parseInt(manualQuantity);
-      const newEntry = {
-        id: Date.now(),
-        folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
-        productName: product.name,
-        productId: product.id,
-        quantity,
-        date: new Date(manualDate).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' }),
-        user: currentUser?.name || 'Admin User',
-        image: product.image
+    const productsToUpdate = receivingCart.map(item => {
+      const current = inventory.find(p => p.id === item.id);
+      return {
+        id: item.id,
+        clientId,
+        name: current?.name ?? item.name,
+        sku: current?.sku ?? item.sku,
+        category: current?.category ?? item.category,
+        price: current?.price ?? item.price,
+        cost: item.newCost,
+        stock: (current?.stock ?? 0) + item.quantity,
+        image: current?.image ?? item.image
       };
-      setStockEntries([newEntry, ...stockEntries]);
-      setInventory(inventory.map(p => p.id === product.id ? { ...p, stock: p.stock + quantity } : p));
+    });
+
+    try {
+      const [savedEntries, savedProducts] = await Promise.all([
+        supabaseService.bulkCreateStockEntries(newEntries),
+        supabaseService.bulkUpsertProducts(productsToUpdate)
+      ]);
+
+      const finalEntries = (savedEntries && savedEntries.length ? savedEntries : newEntries.map((e, i) => ({ ...e, id: Date.now() + i }))) as any[];
+      setStockEntries([...finalEntries, ...stockEntries]);
+
+      const savedById = new Map(savedProducts.map((p: any) => [p.id, p]));
+      const updatedInventory = inventory.map(invItem => {
+        const saved = savedById.get(invItem.id);
+        return saved ? saved : invItem;
+      });
+      setInventory(updatedInventory);
+      setReceivingCart([]);
+    } catch (err) {
+      console.error('Error guardando recepción:', err);
+      alert('Error al guardar la recepción en la base de datos');
+    }
+  };
+
+  const handleNewProductSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const clientId = currentUser?.clientId;
+    if (!clientId) {
+      alert('Error: cliente no activo');
+      return;
+    }
+    const costNum = parseInt(newProductForm.cost) || 0;
+    const priceNum = parseInt(newProductForm.price) || 0;
+    const stockNum = parseInt(newProductForm.stock) || 0;
+
+    try {
+      const savedProduct = await supabaseService.upsertProduct({
+        clientId,
+        name: newProductForm.name,
+        sku: newProductForm.sku,
+        category: newProductForm.category,
+        cost: costNum,
+        price: priceNum,
+        stock: stockNum,
+        image: newProductForm.image
+      } as any);
+
+      setInventory([...inventory, savedProduct]);
+
+      const entry = {
+        folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
+        productName: savedProduct.name,
+        productId: savedProduct.id,
+        quantity: stockNum,
+        cost: costNum,
+        date: new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' }),
+        user: currentUser?.name || 'Admin User',
+        image: savedProduct.image,
+        clientId,
+        storeId: currentStore?.id ?? 0
+      };
+      try {
+        const saved = await supabaseService.createStockEntry(entry);
+        setStockEntries([saved || { ...entry, id: Date.now() + 1 }, ...stockEntries]);
+      } catch {
+        setStockEntries([{ ...entry, id: Date.now() + 1 }, ...stockEntries]);
+      }
+
+      setShowNewProductModal(false);
+      setNewProductForm({
+        name: '',
+        sku: '',
+        category: 'General',
+        cost: '',
+        price: '',
+        image: 'https://picsum.photos/seed/product/200/200',
+        stock: ''
+      });
+      setBarcode('');
+    } catch (err) {
+      console.error('Error creando producto:', err);
+      alert('Error al crear el producto en la base de datos');
+    }
+  };
+
+  const handleManualSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const clientId = currentUser?.clientId;
+    const product = inventory.find(p => p.id === parseInt(manualProduct));
+    if (!clientId || !product || !manualQuantity) return;
+
+    const quantity = parseInt(manualQuantity);
+    const entry = {
+      folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
+      productName: product.name,
+      productId: product.id,
+      quantity,
+      date: new Date(manualDate).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' }),
+      user: currentUser?.name || 'Admin User',
+      image: product.image,
+      clientId,
+      storeId: currentStore?.id ?? 0
+    };
+
+    try {
+      const [savedEntry, savedProduct] = await Promise.all([
+        supabaseService.createStockEntry(entry),
+        supabaseService.upsertProduct({
+          id: product.id,
+          clientId,
+          name: product.name,
+          sku: product.sku,
+          category: product.category,
+          price: product.price,
+          cost: product.cost,
+          stock: product.stock + quantity,
+          image: product.image
+        } as any)
+      ]);
+      setStockEntries([savedEntry || { ...entry, id: Date.now() }, ...stockEntries]);
+      setInventory(inventory.map(p => (p.id === product.id ? savedProduct : p)));
       setManualProduct('');
       setManualQuantity('');
+    } catch (err) {
+      console.error('Error registrando entrada manual:', err);
+      alert('Error al registrar la entrada en la base de datos');
     }
   };
 
@@ -205,9 +259,9 @@ export const StockEntries = ({}: StockEntriesProps) => {
           </div>
         </header>
 
-        <div className="flex-1 overflow-hidden flex flex-col lg:flex-row p-6 gap-6">
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col lg:flex-row p-6 gap-6">
           {/* Left Side: Scanning and Cart */}
-          <div className="flex-1 flex flex-col gap-6 overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col gap-6 overflow-hidden">
             {/* Scanner Area */}
             <div className={`rounded-3xl p-8 shadow-2xl border-2 transition-all duration-300 ${isScanned ? 'bg-green-900/20 border-green-500 shadow-green-500/20' : 'bg-[#131b2e] border-secondary/30 shadow-secondary/10'}`}>
               <h2 className="text-sm font-bold text-white/50 uppercase tracking-wider mb-6 flex items-center gap-2">
@@ -242,8 +296,8 @@ export const StockEntries = ({}: StockEntriesProps) => {
             </div>
 
             {/* Receiving Cart */}
-            <div className="flex-1 bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
-              <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+            <div className="flex-1 min-h-0 bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+              <div className="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
                 <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4" /> Productos en Recepción
                 </h2>
@@ -251,8 +305,8 @@ export const StockEntries = ({}: StockEntriesProps) => {
                   {receivingCart.length} Items
                 </span>
               </div>
-              
-              <div className="flex-1 overflow-y-auto p-6">
+
+              <div className="flex-1 min-h-0 overflow-y-auto p-6">
                 {receivingCart.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-slate-300 space-y-4">
                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center">
@@ -318,7 +372,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                 )}
               </div>
 
-              <div className="p-6 bg-slate-50 border-t border-slate-200">
+              <div className="p-6 bg-slate-50 border-t border-slate-200 shrink-0">
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <p className="text-xs font-bold text-slate-400 uppercase">Costo Total de Recepción</p>
@@ -338,7 +392,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
           </div>
 
           {/* Right Side: History and Manual Entry */}
-          <div className="w-full lg:w-96 flex flex-col gap-6 overflow-hidden">
+          <div className="w-full lg:w-96 min-h-0 flex flex-col gap-6 overflow-hidden">
             {/* Manual Entry Form */}
             <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
               <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -385,13 +439,13 @@ export const StockEntries = ({}: StockEntriesProps) => {
             </div>
 
             {/* Recent Entries */}
-            <div className="flex-1 bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
-              <div className="p-6 border-b border-slate-100">
+            <div className="flex-1 min-h-0 bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+              <div className="p-6 border-b border-slate-100 shrink-0">
                 <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                   <History className="w-4 h-4" /> Últimos Ingresos
                 </h2>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
                 {stockEntries.slice(0, 10).map((entry) => (
                   <div key={entry.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
                     <img src={entry.image} alt="" className="w-10 h-10 rounded-lg object-cover" referrerPolicy="no-referrer" />

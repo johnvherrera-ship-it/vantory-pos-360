@@ -52,21 +52,23 @@ export const supabaseService = {
   },
 
   // === Inventory ===
-  async getProducts(clientId: number, storeId?: number): Promise<Product[]> {
+  async getProducts(clientId: number): Promise<Product[]> {
     if (notConfigured()) return [];
     try {
-      let query = supabase.from('products').select('*').eq('client_id', clientId);
-      if (storeId) query = query.eq('store_id', storeId);
-      const { data, error } = await query;
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('client_id', clientId);
       if (error) throw error;
       return (data || []).map((p: any) => ({
         ...p,
         clientId: p.client_id,
-        storeId: p.store_id,
+        storeId: p.store_id ?? 0,
         category: p.category,
-        stock: p.stock,
-        minStock: p.stock,
-        image: p.image_url
+        stock: p.stock ?? 0,
+        minStock: p.stock ?? 0,
+        image: p.image_url,
+        isFavorite: !!p.is_favorite
       })) as Product[];
     } catch (e) {
       console.error('getProducts failed:', e);
@@ -74,32 +76,69 @@ export const supabaseService = {
     }
   },
 
-  async upsertProduct(product: Partial<Product> & { clientId: number }) {
-    if (notConfigured()) return product;
+  _normalizeProduct(p: any): Product {
+    return {
+      ...p,
+      clientId: p.client_id,
+      storeId: p.store_id ?? 0,
+      category: p.category,
+      stock: p.stock ?? 0,
+      minStock: p.stock ?? 0,
+      image: p.image_url,
+      isFavorite: !!p.is_favorite
+    } as Product;
+  },
+
+  async upsertProduct(product: Partial<Product> & { clientId: number }): Promise<Product> {
+    if (notConfigured()) return product as Product;
+    const payload: any = {
+      client_id: product.clientId,
+      name: product.name,
+      sku: product.sku,
+      category: product.category,
+      price: product.price,
+      cost: product.cost,
+      stock: product.stock,
+      image_url: product.image
+    };
+    if (product.id) payload.id = product.id;
+
     const { data, error } = await supabase
       .from('products')
-      .upsert({
-        id: product.id,
-        client_id: product.clientId,
-        name: product.name,
-        sku: product.sku,
-        category: product.category,
-        price: product.price,
-        cost: product.cost,
-        stock: product.stock,
-        image_url: product.image
-      })
+      .upsert(payload)
       .select();
     if (error) {
       console.error('upsertProduct error:', error);
       throw error;
     }
     const result = data?.[0];
-    if (!result) {
-      console.error('upsertProduct: no data returned');
-      throw new Error('No se recibieron datos después de guardar el producto');
+    if (!result) throw new Error('No se recibieron datos después de guardar el producto');
+    return supabaseService._normalizeProduct(result);
+  },
+
+  async bulkUpsertProducts(products: Array<Partial<Product> & { clientId: number }>): Promise<Product[]> {
+    if (notConfigured()) return products as Product[];
+    if (!products.length) return [];
+    const payload = products.map(p => {
+      const row: any = {
+        client_id: p.clientId,
+        name: p.name,
+        sku: p.sku,
+        category: p.category,
+        price: p.price,
+        cost: p.cost,
+        stock: p.stock,
+        image_url: p.image
+      };
+      if (p.id) row.id = p.id;
+      return row;
+    });
+    const { data, error } = await supabase.from('products').upsert(payload).select();
+    if (error) {
+      console.error('bulkUpsertProducts error:', error);
+      throw error;
     }
-    return result;
+    return (data || []).map(supabaseService._normalizeProduct);
   },
 
   async deleteProduct(productId: number) {
@@ -354,6 +393,32 @@ export const supabaseService = {
       return data?.[0];
     } catch (e) {
       console.error('createStockEntry failed:', e);
+      throw e;
+    }
+  },
+
+  async bulkCreateStockEntries(entries: any[]) {
+    if (notConfigured()) return entries;
+    if (!entries.length) return [];
+    try {
+      const payload = entries.map(entry => ({
+        client_id: entry.clientId,
+        product_id: entry.productId,
+        product_name: entry.productName,
+        quantity: entry.quantity,
+        user_name: entry.user,
+        folio: entry.folio,
+        date: entry.date ? new Date(entry.date).toISOString() : new Date().toISOString(),
+        image_url: entry.image
+      }));
+      const { data, error } = await supabase
+        .from('stock_entries')
+        .insert(payload)
+        .select();
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      console.error('bulkCreateStockEntries failed:', e);
       throw e;
     }
   },

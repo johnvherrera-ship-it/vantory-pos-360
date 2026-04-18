@@ -189,6 +189,27 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     });
     setInventory(updatedInventory);
 
+    // Persistir stock descontado en Supabase
+    const productsToPersist = cart.map(cartItem => {
+      const inv = inventory.find(p => p.id === cartItem.id);
+      if (!inv) return null;
+      return {
+        id: inv.id,
+        clientId: activeClientId,
+        name: inv.name,
+        sku: inv.sku,
+        category: inv.category,
+        price: inv.price,
+        cost: inv.cost,
+        stock: Math.max(0, inv.stock - cartItem.quantity),
+        image: inv.image
+      };
+    }).filter(Boolean) as any[];
+    if (productsToPersist.length) {
+      supabaseService.bulkUpsertProducts(productsToPersist)
+        .catch(err => console.error('bulkUpsertProducts post-sale error:', err));
+    }
+
     // Save last sale for ticket
     const saleId = Date.now();
     const saleData = {
@@ -211,8 +232,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     } else if (method === 'Fiado') {
       let updatedFiados = [...fiados];
       if (selectedFiadoClient === 'new') {
-        updatedFiados.push({
+        const newFiadoPayload: any = {
           id: Date.now(),
+          clientId: activeClientId,
+          storeId: activeStoreId,
           name: newFiadoClient.name,
           phone: newFiadoClient.phone,
           observation: newFiadoClient.observation,
@@ -226,7 +249,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
             type: 'charge',
             cart: [...cart]
           }]
-        });
+        };
+        updatedFiados.push(newFiadoPayload);
+        supabaseService.createFiado(newFiadoPayload)
+          .catch(err => console.error('createFiado persist error:', err));
       } else {
         updatedFiados = updatedFiados.map(client => {
           if (client.id.toString() === selectedFiadoClient) {
