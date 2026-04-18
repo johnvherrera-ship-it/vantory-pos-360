@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { SideNavBar } from '../layout/SideNavBar';
 import { useAppContexts } from '../../hooks/useAppContexts';
+import { supabaseService } from '../../services/supabaseService';
 
 interface StockEntriesProps {}
 
@@ -71,7 +72,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
     setReceivingCart(receivingCart.filter(item => item.id !== id));
   };
 
-  const handleConfirmReception = () => {
+  const handleConfirmReception = async () => {
     if (receivingCart.length === 0) return;
 
     const newEntries = receivingCart.map(item => ({
@@ -83,8 +84,18 @@ export const StockEntries = ({}: StockEntriesProps) => {
       cost: item.newCost,
       date: new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' }),
       user: currentUser?.name || 'Admin User',
-      image: item.image
+      image: item.image,
+      clientId: currentUser?.clientId,
+      storeId: currentStore?.id
     }));
+
+    for (const entry of newEntries) {
+      try {
+        await supabaseService.createStockEntry(entry);
+      } catch (err) {
+        console.error('Error saving stock entry:', err);
+      }
+    }
 
     setStockEntries([...newEntries, ...stockEntries]);
 

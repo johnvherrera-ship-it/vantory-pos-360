@@ -330,6 +330,30 @@ export const supabaseService = {
     }
   },
 
+  async createStockEntry(entry: any) {
+    if (notConfigured()) return entry;
+    try {
+      const { data, error } = await supabase
+        .from('stock_entries')
+        .insert({
+          client_id: entry.clientId,
+          store_id: entry.storeId,
+          product_id: entry.productId,
+          quantity: entry.quantity,
+          cost: entry.cost,
+          user_name: entry.user,
+          folio: entry.folio,
+          created_at: new Date().toISOString()
+        })
+        .select();
+      if (error) throw error;
+      return data?.[0];
+    } catch (e) {
+      console.error('createStockEntry failed:', e);
+      throw e;
+    }
+  },
+
   // === Fiados ===
   async getFiados(clientId: number): Promise<any[]> {
     if (notConfigured()) return [];
@@ -344,6 +368,29 @@ export const supabaseService = {
     } catch (e) {
       console.error('getFiados failed:', e);
       return [];
+    }
+  },
+
+  async createFiado(fiado: any) {
+    if (notConfigured()) return fiado;
+    try {
+      const { data, error } = await supabase
+        .from('fiados')
+        .insert({
+          client_id: fiado.clientId,
+          store_id: fiado.storeId,
+          customer_name: fiado.customerName,
+          total_amount: fiado.totalAmount,
+          paid_amount: fiado.paidAmount,
+          status: fiado.status || 'pending',
+          created_at: new Date().toISOString()
+        })
+        .select();
+      if (error) throw error;
+      return data?.[0];
+    } catch (e) {
+      console.error('createFiado failed:', e);
+      throw e;
     }
   }
 };
