@@ -92,30 +92,17 @@ aside nav::-webkit-scrollbar-thumb:hover {
 
 body {
   font-family: var(--font-body);
-  --app-zoom: 0.85;
-  zoom: var(--app-zoom);
-  min-height: calc(100vh / var(--app-zoom));
+  min-height: 100vh;
   margin: 0;
   display: flex;
   flex-direction: column;
 }
 
-/* Fix for h-screen and min-h-screen when zoom is active */
-.h-screen {
-  height: calc(100vh / var(--app-zoom)) !important;
-}
-.min-h-screen {
-  min-height: calc(100vh / var(--app-zoom)) !important;
-}
 #root {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 100%;
-}
-
-body:has(.auth-page-wrapper) {
-  --app-zoom: 0.80;
 }
 
 h1, h2, h3, .font-headline {
@@ -128,7 +115,7 @@ h1, h2, h3, .font-headline {
   100% { transform: translateX(100%); opacity: 0; }
 }
 .animate-slide-bright {
-  animation: slide-bright 3s ease-in-out infinite;
+  /* animación infinita desactivada para reducir fatiga visual y consumo batería */
 }
 
 .bg-gradient-secondary {
@@ -148,7 +135,6 @@ h1, h2, h3, .font-headline {
 .animate-shimmer {
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   background-size: 1000px 100%;
-  animation: shimmer 3s infinite;
 }
 
 /* ===== GLOW ANIMATIONS ===== */
@@ -162,7 +148,7 @@ h1, h2, h3, .font-headline {
 }
 
 .animate-glow {
-  animation: glow-pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 5px rgba(51, 95, 157, 0.3);
 }
 
 /* ===== FLOATING ANIMATIONS ===== */
@@ -176,7 +162,7 @@ h1, h2, h3, .font-headline {
 }
 
 .animate-float {
-  animation: float-smooth 4s ease-in-out infinite;
+  /* animación flotante infinita desactivada */
 }
 
 /* ===== RIPPLE EFFECT ===== */
@@ -211,7 +197,6 @@ h1, h2, h3, .font-headline {
 
 .animate-gradient-wave {
   background-size: 200% 200%;
-  animation: gradient-wave 3s ease infinite;
 }
 
 /* ===== TEXT REVEAL ===== */
@@ -301,7 +286,7 @@ h1, h2, h3, .font-headline {
 }
 
 .animate-neon-glow {
-  animation: neon-glow 2.5s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(51, 95, 157, 0.3);
 }
 
 /* ===== CARD SHINE EFFECT ===== */
@@ -317,7 +302,6 @@ h1, h2, h3, .font-headline {
 .animate-card-shine {
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
   background-size: 200% 100%;
-  animation: card-shine 3s ease-in-out infinite;
 }
 
 /* ===== BORDER LIGHT PULSE ===== */
@@ -331,7 +315,7 @@ h1, h2, h3, .font-headline {
 }
 
 .animate-border-light-pulse {
-  animation: border-light-pulse 2s ease-in-out infinite;
+  box-shadow: inset 0 0 20px rgba(51, 95, 157, 0.1), 0 0 20px rgba(51, 95, 157, 0.2);
 }
 
 /* ===== GRADIENT BORDER ===== */
@@ -351,7 +335,6 @@ h1, h2, h3, .font-headline {
   background: linear-gradient(135deg, #335F9D, #174986, #335F9D, #335F9D) border-box;
   border: 2px solid transparent;
   background-clip: padding-box;
-  animation: gradient-border-rotate 3s ease infinite;
 }
 
 /* ===== ENHANCED CARD HOVER ===== */
@@ -361,12 +344,9 @@ h1, h2, h3, .font-headline {
 }
 
 .card-hover-enhance:hover {
-  border-color: rgba(51, 95, 157, 0.6);
-  box-shadow:
-    0 0 20px rgba(51, 95, 157, 0.4),
-    0 0 40px rgba(51, 95, 157, 0.2),
-    inset 0 0 20px rgba(51, 95, 157, 0.05);
-  transform: translateY(-8px);
+  border-color: rgba(51, 95, 157, 0.4);
+  box-shadow: 0 4px 12px rgba(51, 95, 157, 0.15);
+  transform: translateY(-2px);
 }
 
 /* ===== PRINT TICKET ===== */
