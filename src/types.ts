@@ -40,6 +40,7 @@ export interface POS {
 export interface Product {
   id: number;
   clientId: number;
+  storeId: number;
   name: string;
   category: string;
   cost: number;
@@ -56,6 +57,7 @@ export interface Product {
 export interface Sale {
   id: number;
   clientId: number;
+  storeId: number;
   posId: number;
   date: string;
   total: number;
@@ -73,6 +75,7 @@ export interface Sale {
 export interface StockEntry {
   id: number;
   clientId: number;
+  storeId: number;
   folio: string;
   productName: string;
   productId: number;
@@ -92,6 +95,7 @@ export interface FiadoTransaction {
 export interface Fiado {
   id: number;
   clientId: number;
+  storeId: number;
   name: string;
   phone: string;
   totalDebt: number;

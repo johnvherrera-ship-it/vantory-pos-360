@@ -42,6 +42,8 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLowStock, setFilterLowStock] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Todas las Categorías');
+  const [pageNumber, setPageNumber] = useState(1);
+  const ITEMS_PER_PAGE = 15;
 
   const handleDelete = async (id: number) => {
     try {
@@ -71,16 +73,22 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
     // Sync with Supabase
     try {
       const clientId = currentUser?.clientId;
+      const storeId = currentStore?.id || currentPOS?.storeId;
       if (!clientId) {
         console.error('No client ID available for product save');
         alert('Error: No se puede guardar el producto sin un cliente activo');
         return;
       }
+      if (!storeId) {
+        console.error('No store ID available for product save');
+        alert('Error: Debes seleccionar un local antes de guardar productos');
+        return;
+      }
       if (product.id && product.id > 1000000000000) {
         const { id, ...newProduct } = product;
-        await supabaseService.upsertProduct({ ...newProduct, clientId });
+        await supabaseService.upsertProduct({ ...newProduct, clientId, storeId } as any);
       } else {
-        await supabaseService.upsertProduct({ ...product, clientId });
+        await supabaseService.upsertProduct({ ...product, clientId, storeId } as any);
       }
     } catch (error) {
       console.error('Error syncing with Supabase:', error);
@@ -146,16 +154,23 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
                          p.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLowStock = filterLowStock ? p.stock < 10 : true;
     const matchesCategory = selectedCategory === 'Todas las Categorías' ? true : p.category === selectedCategory;
-    // Ensure product belongs to current client
-    const matchesClient = p.clientId === currentUser?.clientId;
-    return matchesSearch && matchesLowStock && matchesCategory && matchesClient;
+    return matchesSearch && matchesLowStock && matchesCategory;
   });
+
+  React.useEffect(() => {
+    setPageNumber(1);
+  }, [searchTerm, filterLowStock, selectedCategory]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredInventory.length / ITEMS_PER_PAGE));
+  const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedInventory = filteredInventory.slice(startIndex, endIndex);
 
   const totalProducts = inventory.length;
   const inventoryValue = inventory.reduce((sum, item) => sum + (item.cost * item.stock), 0);
   const lowStockCount = inventory.filter(item => item.stock < 10).length;
-  const avgMargin = inventory.length > 0 
-    ? (inventory.reduce((sum, item) => sum + item.margin, 0) / inventory.length).toFixed(1) 
+  const avgMargin = inventory.length > 0
+    ? (inventory.reduce((sum, item) => sum + (item.margin || 0), 0) / inventory.length).toFixed(1)
     : 0;
 
   return (
@@ -282,12 +297,20 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             <option>Agotado</option>
           </select>
           <div className="ml-auto flex items-center gap-2">
-            <span className="text-xs text-[#0F172A] font-black">Mostrando 1-10 de {filteredInventory.length}</span>
+            <span className="text-xs text-[#0F172A] font-black">Mostrando {filteredInventory.length === 0 ? 0 : startIndex + 1}-{Math.min(endIndex, filteredInventory.length)} de {filteredInventory.length}</span>
             <div className="flex gap-1">
-              <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-all">
+              <button
+                onClick={() => setPageNumber(Math.max(1, pageNumber - 1))}
+                disabled={pageNumber === 1}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-all">
+              <button
+                onClick={() => setPageNumber(Math.min(totalPages, pageNumber + 1))}
+                disabled={pageNumber === totalPages}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
@@ -309,7 +332,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container-low">
-              {filteredInventory.map((product) => (
+              {paginatedInventory.map((product) => (
                 <tr key={product.id} className="hover:bg-surface-container-high transition-all group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
@@ -376,13 +399,40 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             </tbody>
           </table>
           <div className="px-8 py-6 bg-surface-container-low/30 border-t border-outline-variant/10 flex justify-between items-center">
-            <p className="text-sm text-on-surface-variant font-medium">Página 1 de 1</p>
+            <p className="text-sm text-on-surface-variant font-medium">Página {pageNumber} de {totalPages}</p>
             <div className="flex items-center gap-1">
-              <button className="px-4 py-2 text-sm font-bold rounded-xl bg-surface-container-lowest shadow-sm hover:bg-white transition-all">Anterior</button>
-              <div className="flex px-2">
-                <button className="w-8 h-8 rounded-lg bg-secondary text-white text-xs font-bold">1</button>
+              <button
+                onClick={() => setPageNumber(Math.max(1, pageNumber - 1))}
+                disabled={pageNumber === 1}
+                className="px-4 py-2 text-sm font-bold rounded-xl bg-surface-container-lowest shadow-sm hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Anterior
+              </button>
+              <div className="flex px-2 gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const page = i + 1;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setPageNumber(page)}
+                      className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                        pageNumber === page
+                          ? 'bg-secondary text-white'
+                          : 'bg-surface-container-low text-on-surface hover:bg-surface-container-high'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
               </div>
-              <button className="px-4 py-2 text-sm font-bold rounded-xl bg-surface-container-lowest shadow-sm hover:bg-white transition-all">Siguiente</button>
+              <button
+                onClick={() => setPageNumber(Math.min(totalPages, pageNumber + 1))}
+                disabled={pageNumber === totalPages}
+                className="px-4 py-2 text-sm font-bold rounded-xl bg-surface-container-lowest shadow-sm hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Siguiente
+              </button>
             </div>
           </div>
         </div>

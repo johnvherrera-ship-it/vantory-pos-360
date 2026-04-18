@@ -44,6 +44,7 @@ interface AppContextType {
   // Data Isolation Helpers
   activeClientId: number;
   activePosId: number;
+  activeStoreId: number;
   clientInventory: Product[];
   setClientInventory: (action: any) => void;
   clientSalesHistory: Sale[];
@@ -68,9 +69,10 @@ interface AppContextProviderProps {
   children: React.ReactNode;
   currentUser?: User | null;
   currentPOS?: POS | null;
+  currentStore?: Store | null;
 }
 
-export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children, currentUser, currentPOS }) => {
+export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children, currentUser, currentPOS, currentStore }) => {
   const prevClientIdRef = React.useRef<string | number>(currentUser?.clientId ?? 'default');
   const reloadingRef = React.useRef<boolean>(false);
   // ===== SaaS Clients =====
@@ -250,8 +252,9 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
 
   // ===== Data Isolation Helpers =====
   const activeClientId = currentUser?.clientId || 1;
-  // Use 0 as sentinel value when no POS is selected, not 1 (which might be a valid ID)
+  // Use 0 as sentinel value when no POS/Store is selected, not 1 (which might be a valid ID)
   const activePosId = currentPOS?.id || 0;
+  const activeStoreId = currentStore?.id || currentPOS?.storeId || 0;
 
   useEffect(() => {
     localStorage.setItem('vantory_users', JSON.stringify(users));
@@ -281,7 +284,12 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         try {
           const products = await supabaseService.getProducts(activeClientId);
           if (products.length > 0) {
-            setInventory(products);
+            // Merge remote with any local-only items for other stores not fetched
+            setInventory(prev => {
+              const remoteIds = new Set(products.map(p => p.id));
+              const keepLocal = prev.filter(p => !remoteIds.has(p.id) && p.clientId !== activeClientId);
+              return [...keepLocal, ...products];
+            });
           }
         } catch (error) {
           console.error('Error loading inventory from Supabase:', error);
@@ -297,7 +305,11 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         try {
           const sales = await supabaseService.getSales(activeClientId);
           if (sales.length > 0) {
-            setSalesHistory(sales);
+            setSalesHistory(prev => {
+              const remoteIds = new Set(sales.map(s => s.id));
+              const keepLocal = prev.filter(s => !remoteIds.has(s.id) && s.clientId !== activeClientId);
+              return [...keepLocal, ...sales];
+            });
           }
         } catch (error) {
           console.error('Error loading sales from Supabase:', error);
@@ -342,14 +354,34 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     });
   }, [activeClientId]);
 
-  const clientInventory = useMemo(() => inventory.filter(i => i.clientId === activeClientId), [inventory, activeClientId]);
-  const setClientInventory = useCallback(createClientSetter(setInventory), [createClientSetter]);
+  // Scoped setter by clientId + storeId (for store-isolated resources)
+  const createClientStoreSetter = useCallback((globalSetter: any) => (action: any) => {
+    globalSetter((prev: any[]) => {
+      const otherData = prev.filter((item: any) => !(item.clientId === activeClientId && (item.storeId ?? activeStoreId) === activeStoreId));
+      const scopedData = prev.filter((item: any) => item.clientId === activeClientId && (item.storeId ?? activeStoreId) === activeStoreId);
+      let newScopedData = typeof action === 'function' ? action(scopedData) : action;
+      newScopedData = newScopedData.map((item: any) => ({ ...item, clientId: activeClientId, storeId: activeStoreId }));
+      return [...otherData, ...newScopedData];
+    });
+  }, [activeClientId, activeStoreId]);
 
-  const clientSalesHistory = useMemo(() => salesHistory.filter(s => s.clientId === activeClientId), [salesHistory, activeClientId]);
-  const setClientSalesHistory = useCallback(createClientSetter(setSalesHistory), [createClientSetter]);
+  const clientInventory = useMemo(
+    () => inventory.filter(i => i.clientId === activeClientId && (activeStoreId === 0 || (i as any).storeId === activeStoreId)),
+    [inventory, activeClientId, activeStoreId]
+  );
+  const setClientInventory = useCallback(createClientStoreSetter(setInventory), [createClientStoreSetter]);
 
-  const clientStockEntries = useMemo(() => stockEntries.filter(e => e.clientId === activeClientId), [stockEntries, activeClientId]);
-  const setClientStockEntries = useCallback(createClientSetter(setStockEntries), [createClientSetter]);
+  const clientSalesHistory = useMemo(
+    () => salesHistory.filter(s => s.clientId === activeClientId && (activeStoreId === 0 || (s as any).storeId === activeStoreId)),
+    [salesHistory, activeClientId, activeStoreId]
+  );
+  const setClientSalesHistory = useCallback(createClientStoreSetter(setSalesHistory), [createClientStoreSetter]);
+
+  const clientStockEntries = useMemo(
+    () => stockEntries.filter(e => e.clientId === activeClientId && (activeStoreId === 0 || (e as any).storeId === activeStoreId)),
+    [stockEntries, activeClientId, activeStoreId]
+  );
+  const setClientStockEntries = useCallback(createClientStoreSetter(setStockEntries), [createClientStoreSetter]);
 
   const clientStores = useMemo(() => stores.filter(s => s.clientId === activeClientId), [stores, activeClientId]);
   const setClientStores = useCallback(createClientSetter(setStores), [createClientSetter]);
@@ -357,8 +389,11 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   const clientUsers = useMemo(() => users.filter(u => u.clientId === activeClientId), [users, activeClientId]);
   const setClientUsers = useCallback(createClientSetter(setUsers), [createClientSetter]);
 
-  const clientFiados = useMemo(() => fiados.filter(f => f.clientId === activeClientId), [fiados, activeClientId]);
-  const setClientFiados = useCallback(createClientSetter(setFiados), [createClientSetter]);
+  const clientFiados = useMemo(
+    () => fiados.filter(f => f.clientId === activeClientId && (activeStoreId === 0 || (f as any).storeId === activeStoreId)),
+    [fiados, activeClientId, activeStoreId]
+  );
+  const setClientFiados = useCallback(createClientStoreSetter(setFiados), [createClientStoreSetter]);
 
   const clientCashHistory = useMemo(() => cashHistory.filter(h => h.clientId === activeClientId && h.posId === activePosId), [cashHistory, activeClientId, activePosId]);
   const setClientCashHistory = useCallback((action: any) => {
@@ -409,6 +444,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     setFiados,
     activeClientId,
     activePosId,
+    activeStoreId,
     clientInventory,
     setClientInventory,
     clientSalesHistory,

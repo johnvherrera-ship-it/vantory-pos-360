@@ -31,7 +31,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   const { ui, pos, app } = useAppContexts();
   const { setCurrentPage, setShowCashRegisterModal, setShowNotificationsPanel } = ui;
   const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
-  const { clientInventory: inventory, setClientInventory: setInventory, clientFiados: fiados, setClientFiados: setFiados, clientCashRegister: cashRegister, setClientCashRegister: setCashRegister, clientUsers: users, setClientSalesHistory, activePosId, activeClientId } = app;
+  const { clientInventory: inventory, setClientInventory: setInventory, clientFiados: fiados, setClientFiados: setFiados, clientCashRegister: cashRegister, setClientCashRegister: setCashRegister, clientUsers: users, setClientSalesHistory, activePosId, activeClientId, activeStoreId } = app;
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState('');
@@ -193,6 +193,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     const saleId = Date.now();
     const saleData = {
       id: saleId,
+      clientId: activeClientId,
+      storeId: activeStoreId,
       posId: activePosId,
       cart: [...cart],
       total,
@@ -256,6 +258,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     // Persistir venta en Supabase (si está configurado)
     supabaseService.createSale({
       clientId: activeClientId,
+      storeId: activeStoreId,
       posId: activePosId,
       date: saleData.date,
       total,
@@ -264,7 +267,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
       cart: [...cart],
       user: currentUser?.name || 'Sistema',
       change
-    }).catch((err) => console.error('createSale persist error:', err));
+    } as any).catch((err) => console.error('createSale persist error:', err));
 
     // Limpiar estado de pago en progreso y sincronizar venta completada al panel cliente
     localStorage.removeItem('pos-payment');

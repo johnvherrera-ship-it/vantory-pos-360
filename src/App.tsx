@@ -143,9 +143,9 @@ function AppShell() {
 
 // Context wrapper
 function AppContextWrapper({ children }: { children: React.ReactNode }) {
-  const { currentUser, currentPOS } = usePOSContext();
+  const { currentUser, currentPOS, currentStore } = usePOSContext();
   return (
-    <AppContextProvider currentUser={currentUser} currentPOS={currentPOS}>
+    <AppContextProvider currentUser={currentUser} currentPOS={currentPOS} currentStore={currentStore}>
       {children}
     </AppContextProvider>
   );

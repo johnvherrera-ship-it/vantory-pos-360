@@ -52,17 +52,17 @@ export const supabaseService = {
   },
 
   // === Inventory ===
-  async getProducts(clientId: number): Promise<Product[]> {
+  async getProducts(clientId: number, storeId?: number): Promise<Product[]> {
     if (notConfigured()) return [];
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('client_id', clientId);
+      let query = supabase.from('products').select('*').eq('client_id', clientId);
+      if (storeId) query = query.eq('store_id', storeId);
+      const { data, error } = await query;
       if (error) throw error;
       return (data || []).map((p: any) => ({
         ...p,
         clientId: p.client_id,
+        storeId: p.store_id,
         category: p.category_id,
         stock: p.stock_quantity,
         minStock: p.min_stock,
@@ -81,6 +81,7 @@ export const supabaseService = {
       .upsert({
         id: product.id,
         client_id: product.clientId,
+        store_id: (product as any).storeId,
         name: product.name,
         sku: product.sku,
         category_id: product.category,
@@ -264,18 +265,21 @@ export const supabaseService = {
   },
 
   // === Sales ===
-  async getSales(clientId: number): Promise<Sale[]> {
+  async getSales(clientId: number, storeId?: number): Promise<Sale[]> {
     if (notConfigured()) return [];
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('sales')
         .select('*')
         .eq('client_id', clientId)
         .order('created_at', { ascending: false });
+      if (storeId) query = query.eq('store_id', storeId);
+      const { data, error } = await query;
       if (error) throw error;
       return (data || []).map((s: any) => ({
         ...s,
         clientId: s.client_id,
+        storeId: s.store_id,
         posId: s.pos_id,
         date: s.created_at,
         user: s.user_name
@@ -293,6 +297,7 @@ export const supabaseService = {
         .from('sales')
         .insert({
           client_id: sale.clientId,
+          store_id: (sale as any).storeId,
           pos_id: sale.posId,
           total: sale.total,
           payment_method: sale.paymentMethod,
