@@ -169,38 +169,44 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     return saved ? JSON.parse(saved) : [];
   });
 
-  // ===== localStorage Persistence Effects =====
-  useEffect(() => {
-    localStorage.setItem('vantory_sales_history', JSON.stringify(salesHistory));
-  }, [salesHistory]);
+  // ===== localStorage Persistence Effects (with client isolation) =====
+  const getClientStorageKey = (baseKey: string) => {
+    const clientId = currentUser?.clientId || 'default';
+    return `${baseKey}_client_${clientId}`;
+  };
 
   useEffect(() => {
-    localStorage.setItem('vantory_stock_entries', JSON.stringify(stockEntries));
-  }, [stockEntries]);
+    localStorage.setItem(getClientStorageKey('vantory_sales_history'), JSON.stringify(salesHistory));
+  }, [salesHistory, currentUser?.clientId]);
 
   useEffect(() => {
-    localStorage.setItem('vantory_inventory', JSON.stringify(inventory));
-  }, [inventory]);
+    localStorage.setItem(getClientStorageKey('vantory_stock_entries'), JSON.stringify(stockEntries));
+  }, [stockEntries, currentUser?.clientId]);
 
   useEffect(() => {
-    localStorage.setItem('vantory_categories', JSON.stringify(categories));
-  }, [categories]);
+    localStorage.setItem(getClientStorageKey('vantory_inventory'), JSON.stringify(inventory));
+  }, [inventory, currentUser?.clientId]);
 
   useEffect(() => {
-    localStorage.setItem('vantory_cash_registers', JSON.stringify(cashRegisters));
-  }, [cashRegisters]);
+    localStorage.setItem(getClientStorageKey('vantory_categories'), JSON.stringify(categories));
+  }, [categories, currentUser?.clientId]);
 
   useEffect(() => {
-    localStorage.setItem('vantory_fiados', JSON.stringify(fiados));
-  }, [fiados]);
+    localStorage.setItem(getClientStorageKey('vantory_cash_registers'), JSON.stringify(cashRegisters));
+  }, [cashRegisters, currentUser?.clientId]);
 
   useEffect(() => {
-    localStorage.setItem('vantory_cash_history', JSON.stringify(cashHistory));
-  }, [cashHistory]);
+    localStorage.setItem(getClientStorageKey('vantory_fiados'), JSON.stringify(fiados));
+  }, [fiados, currentUser?.clientId]);
+
+  useEffect(() => {
+    localStorage.setItem(getClientStorageKey('vantory_cash_history'), JSON.stringify(cashHistory));
+  }, [cashHistory, currentUser?.clientId]);
 
   // ===== Data Isolation Helpers =====
   const activeClientId = currentUser?.clientId || 1;
-  const activePosId = currentPOS?.id || 1;
+  // Use 0 as sentinel value when no POS is selected, not 1 (which might be a valid ID)
+  const activePosId = currentPOS?.id || 0;
 
   useEffect(() => {
     localStorage.setItem('vantory_users', JSON.stringify(users));
