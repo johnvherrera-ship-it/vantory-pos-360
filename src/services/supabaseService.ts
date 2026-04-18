@@ -122,7 +122,7 @@ export const supabaseService = {
         store_id: user.storeId,
         name: user.name,
         email: user.email,
-        password: user.password,
+        password: user.password || 'temp123',
         role: user.role,
         modules: user.modules,
         status: user.status || 'active',
@@ -130,7 +130,10 @@ export const supabaseService = {
       })
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase createUser error:', error);
+      throw new Error(`No se pudo crear usuario: ${error.message}`);
+    }
     return {
       ...data[0],
       clientId: data[0].client_id,
@@ -155,6 +158,16 @@ export const supabaseService = {
 
     if (error) throw error;
     return data[0];
+  },
+
+  async deleteUser(userId: number) {
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', userId);
+
+    if (error) throw error;
+    return true;
   },
 
   // === Stores & POS ===

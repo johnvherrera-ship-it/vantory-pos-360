@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  LayoutDashboard, 
-  Users, 
-  LogOut, 
-  ArrowLeft, 
-  Plus, 
-  Globe, 
-  Monitor, 
-  UserPlus, 
-  Edit, 
-  X, 
-  Info 
+import {
+  LayoutDashboard,
+  Users,
+  LogOut,
+  ArrowLeft,
+  Plus,
+  Globe,
+  Monitor,
+  UserPlus,
+  Edit,
+  X,
+  Info,
+  Trash2
 } from 'lucide-react';
 import { Logo } from '../layout/Logo';
 import { supabaseService } from '../../services/supabaseService';
@@ -50,6 +51,7 @@ const SuperAdminClientProfile = ({
   
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [userError, setUserError] = useState('');
 
   // Local state for this client's data (separate from global app state)
   const [localStores, setLocalStores] = useState<any[]>([]);
@@ -80,6 +82,7 @@ const SuperAdminClientProfile = ({
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUserError('');
     const form = e.target as HTMLFormElement;
     const name = (form.elements.namedItem('name') as HTMLInputElement).value;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
@@ -92,31 +95,44 @@ const SuperAdminClientProfile = ({
     const modules = Array.from(modulesCheckboxes).map(cb => cb.value);
 
     if (editingUser) {
-      await supabaseService.updateUser(editingUser.id, { name, email, role, status, modules, storeId: storeId ? parseInt(storeId) : null });
-      setLocalUsers(localUsers.map((u: any) => u.id === editingUser.id ? { ...u, name, email, role, status, modules, storeId: storeId ? parseInt(storeId) : null } : u));
+      await supabaseService.updateUser(editingUser.id, { name, email, role, status, modules, storeId: storeId !== '' ? parseInt(storeId) : null });
+      setLocalUsers(localUsers.map((u: any) => u.id === editingUser.id ? { ...u, name, email, role, status, modules, storeId: storeId !== '' ? parseInt(storeId) : null } : u));
     } else {
       try {
         const newUser = {
           clientId: client.id,
-          storeId: storeId ? parseInt(storeId) : null,
+          storeId: storeId !== '' ? parseInt(storeId) : null,
           name,
           email,
           password,
           role,
           status,
-          modules,
-          image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80'
+          modules
         };
         const saved = await supabaseService.createUser(newUser);
         setLocalUsers([...localUsers, { ...newUser, id: saved.id }]);
+        form.reset();
       } catch (error) {
         console.error('Error creating user:', error);
-        alert('Error al crear usuario. Revise que el email sea único.');
+        const errorMsg = error instanceof Error ? error.message : 'Error desconocido';
+        setUserError(errorMsg);
         return;
       }
     }
     setShowUserModal(false);
     setEditingUser(null);
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+      try {
+        await supabaseService.deleteUser(userId);
+        setLocalUsers(localUsers.filter((u: any) => u.id !== userId));
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('Error al eliminar usuario');
+      }
+    }
   };
 
   const handleAddStore = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -303,7 +319,7 @@ const SuperAdminClientProfile = ({
 
         <div className="mt-12 flex justify-between items-center mb-6">
           <h3 className="text-xl font-black font-headline">Usuarios del Cliente</h3>
-          <button onClick={() => { setEditingUser(null); setShowUserModal(true); }} className="bg-secondary text-white px-4 py-2 rounded-xl font-bold hover:bg-secondary/90 transition-colors flex items-center gap-2 text-sm">
+          <button onClick={() => { setEditingUser(null); setUserError(''); setShowUserModal(true); }} className="bg-secondary text-white px-4 py-2 rounded-xl font-bold hover:bg-secondary/90 transition-colors flex items-center gap-2 text-sm">
             <UserPlus className="w-4 h-4" /> Nuevo Usuario
           </button>
         </div>
@@ -324,7 +340,7 @@ const SuperAdminClientProfile = ({
                 <tr key={user.id} className="hover:bg-surface-container-lowest transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <img className="w-8 h-8 rounded-full object-cover border border-outline-variant/20" src={user.image} alt={user.name} />
+                      {user.image && <img className="w-8 h-8 rounded-full object-cover border border-outline-variant/20" src={user.image} alt={user.name} />}
                       <div>
                         <span className="font-bold text-on-surface block">{user.name}</span>
                         <span className="text-xs text-on-surface-variant">{user.email}</span>
@@ -346,9 +362,12 @@ const SuperAdminClientProfile = ({
                       {user.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <button onClick={() => { setEditingUser(user); setShowUserModal(true); }} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                  <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                    <button onClick={() => { setEditingUser(user); setUserError(''); setShowUserModal(true); }} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors">
                       <Edit className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDeleteUser(user.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
@@ -444,12 +463,17 @@ const SuperAdminClientProfile = ({
                   <h3 className="text-2xl font-black text-[#0F172A]">{editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}</h3>
                   <p className="text-sm text-on-surface-variant mt-1">Gestione los accesos, permisos y local del usuario.</p>
                 </div>
-                <button onClick={() => { setShowUserModal(false); setEditingUser(null); }} className="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+                <button onClick={() => { setShowUserModal(false); setEditingUser(null); setUserError(''); }} className="p-2 hover:bg-surface-container-low rounded-full transition-colors">
                   <X className="w-6 h-6 text-on-surface-variant" />
                 </button>
               </div>
 
               <form onSubmit={handleSaveUser} className="space-y-6">
+                {userError && (
+                  <div className="bg-error/10 text-error p-3 rounded-xl text-sm font-bold flex items-center gap-2">
+                    <Info className="w-5 h-5" /> {userError}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-[#0F172A] mb-2">Nombre Completo</label>
@@ -549,7 +573,7 @@ const SuperAdminClientProfile = ({
                 </div>
                 
                 <div className="pt-6 flex gap-3">
-                  <button type="button" onClick={() => { setShowUserModal(false); setEditingUser(null); }} className="flex-1 py-3 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold transition-colors">
+                  <button type="button" onClick={() => { setShowUserModal(false); setEditingUser(null); setUserError(''); }} className="flex-1 py-3 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold transition-colors">
                     Cancelar
                   </button>
                   <button type="submit" className="flex-[2] py-3 px-4 bg-secondary text-white rounded-xl font-bold hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20">

@@ -59,22 +59,10 @@ export const LoginPage = ({
       return;
     }
 
-    // Supabase Auth + Data Fetching
+    // Direct user table authentication (no Supabase Auth)
     const attemptLogin = async () => {
       try {
-        // Authenticate with Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (authError || !authData.user) {
-          alert('Credenciales inválidas. Intente nuevamente.');
-          console.warn('Auth error:', authError?.message);
-          return;
-        }
-
-        // Fetch user profile from users table
+        // Fetch user from users table
         const { data: dbUsers, error: profileError } = await supabase
           .from('users')
           .select('*')
@@ -82,14 +70,21 @@ export const LoginPage = ({
           .single();
 
         if (profileError || !dbUsers) {
-          alert('Perfil de usuario no encontrado. Contacte a soporte.');
+          alert('Credenciales inválidas. Intente nuevamente.');
           console.warn('Profile error:', profileError?.message);
+          return;
+        }
+
+        // Validate password
+        if (dbUsers.password !== password) {
+          alert('Credenciales inválidas. Intente nuevamente.');
           return;
         }
 
         const authenticatedUser = {
           ...dbUsers,
           clientId: dbUsers.client_id,
+          storeId: dbUsers.store_id,
           modules: dbUsers.modules || []
         };
 
