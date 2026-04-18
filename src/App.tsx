@@ -6,6 +6,7 @@
 import React from 'react';
 import { Menu, ArrowUp, ExternalLink, MessageCircle, Instagram } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AppContextProvider } from './context/AppContext';
 import { POSContextProvider } from './context/POSContext';
 import { UIContextProvider, useUIContext } from './context/UIContext';
@@ -137,6 +138,8 @@ function AppShell() {
         setClientCashHistory={setClientCashHistory}
         currentUser={currentUser}
       />
+
+      <SpeedInsights />
     </div>
   );
 }
