@@ -45,6 +45,8 @@ export const LoginPage = ({
     const adminEmail = import.meta.env.VITE_DEMO_SUPERADMIN_EMAIL;
     const adminPassword = import.meta.env.VITE_DEMO_SUPERADMIN_PASSWORD;
 
+    console.log('Admin check:', { adminEmail, adminPassword, enteredEmail: email, enteredPassword: password });
+
     if (adminEmail && adminPassword && email === adminEmail && password === adminPassword) {
       setCurrentUser({
         id: 0,
