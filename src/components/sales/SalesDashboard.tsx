@@ -489,39 +489,39 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
               {inventory
-                .filter(p => 
-                  p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                .filter(p =>
+                  p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                   p.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
                   p.category.toLowerCase().includes(searchTerm.toLowerCase())
                 )
                 .map((product) => (
-                <button 
+                <button
                   key={product.id}
                   onClick={() => handleAddToCart(product)}
-                  className="bg-surface-container-lowest p-0 rounded-xl border border-outline-variant/20 shadow-sm hover:border-secondary hover:shadow-md transition-all text-left flex flex-col h-full group overflow-hidden"
+                  className="bg-surface-container-lowest p-0 rounded-lg border border-outline-variant/20 shadow-sm hover:border-secondary hover:shadow-md transition-all text-left flex flex-col h-full group overflow-hidden"
                 >
                   <div className="aspect-square w-full bg-surface-container-low overflow-hidden relative">
-                    <img 
-                      src={product.image} 
-                      alt={product.name} 
+                    <img
+                      src={product.image}
+                      alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       referrerPolicy="no-referrer"
                     />
                     {product.stock < 10 && (
-                      <div className="absolute top-2 right-2 bg-error text-white text-[10px] font-black px-2 py-1 rounded-full shadow-lg">
-                        BAJO STOCK
+                      <div className="absolute top-1 right-1 bg-error text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-lg">
+                        BAJO
                       </div>
                     )}
                   </div>
-                  <div className="p-4 flex flex-col flex-1">
-                    <h4 className="font-bold text-on-surface text-sm leading-tight mb-1 group-hover:text-secondary transition-colors line-clamp-2">{product.name}</h4>
-                    <p className="text-xs text-[#0F172A] font-black mb-3">{product.category}</p>
+                  <div className="p-2 flex flex-col flex-1">
+                    <h4 className="font-bold text-on-surface text-xs leading-tight mb-0.5 group-hover:text-secondary transition-colors line-clamp-2">{product.name}</h4>
+                    <p className="text-[10px] text-[#0F172A] font-black mb-1">{product.category}</p>
                     <div className="mt-auto">
-                      <p className="text-lg font-black text-green-600 mb-1">{formatCurrency(product.price)}</p>
-                      <p className={`text-xs font-black ${product.stock < 10 ? 'text-error' : 'text-[#0F172A]'}`}>
-                        Stock: {product.stock} {product.stock < 10 && '⚠'}
+                      <p className="text-sm font-black text-green-600 mb-0.5">{formatCurrency(product.price)}</p>
+                      <p className={`text-[10px] font-black ${product.stock < 10 ? 'text-error' : 'text-[#0F172A]'}`}>
+                        {product.stock}u {product.stock < 10 && '⚠'}
                       </p>
                     </div>
                   </div>
@@ -532,9 +532,9 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
           {/* Right Side: Cart / Summary */}
           <section className="flex-1 bg-surface-container-low p-6 flex flex-col border-l border-outline-variant/20">
-            <div className="bg-surface-container-lowest flex-1 rounded-2xl flex flex-col shadow-sm border border-outline-variant/20 overflow-hidden">
+            <div className="bg-surface-container-lowest h-[500px] rounded-2xl flex flex-col shadow-sm border border-outline-variant/20 overflow-hidden">
               {/* Cart List */}
-              <div className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex-1 flex flex-col overflow-hidden min-h-0">
                 <div className="p-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
                   <h3 className="text-sm font-black text-[#0F172A] tracking-widest uppercase"><span className="text-secondary">CARRITO</span> <span className="text-[#0F172A]/70">({totalItems})</span></h3>
                   <div className="flex gap-2">
