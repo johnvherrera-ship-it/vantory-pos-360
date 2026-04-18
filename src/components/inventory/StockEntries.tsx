@@ -145,6 +145,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
     try {
       const savedProduct = await supabaseService.upsertProduct({
         clientId,
+        storeId: currentStore?.id ?? 0,
         name: newProductForm.name,
         sku: newProductForm.sku,
         category: newProductForm.category,

@@ -93,6 +93,7 @@ export const supabaseService = {
     if (notConfigured()) return product as Product;
     const payload: any = {
       client_id: product.clientId,
+      store_id: product.storeId ?? null,
       name: product.name,
       sku: product.sku,
       category: product.category,
@@ -122,6 +123,7 @@ export const supabaseService = {
     const payload = products.map(p => {
       const row: any = {
         client_id: p.clientId,
+        store_id: p.storeId ?? null,
         name: p.name,
         sku: p.sku,
         category: p.category,
