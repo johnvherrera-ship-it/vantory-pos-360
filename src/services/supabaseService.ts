@@ -203,7 +203,7 @@ export const supabaseService = {
     };
   },
 
-  async createPOS(pos: Partial<POS> & { client_id: number }) {
+  async createPOS(pos: Partial<POS> & { client_id: number; storeId: number }) {
     const { data, error } = await supabase
       .from('pos_machines')
       .insert({
@@ -214,15 +214,18 @@ export const supabaseService = {
         last_sync: new Date().toISOString()
       })
       .select();
-    
-    if (error) throw error;
+
+    if (error) {
+      console.error('Supabase createPOS error:', error);
+      throw new Error(`No se pudo crear caja: ${error.message}`);
+    }
     if (!data || data.length === 0) throw new Error('No se pudo crear la caja');
 
     return {
       ...data[0],
       clientId: data[0].client_id,
       storeId: data[0].store_id,
-      id: data[0].id // Aseguramos el ID
+      id: data[0].id
     };
   },
 

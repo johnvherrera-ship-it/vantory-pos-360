@@ -142,8 +142,11 @@ const SuperAdminClientProfile = ({
 
   const handleAddPos = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedStoreForPos) return;
-    
+    if (!selectedStoreForPos) {
+      setPosError('Debe seleccionar una tienda');
+      return;
+    }
+
     const form = e.currentTarget;
     const posData = {
       client_id: client.id,
@@ -156,9 +159,11 @@ const SuperAdminClientProfile = ({
       setLocalPos([...localPos, savedPos]);
       setShowPosModal(false);
       setPosError('');
+      form.reset();
     } catch (error) {
       console.error('Error creating POS:', error);
-      setPosError('Error al guardar la caja en la base de datos.');
+      const errorMsg = error instanceof Error ? error.message : 'Error desconocido';
+      setPosError(errorMsg);
     }
   };
 
