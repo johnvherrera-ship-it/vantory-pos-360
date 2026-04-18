@@ -63,22 +63,41 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
 
   const handleSave = async (product: any) => {
     const clientId = currentUser?.clientId;
+    console.log('🔵 handleSave START - producto local:', { id: product.id, name: product.name });
     if (!clientId) {
       alert('Error: No se puede guardar el producto sin un cliente activo');
       return;
     }
 
     try {
+      console.log('🟡 Guardando en Supabase...');
       const savedProduct = await supabaseService.upsertProduct({ ...product, clientId } as any);
+      console.log('🟢 Guardado exitoso:', { id: savedProduct.id, name: savedProduct.name });
+
       if (product.id) {
-        setInventory(inventory.map(p => p.id === product.id ? savedProduct : p));
+        console.log('🟡 Actualizando producto existente...');
+        setInventory((prev: any[]) => {
+          const updated = prev.map(p => {
+            if (p.id === product.id || p.id === savedProduct.id) {
+              return savedProduct;
+            }
+            return p;
+          });
+          console.log(`🟢 Producto actualizado. Total items: ${updated.length}`);
+          return updated;
+        });
       } else {
-        setInventory([...inventory, savedProduct]);
+        console.log('🟡 Agregando nuevo producto...');
+        setInventory((prev: any[]) => {
+          const updated = [...prev, savedProduct];
+          console.log(`🟢 Producto agregado. Total items: ${updated.length}`);
+          return updated;
+        });
       }
       setEditingProduct(null);
       setShowAddProduct(false);
     } catch (error) {
-      console.error('Error syncing with Supabase:', error);
+      console.error('❌ Error:', error);
       alert('Error al guardar el producto en la base de datos');
     }
   };

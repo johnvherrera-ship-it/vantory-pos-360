@@ -278,8 +278,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
       try {
         const products = await supabaseService.getProducts(activeClientId);
         setInventory(prev => {
-          const remoteIds = new Set(products.map(p => p.id));
-          const keepLocal = prev.filter(p => !remoteIds.has(p.id) && p.clientId !== activeClientId);
+          const keepLocal = prev.filter(p => p.clientId !== activeClientId);
           return [...keepLocal, ...products];
         });
       } catch (e) {
@@ -291,8 +290,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
       try {
         const sales = await supabaseService.getSales(activeClientId);
         setSalesHistory(prev => {
-          const remoteIds = new Set(sales.map(s => s.id));
-          const keepLocal = prev.filter(s => !remoteIds.has(s.id) && s.clientId !== activeClientId);
+          const keepLocal = prev.filter(s => s.clientId !== activeClientId);
           return [...keepLocal, ...sales];
         });
       } catch (e) {
@@ -304,8 +302,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
       try {
         const entries = await supabaseService.getStockEntries(activeClientId);
         setStockEntries(prev => {
-          const remoteIds = new Set(entries.map(e => e.id));
-          const keepLocal = prev.filter(e => !remoteIds.has(e.id) && e.clientId !== activeClientId);
+          const keepLocal = prev.filter(e => e.clientId !== activeClientId);
           return [...keepLocal, ...entries];
         });
       } catch (e) {
@@ -317,8 +314,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
       try {
         const fiados = await supabaseService.getFiados(activeClientId);
         setFiados(prev => {
-          const remoteIds = new Set(fiados.map(f => f.id));
-          const keepLocal = prev.filter(f => !remoteIds.has(f.id) && f.clientId !== activeClientId);
+          const keepLocal = prev.filter(f => f.clientId !== activeClientId);
           return [...keepLocal, ...fiados];
         });
       } catch (e) {

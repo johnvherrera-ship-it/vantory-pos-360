@@ -90,8 +90,16 @@ export const supabaseService = {
         image_url: product.image
       })
       .select();
-    if (error) throw error;
-    return data?.[0];
+    if (error) {
+      console.error('upsertProduct error:', error);
+      throw error;
+    }
+    const result = data?.[0];
+    if (!result) {
+      console.error('upsertProduct: no data returned');
+      throw new Error('No se recibieron datos después de guardar el producto');
+    }
+    return result;
   },
 
   async deleteProduct(productId: number) {
