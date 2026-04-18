@@ -40,8 +40,8 @@ export const StockEntries = ({}: StockEntriesProps) => {
   const [receivingCart, setReceivingCart] = useState<any[]>([]);
   const [isScanned, setIsScanned] = useState(false);
 
-  const todayStr = new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' });
-  const entriesToday = stockEntries.filter(entry => entry.date === todayStr).length;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const entriesToday = stockEntries.filter(entry => entry.date?.split('T')[0] === todayStr).length;
 
   const handleBarcodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +80,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
       return;
     }
 
-    const nowDate = new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' });
+    const nowDate = new Date().toISOString();
     const newEntries = receivingCart.map(item => ({
       folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
       productName: item.name,
@@ -163,7 +163,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
         productId: savedProduct.id,
         quantity: stockNum,
         cost: costNum,
-        date: new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' }),
+        date: new Date().toISOString(),
         user: currentUser?.name || 'Admin User',
         image: savedProduct.image,
         clientId,
@@ -205,7 +205,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
       productName: product.name,
       productId: product.id,
       quantity,
-      date: new Date(manualDate).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: '2-digit' }),
+      date: new Date(manualDate).toISOString(),
       user: currentUser?.name || 'Admin User',
       image: product.image,
       clientId,
