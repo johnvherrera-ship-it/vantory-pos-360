@@ -337,13 +337,13 @@ export const supabaseService = {
         .from('stock_entries')
         .insert({
           client_id: entry.clientId,
-          store_id: entry.storeId,
           product_id: entry.productId,
+          product_name: entry.productName,
           quantity: entry.quantity,
-          cost: entry.cost,
           user_name: entry.user,
           folio: entry.folio,
-          created_at: new Date().toISOString()
+          date: new Date().toISOString(),
+          image_url: entry.image
         })
         .select();
       if (error) throw error;
