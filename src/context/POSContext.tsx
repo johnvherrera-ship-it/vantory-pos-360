@@ -61,11 +61,8 @@ export const POSContextProvider: React.FC<POSContextProviderProps> = ({
   }, [currentUser, currentStore, currentPOS]);
 
   useEffect(() => {
-    if (users.length > 0 && !currentUser) {
-      setCurrentUser(users[0]);
-      if (onUserAutoGrant) {
-        onUserAutoGrant(users);
-      }
+    if (users.length > 0 && currentUser && onUserAutoGrant) {
+      onUserAutoGrant(users);
     }
   }, [users, currentUser, onUserAutoGrant]);
 

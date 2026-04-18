@@ -114,8 +114,22 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   }, [showCashModal, showFiadoModal, amountReceived, total, selectedFiadoClient, newFiadoClient.name]);
 
   const playBeep = () => {
-    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-    audio.play().catch(() => {});
+    try {
+      const AudioCtx = (window.AudioContext || (window as any).webkitAudioContext);
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1000, ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+      osc.onended = () => ctx.close();
+    } catch {}
   };
 
   const handleAddToCart = (product: any) => {
@@ -151,16 +165,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     if (product) {
       handleAddToCart(product);
     } else {
-      const newProduct = { 
-        id: Date.now(), 
-        name: `Producto ${barcode}`, 
-        sku: barcode, 
-        cost: Math.floor(Math.random() * 1000) + 500, // Default cost for unknown products
-        price: Math.floor(Math.random() * 5000) + 1000, 
-        quantity: 1 
-      };
-      setCart([...cart, newProduct]);
-      setLastScanned({ name: newProduct.name, price: newProduct.price });
+      alert(`Producto no encontrado: ${barcode}. Regístralo primero en Inventario.`);
     }
     setBarcode('');
   };
@@ -179,7 +184,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
       return sum + ((item.price - cost) * item.quantity);
     }, 0);
 
-    // Deduct from inventory
+    // Deduct from inventory (optimistic UI update)
     const updatedInventory = inventory.map(invItem => {
       const cartItem = cart.find(c => c.id === invItem.id);
       if (cartItem) {
@@ -189,25 +194,23 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     });
     setInventory(updatedInventory);
 
-    // Persistir stock descontado en Supabase
-    const productsToPersist = cart.map(cartItem => {
-      const inv = inventory.find(p => p.id === cartItem.id);
-      if (!inv) return null;
-      return {
-        id: inv.id,
-        clientId: activeClientId,
-        name: inv.name,
-        sku: inv.sku,
-        category: inv.category,
-        price: inv.price,
-        cost: inv.cost,
-        stock: Math.max(0, inv.stock - cartItem.quantity),
-        image: inv.image
-      };
-    }).filter(Boolean) as any[];
-    if (productsToPersist.length) {
-      supabaseService.bulkUpsertProducts(productsToPersist)
-        .catch(err => console.error('bulkUpsertProducts post-sale error:', err));
+    // Atomic stock decrement: re-fetch from DB before upsert to avoid race conditions
+    const decrementItems = cart
+      .filter(ci => inventory.find(p => p.id === ci.id))
+      .map(ci => ({ productId: ci.id, quantity: ci.quantity }));
+    if (decrementItems.length) {
+      supabaseService.decrementStockAtomic(activeClientId, decrementItems)
+        .then((fresh) => {
+          if (fresh.length) {
+            setInventory((prev: any[]) =>
+              prev.map(p => {
+                const updated = fresh.find(f => f.id === p.id);
+                return updated ? updated : p;
+              })
+            );
+          }
+        })
+        .catch(err => console.error('decrementStockAtomic error:', err));
     }
 
     // Save last sale for ticket

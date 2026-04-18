@@ -107,31 +107,50 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const clientId = currentUser?.clientId;
+    if (!clientId) {
+      alert('Error: No se puede importar sin un cliente activo');
+      return;
+    }
+
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const data = event.target?.result;
-      const workbook = XLSX.read(data, { type: 'binary' });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(sheet);
+    reader.onload = async (event) => {
+      try {
+        const data = event.target?.result;
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-      const newItems = jsonData.map((row: any) => ({
-        id: Date.now() + Math.random(),
-        sku: String(row.sku || row.SKU || ''),
-        name: String(row.nombre || row.Nombre || 'Producto Nuevo'),
-        category: String(row.categoria || row.Categoría || 'General'),
-        cost: parseInt(row.costo || row.Costo || 0),
-        price: parseInt(row.precio || row.Precio || 0),
-        stock: parseInt(row.stock || row.Stock || 0),
-        isFavorite: String(row.favorito || row.Favorito || '').toUpperCase() === 'SI',
-        image: String(row.imagen_url || row.Imagen || 'https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=100&q=80'),
-        margin: row.precio && row.costo ? Math.round(((parseInt(row.precio) - parseInt(row.costo)) / parseInt(row.precio)) * 100) : 0
-      })).filter(item => item.sku !== '');
+        const newItems = jsonData.map((row: any) => {
+          const cost = parseInt(row.costo || row.Costo || 0) || 0;
+          const price = parseInt(row.precio || row.Precio || 0) || 0;
+          return {
+            clientId,
+            sku: String(row.sku || row.SKU || ''),
+            name: String(row.nombre || row.Nombre || 'Producto Nuevo'),
+            category: String(row.categoria || row.Categoría || 'General'),
+            cost,
+            price,
+            stock: parseInt(row.stock || row.Stock || 0) || 0,
+            isFavorite: String(row.favorito || row.Favorito || '').toUpperCase() === 'SI',
+            image: String(row.imagen_url || row.Imagen || 'https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=100&q=80'),
+            margin: price && cost ? Math.round(((price - cost) / price) * 100) : 0
+          };
+        }).filter(item => item.sku !== '');
 
-      if (newItems.length > 0) {
-        setInventory([...inventory, ...newItems]);
+        if (newItems.length === 0) {
+          alert('No se encontraron productos válidos en el archivo.');
+          return;
+        }
+
+        const saved = await supabaseService.bulkUpsertProducts(newItems as any);
+        setInventory((prev: any[]) => [...prev, ...saved]);
         setShowBulkUpload(false);
-        alert(`Se han importado ${newItems.length} productos exitosamente.`);
+        alert(`Se han importado ${saved.length} productos exitosamente.`);
+      } catch (err) {
+        console.error('Bulk upload error:', err);
+        alert('Error al importar productos a la base de datos');
       }
     };
     reader.readAsBinaryString(file);

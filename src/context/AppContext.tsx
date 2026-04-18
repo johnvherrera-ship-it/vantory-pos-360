@@ -108,11 +108,8 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   });
 
   // ===== Inventory & Stock =====
-  const [inventory, setInventory] = useState(() => {
-    const clientId = currentUser?.clientId || 'default';
-    const saved = localStorage.getItem(`vantory_inventory_client_${clientId}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  // Source of truth: Supabase. Loaded via refetch effects below.
+  const [inventory, setInventory] = useState<Product[]>([]);
 
   const [categories, setCategories] = useState<string[]>(() => {
     const clientId = currentUser?.clientId || 'default';
@@ -120,18 +117,10 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     return saved ? JSON.parse(saved) : ['Cerveza', 'Licor', 'Bebida', 'Snacks', 'Abarrotes', 'Limpieza'];
   });
 
-  const [stockEntries, setStockEntries] = useState(() => {
-    const clientId = currentUser?.clientId || 'default';
-    const saved = localStorage.getItem(`vantory_stock_entries_client_${clientId}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [stockEntries, setStockEntries] = useState<StockEntry[]>([]);
 
   // ===== Sales =====
-  const [salesHistory, setSalesHistory] = useState<any[]>(() => {
-    const clientId = currentUser?.clientId || 'default';
-    const saved = localStorage.getItem(`vantory_sales_history_client_${clientId}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [salesHistory, setSalesHistory] = useState<Sale[]>([]);
 
   // ===== Cash Register =====
   const [cashRegisters, setCashRegisters] = useState<any[]>(() => {
@@ -167,11 +156,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   });
 
   // ===== Fiados =====
-  const [fiados, setFiados] = useState<any[]>(() => {
-    const clientId = currentUser?.clientId || 'default';
-    const saved = localStorage.getItem(`vantory_fiados_client_${clientId}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [fiados, setFiados] = useState<Fiado[]>([]);
 
   // ===== localStorage Persistence Effects (with client isolation) =====
   const getClientStorageKey = (baseKey: string) => {
@@ -195,33 +180,19 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
       }
     };
 
-    setInventory((prev) => load('vantory_inventory', prev));
+    // Supabase refetch effects will load inventory/sales/stockEntries/fiados.
+    // Only load local caches for non-DB-backed resources.
     setCategories((prev) => load('vantory_categories', prev));
-    setStockEntries((prev) => load('vantory_stock_entries', prev));
-    setSalesHistory((prev) => load('vantory_sales_history', prev));
     setCashRegisters((prev) => load('vantory_cash_registers', prev));
     setCashHistory((prev) => load('vantory_cash_history', prev));
-    setFiados((prev) => load('vantory_fiados', prev));
 
     // Release guard on next tick so persistence effects skip the transitional render
     const t = setTimeout(() => { reloadingRef.current = false; }, 0);
     return () => clearTimeout(t);
   }, [currentUser?.clientId]);
 
-  useEffect(() => {
-    if (reloadingRef.current) return;
-    localStorage.setItem(getClientStorageKey('vantory_sales_history'), JSON.stringify(salesHistory));
-  }, [salesHistory, currentUser?.clientId]);
-
-  useEffect(() => {
-    if (reloadingRef.current) return;
-    localStorage.setItem(getClientStorageKey('vantory_stock_entries'), JSON.stringify(stockEntries));
-  }, [stockEntries, currentUser?.clientId]);
-
-  useEffect(() => {
-    if (reloadingRef.current) return;
-    localStorage.setItem(getClientStorageKey('vantory_inventory'), JSON.stringify(inventory));
-  }, [inventory, currentUser?.clientId]);
+  // NOTE: inventory, salesHistory, stockEntries, fiados persist to Supabase (source of truth).
+  // localStorage removed to avoid dual source of truth divergence. Cache-on-read only via initial useState.
 
   useEffect(() => {
     if (reloadingRef.current) return;
@@ -232,11 +203,6 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     if (reloadingRef.current) return;
     localStorage.setItem(getClientStorageKey('vantory_cash_registers'), JSON.stringify(cashRegisters));
   }, [cashRegisters, currentUser?.clientId]);
-
-  useEffect(() => {
-    if (reloadingRef.current) return;
-    localStorage.setItem(getClientStorageKey('vantory_fiados'), JSON.stringify(fiados));
-  }, [fiados, currentUser?.clientId]);
 
   useEffect(() => {
     if (reloadingRef.current) return;

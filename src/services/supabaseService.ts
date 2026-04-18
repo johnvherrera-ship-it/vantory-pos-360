@@ -341,6 +341,7 @@ export const supabaseService = {
         .from('sales')
         .insert({
           client_id: sale.clientId,
+          store_id: (sale as any).storeId ?? null,
           pos_id: sale.posId,
           total: sale.total,
           payment_method: sale.paymentMethod,
@@ -354,6 +355,35 @@ export const supabaseService = {
       console.error('createSale failed:', e);
       return null;
     }
+  },
+
+  async decrementStockAtomic(clientId: number, items: Array<{ productId: number; quantity: number }>): Promise<Product[]> {
+    if (notConfigured()) return [];
+    if (!items.length) return [];
+    const ids = items.map(i => i.productId);
+    const { data: current, error: fetchErr } = await supabase
+      .from('products')
+      .select('*')
+      .in('id', ids)
+      .eq('client_id', clientId);
+    if (fetchErr) throw fetchErr;
+    const payload = (current || []).map((row: any) => {
+      const decrement = items.find(i => i.productId === row.id)?.quantity ?? 0;
+      return {
+        id: row.id,
+        client_id: row.client_id,
+        name: row.name,
+        sku: row.sku,
+        category: row.category,
+        price: row.price,
+        cost: row.cost,
+        stock: Math.max(0, (row.stock ?? 0) - decrement),
+        image_url: row.image_url
+      };
+    });
+    const { data, error } = await supabase.from('products').upsert(payload).select();
+    if (error) throw error;
+    return (data || []).map(supabaseService._normalizeProduct);
   },
 
   // === Stock Entries ===
