@@ -62,34 +62,21 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   };
 
   const handleSave = async (product: any) => {
-    if (product.id) {
-      setInventory(inventory.map(p => p.id === product.id ? product : p));
-    } else {
-      setInventory([...inventory, { ...product, id: Date.now() }]);
+    const clientId = currentUser?.clientId;
+    if (!clientId) {
+      alert('Error: No se puede guardar el producto sin un cliente activo');
+      return;
     }
-    setEditingProduct(null);
-    setShowAddProduct(false);
 
-    // Sync with Supabase
     try {
-      const clientId = currentUser?.clientId;
-      const storeId = currentStore?.id || currentPOS?.storeId;
-      if (!clientId) {
-        console.error('No client ID available for product save');
-        alert('Error: No se puede guardar el producto sin un cliente activo');
-        return;
-      }
-      if (!storeId) {
-        console.error('No store ID available for product save');
-        alert('Error: Debes seleccionar un local antes de guardar productos');
-        return;
-      }
-      if (product.id && product.id > 1000000000000) {
-        const { id, ...newProduct } = product;
-        await supabaseService.upsertProduct({ ...newProduct, clientId, storeId } as any);
+      const savedProduct = await supabaseService.upsertProduct({ ...product, clientId } as any);
+      if (product.id) {
+        setInventory(inventory.map(p => p.id === product.id ? savedProduct : p));
       } else {
-        await supabaseService.upsertProduct({ ...product, clientId, storeId } as any);
+        setInventory([...inventory, savedProduct]);
       }
+      setEditingProduct(null);
+      setShowAddProduct(false);
     } catch (error) {
       console.error('Error syncing with Supabase:', error);
       alert('Error al guardar el producto en la base de datos');
