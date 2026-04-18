@@ -70,14 +70,21 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
 
     // Sync with Supabase
     try {
-      if (product.id && product.id > 1000000000000) { // It's a temporary Date.now() ID
+      const clientId = currentUser?.clientId;
+      if (!clientId) {
+        console.error('No client ID available for product save');
+        alert('Error: No se puede guardar el producto sin un cliente activo');
+        return;
+      }
+      if (product.id && product.id > 1000000000000) {
         const { id, ...newProduct } = product;
-        await supabaseService.upsertProduct({ ...newProduct, clientId: pos.currentUser?.clientId || 1 });
+        await supabaseService.upsertProduct({ ...newProduct, clientId });
       } else {
-        await supabaseService.upsertProduct({ ...product, clientId: pos.currentUser?.clientId || 1 });
+        await supabaseService.upsertProduct({ ...product, clientId });
       }
     } catch (error) {
       console.error('Error syncing with Supabase:', error);
+      alert('Error al guardar el producto en la base de datos');
     }
   };
 
@@ -134,12 +141,14 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   };
 
   const filteredInventory = inventory.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          p.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          p.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLowStock = filterLowStock ? p.stock < 10 : true;
     const matchesCategory = selectedCategory === 'Todas las Categorías' ? true : p.category === selectedCategory;
-    return matchesSearch && matchesLowStock && matchesCategory;
+    // Ensure product belongs to current client
+    const matchesClient = p.clientId === currentUser?.clientId;
+    return matchesSearch && matchesLowStock && matchesCategory && matchesClient;
   });
 
   const totalProducts = inventory.length;

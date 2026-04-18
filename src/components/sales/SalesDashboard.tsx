@@ -58,6 +58,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
       if (e.key === 'F10') {
         e.preventDefault();
         if (cart.length > 0) {
+          if (!currentPOS) {
+            alert('Debes seleccionar una caja primero');
+            return;
+          }
           if (!cashRegister.isOpen) {
             setShowCashRegisterModal(true);
             return;
@@ -71,7 +75,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cart, cashRegister.isOpen, setShowCashRegisterModal]);
+  }, [cart, cashRegister.isOpen, setShowCashRegisterModal, currentPOS]);
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + (parseInt(surcharge) || 0);
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -561,8 +565,12 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <button 
+                  <button
                     onClick={() => {
+                      if (!currentPOS) {
+                        alert('Debes seleccionar una caja primero');
+                        return;
+                      }
                       if (!cashRegister.isOpen) {
                         setShowCashRegisterModal(true);
                         return;
@@ -575,8 +583,12 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     <Banknote className="w-5 h-5" />
                     Efectivo (F10)
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
+                      if (!currentPOS) {
+                        alert('Debes seleccionar una caja primero');
+                        return;
+                      }
                       if (!cashRegister.isOpen) {
                         setShowCashRegisterModal(true);
                         return;
@@ -589,8 +601,12 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     <CreditCard className="w-5 h-5" />
                     Débito
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
+                      if (!currentPOS) {
+                        alert('Debes seleccionar una caja primero');
+                        return;
+                      }
                       if (!cashRegister.isOpen) {
                         setShowCashRegisterModal(true);
                         return;
@@ -603,8 +619,12 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     <CreditCard className="w-4 h-4" />
                     Pluxee
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
+                      if (!currentPOS) {
+                        alert('Debes seleccionar una caja primero');
+                        return;
+                      }
                       if (!cashRegister.isOpen) {
                         setShowCashRegisterModal(true);
                         return;
@@ -617,8 +637,12 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     <CreditCard className="w-4 h-4" />
                     AmiPass
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
+                      if (!currentPOS) {
+                        alert('Debes seleccionar una caja primero');
+                        return;
+                      }
                       if (!cashRegister.isOpen) {
                         setShowCashRegisterModal(true);
                         return;
