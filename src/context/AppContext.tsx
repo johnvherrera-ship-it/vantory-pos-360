@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { Product, Sale, StockEntry, User, Store, POS, Fiado, CashRegister, CashHistoryRecord, SaaSClient } from '../types';
 import { supabaseService } from '../services/supabaseService';
+import { supabase } from '../lib/supabase';
 
 interface AppContextType {
   // SaaS Clients
@@ -110,12 +111,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   const [inventory, setInventory] = useState(() => {
     const clientId = currentUser?.clientId || 'default';
     const saved = localStorage.getItem(`vantory_inventory_client_${clientId}`);
-    return saved ? JSON.parse(saved) : [
-      { id: 1, clientId: 1, name: 'Cerveza Corona 330cc', category: 'Cerveza', cost: 900, price: 1500, stock: 48, sku: '7801', isFavorite: true, image: 'https://images.unsplash.com/photo-1614315584058-2200ed432b4b?auto=format&fit=crop&w=100&q=80' },
-      { id: 2, clientId: 1, name: 'Pisco Mistral 35° 750cc', category: 'Licor', cost: 5000, price: 8500, stock: 12, sku: '7802', isFavorite: true, image: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=100&q=80' },
-      { id: 3, clientId: 1, name: 'Coca Cola 1.5L', category: 'Bebida', cost: 1200, price: 2100, stock: 5, sku: '7803', isFavorite: true, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=100&q=80' },
-      { id: 4, clientId: 1, name: 'Papas Lays Clásicas 250g', category: 'Snacks', cost: 1500, price: 2800, stock: 15, sku: '7804', isFavorite: false, image: 'https://images.unsplash.com/photo-1566478989037-e924e5bbc31e?auto=format&fit=crop&w=100&q=80' },
-    ];
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [categories, setCategories] = useState<string[]>(() => {
@@ -127,10 +123,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   const [stockEntries, setStockEntries] = useState(() => {
     const clientId = currentUser?.clientId || 'default';
     const saved = localStorage.getItem(`vantory_stock_entries_client_${clientId}`);
-    return saved ? JSON.parse(saved) : [
-      { id: 1, clientId: 1, folio: 'ENT-4829', productName: 'iPhone 15 Pro Max 256GB', productId: 101, quantity: 24, date: '27 Oct, 23', user: 'J. Delgado', image: 'https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=100&q=80' },
-      { id: 2, clientId: 1, folio: 'ENT-4828', productName: 'MacBook Air M2 13"', productId: 102, quantity: 10, date: '27 Oct, 23', user: 'A. María', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=100&q=80' },
-    ];
+    return saved ? JSON.parse(saved) : [];
   });
 
   // ===== Sales =====
@@ -279,44 +272,74 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   }, [vantoryClients]);
 
   useEffect(() => {
-    const loadInventory = async () => {
-      if (activeClientId) {
-        try {
-          const products = await supabaseService.getProducts(activeClientId);
-          if (products.length > 0) {
-            // Merge remote with any local-only items for other stores not fetched
-            setInventory(prev => {
-              const remoteIds = new Set(products.map(p => p.id));
-              const keepLocal = prev.filter(p => !remoteIds.has(p.id) && p.clientId !== activeClientId);
-              return [...keepLocal, ...products];
-            });
-          }
-        } catch (error) {
-          console.error('Error loading inventory from Supabase:', error);
-        }
-      }
-    };
-    loadInventory();
-  }, [activeClientId]);
+    if (!activeClientId) return;
 
-  useEffect(() => {
-    const loadSalesHistory = async () => {
-      if (activeClientId) {
-        try {
-          const sales = await supabaseService.getSales(activeClientId);
-          if (sales.length > 0) {
-            setSalesHistory(prev => {
-              const remoteIds = new Set(sales.map(s => s.id));
-              const keepLocal = prev.filter(s => !remoteIds.has(s.id) && s.clientId !== activeClientId);
-              return [...keepLocal, ...sales];
-            });
-          }
-        } catch (error) {
-          console.error('Error loading sales from Supabase:', error);
-        }
+    const refetchProducts = async () => {
+      try {
+        const products = await supabaseService.getProducts(activeClientId);
+        setInventory(prev => {
+          const remoteIds = new Set(products.map(p => p.id));
+          const keepLocal = prev.filter(p => !remoteIds.has(p.id) && p.clientId !== activeClientId);
+          return [...keepLocal, ...products];
+        });
+      } catch (e) {
+        console.error('Error loading inventory:', e);
       }
     };
-    loadSalesHistory();
+
+    const refetchSales = async () => {
+      try {
+        const sales = await supabaseService.getSales(activeClientId);
+        setSalesHistory(prev => {
+          const remoteIds = new Set(sales.map(s => s.id));
+          const keepLocal = prev.filter(s => !remoteIds.has(s.id) && s.clientId !== activeClientId);
+          return [...keepLocal, ...sales];
+        });
+      } catch (e) {
+        console.error('Error loading sales:', e);
+      }
+    };
+
+    const refetchStockEntries = async () => {
+      try {
+        const entries = await supabaseService.getStockEntries(activeClientId);
+        setStockEntries(prev => {
+          const remoteIds = new Set(entries.map(e => e.id));
+          const keepLocal = prev.filter(e => !remoteIds.has(e.id) && e.clientId !== activeClientId);
+          return [...keepLocal, ...entries];
+        });
+      } catch (e) {
+        console.error('Error loading stock entries:', e);
+      }
+    };
+
+    const refetchFiados = async () => {
+      try {
+        const fiados = await supabaseService.getFiados(activeClientId);
+        setFiados(prev => {
+          const remoteIds = new Set(fiados.map(f => f.id));
+          const keepLocal = prev.filter(f => !remoteIds.has(f.id) && f.clientId !== activeClientId);
+          return [...keepLocal, ...fiados];
+        });
+      } catch (e) {
+        console.error('Error loading fiados:', e);
+      }
+    };
+
+    refetchProducts();
+    refetchSales();
+    refetchStockEntries();
+    refetchFiados();
+
+    const channel = supabase
+      .channel(`client-${activeClientId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products', filter: `client_id=eq.${activeClientId}` }, refetchProducts)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: `client_id=eq.${activeClientId}` }, refetchSales)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'stock_entries', filter: `client_id=eq.${activeClientId}` }, refetchStockEntries)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'fiados', filter: `client_id=eq.${activeClientId}` }, refetchFiados)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [activeClientId]);
 
   useEffect(() => {

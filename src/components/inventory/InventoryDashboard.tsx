@@ -25,7 +25,6 @@ import { SideNavBar } from '../layout/SideNavBar';
 import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
 import { supabaseService } from '../../services/supabaseService';
-import { generateSampleProducts } from '../../utils/seedProducts';
 
 interface InventoryDashboardProps {}
 
@@ -45,20 +44,6 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   const [selectedCategory, setSelectedCategory] = useState('Todas las Categorías');
   const [pageNumber, setPageNumber] = useState(1);
   const ITEMS_PER_PAGE = 15;
-
-  React.useEffect(() => {
-    if (inventory.length === 0 && currentUser?.clientId && currentStore?.id) {
-      const sampleProducts = generateSampleProducts();
-      sampleProducts.forEach(product => {
-        supabaseService.upsertProduct({
-          ...product,
-          clientId: currentUser.clientId,
-          storeId: currentStore.id
-        }).catch(err => console.error('Error seeding product:', err));
-      });
-      setInventory(sampleProducts);
-    }
-  }, [currentUser?.clientId, currentStore?.id]);
 
   const handleDelete = async (id: number) => {
     try {

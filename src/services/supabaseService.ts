@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { Product, SaaSClient, Sale, User, Store, POS } from '../types';
+import { Product, SaaSClient, Sale, User, Store, POS, StockEntry } from '../types';
 
 const notConfigured = () => !isSupabaseConfigured;
 
@@ -310,6 +310,40 @@ export const supabaseService = {
     } catch (e) {
       console.error('createSale failed:', e);
       return null;
+    }
+  },
+
+  // === Stock Entries ===
+  async getStockEntries(clientId: number): Promise<StockEntry[]> {
+    if (notConfigured()) return [];
+    try {
+      const { data, error } = await supabase
+        .from('stock_entries')
+        .select('*')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []) as StockEntry[];
+    } catch (e) {
+      console.error('getStockEntries failed:', e);
+      return [];
+    }
+  },
+
+  // === Fiados ===
+  async getFiados(clientId: number): Promise<any[]> {
+    if (notConfigured()) return [];
+    try {
+      const { data, error } = await supabase
+        .from('fiados')
+        .select('*')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []) as any[];
+    } catch (e) {
+      console.error('getFiados failed:', e);
+      return [];
     }
   }
 };
