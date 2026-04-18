@@ -378,12 +378,17 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
                   <td className="px-8 py-6 font-medium font-body text-on-surface tabular-nums">${product.cost.toLocaleString('es-CL')}</td>
                   <td className="px-8 py-6 font-bold font-body text-on-surface tabular-nums">${product.price.toLocaleString('es-CL')}</td>
                   <td className="px-8 py-6">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-surface-container-high rounded-full overflow-hidden w-20">
-                        <div className="bg-secondary h-full" style={{width: `${product.margin}%`}}></div>
-                      </div>
-                      <span className="text-sm font-bold text-secondary">{product.margin}%</span>
-                    </div>
+                    {(() => {
+                      const margin = product.price > 0 ? Math.round(((product.price - product.cost) / product.price) * 100) : 0;
+                      return (
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-surface-container-high rounded-full overflow-hidden w-20">
+                            <div className="bg-secondary h-full" style={{width: `${margin}%`}}></div>
+                          </div>
+                          <span className="text-sm font-bold text-secondary">{margin}%</span>
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td className="px-8 py-6 text-right">
                     <button 
