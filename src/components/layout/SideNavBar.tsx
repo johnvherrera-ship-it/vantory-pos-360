@@ -39,7 +39,7 @@ export const SideNavBar = ({
     return (
       <a
         onClick={() => setCurrentPage(page)}
-        className={`flex items-center gap-3 py-2.5 px-5 my-0.5 transition-all cursor-pointer rounded-lg mx-3 active:scale-[0.98] ${currentPage === page ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
+        className={`flex items-center gap-3 py-2.5 px-4 my-0.5 transition-all cursor-pointer rounded-lg mx-2 active:scale-[0.98] ${currentPage === page ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
       >
         <Icon className="w-5 h-5" />
         <span className="text-sm font-semibold font-body">{label}</span>
@@ -48,7 +48,7 @@ export const SideNavBar = ({
   };
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 z-50 bg-secondary flex flex-col py-6 shadow-lg border-r border-white/10">
+    <aside className="fixed top-0 bottom-0 left-0 w-64 z-50 bg-secondary flex flex-col py-6 shadow-lg border-r border-white/10">
       <div className="px-6 mb-4">
         <Logo onClick={() => setCurrentPage('home')} light={true} />
       </div>
@@ -72,7 +72,7 @@ export const SideNavBar = ({
         </div>
       )}
 
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden pr-2">
         <div className="px-6 mb-2 mt-4 text-xs font-semibold text-white/50 uppercase tracking-wider">
           General
         </div>
@@ -100,7 +100,7 @@ export const SideNavBar = ({
             if (setCurrentUser) setCurrentUser(null);
             setCurrentPage('home');
           }}
-          className="w-full flex items-center gap-3 py-3 px-6 text-white/70 hover:bg-white/10 hover:text-white transition-all rounded-xl active:scale-[0.98]"
+          className="flex items-center gap-3 py-3 px-4 text-white/70 hover:bg-white/10 hover:text-white transition-all rounded-xl active:scale-[0.98] mx-2"
         >
           <History className="w-5 h-5" />
           <span className="text-sm font-semibold font-body">Cerrar Sesión</span>
