@@ -36,6 +36,8 @@ const SuperAdminClients = ({
   const [showModal, setShowModal] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
   const [confirmDialog, setConfirmDialog] = useState<{ show: boolean; clientId: number | null }>({ show: false, clientId: null });
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
 
   const handleSaveClient = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,7 +67,8 @@ const SuperAdminClients = ({
           await supabaseService.createUser({
             clientId: savedClient.id,
             name: `Admin ${savedClient.name}`,
-            email: savedClient.email,
+            email: adminEmail || savedClient.email,
+            password: adminPassword || undefined,
             role: 'Administrador',
             modules: ['dashboard', 'inventory', 'sales', 'history', 'entries', 'kpis', 'users', 'fiados'],
             status: 'active',
@@ -75,6 +78,8 @@ const SuperAdminClients = ({
       }
       setShowModal(false);
       setEditingClient(null);
+      setAdminEmail('');
+      setAdminPassword('');
     } catch (error) {
       console.error('Error syncing client with Supabase:', error);
       alert('Error al guardar cliente: ' + (error instanceof Error ? error.message : 'Desconocido'));
@@ -151,7 +156,7 @@ const SuperAdminClients = ({
             <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Gestión de <span className="text-secondary">Clientes</span></h2>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">PANEL MAESTRO &gt; CLIENTES SAAS</p>
           </div>
-          <button onClick={() => { setEditingClient(null); setShowModal(true); }} className="bg-secondary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-secondary/90 transition-colors shadow-lg">
+          <button onClick={() => { setEditingClient(null); setAdminEmail(''); setAdminPassword(''); setShowModal(true); }} className="bg-secondary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-secondary/90 transition-colors shadow-lg">
             <Plus className="w-5 h-5" />
             Nuevo Cliente
           </button>
@@ -236,7 +241,7 @@ const SuperAdminClients = ({
                 <h3 className="text-2xl font-black font-headline">
                   {editingClient ? 'Editar Cliente SaaS' : 'Nuevo Cliente SaaS'}
                 </h3>
-                <button onClick={() => { setShowModal(false); setEditingClient(null); }} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+                <button onClick={() => { setShowModal(false); setEditingClient(null); setAdminEmail(''); setAdminPassword(''); }} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -251,6 +256,18 @@ const SuperAdminClients = ({
                     <label className="block text-sm font-bold text-on-surface-variant mb-1">Correo Administrador</label>
                     <input type="email" name="email" defaultValue={editingClient?.email} required className="w-full p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-secondary outline-none font-medium" placeholder="admin@empresa.cl" />
                   </div>
+                  {!editingClient && (
+                    <>
+                      <div className="col-span-2">
+                        <label className="block text-sm font-bold text-on-surface-variant mb-1">Email del Admin (Opcional)</label>
+                        <input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} className="w-full p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-secondary outline-none font-medium" placeholder="Si no especificas, usará el email del cliente" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-sm font-bold text-on-surface-variant mb-1">Contraseña del Admin (Opcional)</label>
+                        <input type="password" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} className="w-full p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-secondary outline-none font-medium" placeholder="Si no especificas, usará: temp123" />
+                      </div>
+                    </>
+                  )}
                   <div className="col-span-2">
                     <label className="block text-sm font-bold text-on-surface-variant mb-1">MRR (Mensualidad $)</label>
                     <input type="number" name="mrr" defaultValue={editingClient?.mrr || 29990} required className="w-full p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-secondary outline-none font-medium" />
@@ -266,7 +283,7 @@ const SuperAdminClients = ({
                 </div>
 
                 <div className="pt-6 flex gap-3">
-                  <button type="button" onClick={() => { setShowModal(false); setEditingClient(null); }} className="flex-1 py-3 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold transition-colors">
+                  <button type="button" onClick={() => { setShowModal(false); setEditingClient(null); setAdminEmail(''); setAdminPassword(''); }} className="flex-1 py-3 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold transition-colors">
                     Cancelar
                   </button>
                   <button type="submit" className="flex-1 py-3 px-4 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-bold transition-colors shadow-md">
