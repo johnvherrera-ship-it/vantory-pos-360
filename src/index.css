@@ -96,7 +96,7 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  zoom: 0.9;
+  zoom: 0.85;
 }
 
 #root {

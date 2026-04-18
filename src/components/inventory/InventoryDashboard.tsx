@@ -183,6 +183,10 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
         return sum + margin;
       }, 0) / inventory.length).toFixed(1)
     : 0;
+  const totalProfit = inventory.reduce((sum, item) => {
+    const profitPerUnit = item.price - item.cost;
+    return sum + (profitPerUnit * item.stock);
+  }, 0);
 
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
@@ -282,6 +286,20 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             </div>
             <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Promedio de rentabilidad de tus productos (diferencia entre costo y precio de venta).</p>
           </div>
+
+          <div className="bg-surface-container-lowest p-6 rounded-2xl flex flex-col justify-between min-h-[140px] transition-all border-2 border-green-400/30 shadow-md bg-green-50/30">
+            <div>
+              <span className="text-green-700 font-black text-xs uppercase tracking-widest mb-2 block">Ganancia Total</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold font-headline tabular-nums text-green-700">
+                  {totalProfit >= 1000000
+                    ? `$${(totalProfit / 1000000).toFixed(1)}M`
+                    : `$${totalProfit.toLocaleString('es-CL')}`}
+                </span>
+              </div>
+            </div>
+            <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Ganancia potencial total si vendes todo el stock actual (precio venta - costo).</p>
+          </div>
         </div>
 
         {/* Filter Bar */}
@@ -339,6 +357,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
                 <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Costo</th>
                 <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Precio Venta</th>
                 <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Margen</th>
+                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Ganancia</th>
                 <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label text-right">Acciones</th>
               </tr>
             </thead>
@@ -390,8 +409,15 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
                       );
                     })()}
                   </td>
+                  <td className="px-8 py-6 font-bold text-green-700">
+                    {(() => {
+                      const profitPerUnit = product.price - product.cost;
+                      const totalProfit = profitPerUnit * product.stock;
+                      return `$${totalProfit.toLocaleString('es-CL')}`;
+                    })()}
+                  </td>
                   <td className="px-8 py-6 text-right">
-                    <button 
+                    <button
                       onClick={() => setViewingProduct(product)}
                       className="p-2 text-outline hover:text-secondary transition-colors"
                     >
