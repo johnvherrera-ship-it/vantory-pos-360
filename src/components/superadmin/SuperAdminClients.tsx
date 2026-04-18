@@ -26,15 +26,16 @@ interface SuperAdminClientsProps {
   setSelectedClient: (client: any) => void;
 }
 
-const SuperAdminClients = ({ 
-  setCurrentPage, 
-  vantoryClients, 
-  setVantoryClients, 
-  setCurrentUser, 
-  setSelectedClient 
+const SuperAdminClients = ({
+  setCurrentPage,
+  vantoryClients,
+  setVantoryClients,
+  setCurrentUser,
+  setSelectedClient
 }: SuperAdminClientsProps) => {
   const [showModal, setShowModal] = useState(false);
   const [editingClient, setEditingClient] = useState<any>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{ show: boolean; clientId: number | null }>({ show: false, clientId: null });
 
   const handleSaveClient = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,25 +51,17 @@ const SuperAdminClients = ({
       joinDate: editingClient ? editingClient.joinDate : new Date().toISOString().split('T')[0],
     };
 
-    if (editingClient) {
-      setVantoryClients(vantoryClients.map((c: any) => c.id === editingClient.id ? newClient : c));
-    } else {
-      setVantoryClients([...vantoryClients, newClient]);
-    }
-
-    // Sync with Supabase
     try {
       if (editingClient) {
         await supabaseService.upsertClient(newClient);
+        setVantoryClients(vantoryClients.map((c: any) => c.id === editingClient.id ? newClient : c));
       } else {
         const { id: _, ...supabaseData } = newClient;
         const savedClient = await supabaseService.upsertClient(supabaseData);
-        // Update local state with the REAL ID from Supabase
         if (savedClient) {
           const updated = vantoryClients.map((c: any) => c.email === savedClient.email ? { ...c, id: savedClient.id } : c);
           setVantoryClients(updated);
-          
-          // Create initial admin user for this client using the REAL ID
+
           await supabaseService.createUser({
             clientId: savedClient.id,
             name: `Admin ${savedClient.name}`,
@@ -80,22 +73,22 @@ const SuperAdminClients = ({
           });
         }
       }
+      setShowModal(false);
+      setEditingClient(null);
     } catch (error) {
       console.error('Error syncing client with Supabase:', error);
+      alert('Error al guardar cliente: ' + (error instanceof Error ? error.message : 'Desconocido'));
     }
-
-    setShowModal(false);
-    setEditingClient(null);
   };
 
   const handleDeleteClient = async (clientId: number) => {
-    if (window.confirm('¿Está seguro de eliminar este cliente? Esta acción no se puede deshacer.')) {
-      try {
-        await supabaseService.deleteClient(clientId);
-        setVantoryClients(vantoryClients.filter((c: any) => c.id !== clientId));
-      } catch (error) {
-        console.error('Error deleting client:', error);
-      }
+    try {
+      await supabaseService.deleteClient(clientId);
+      setVantoryClients(vantoryClients.filter((c: any) => c.id !== clientId));
+      setConfirmDialog({ show: false, clientId: null });
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      alert('Error al eliminar cliente: ' + (error instanceof Error ? error.message : 'Desconocido'));
     }
   };
 
@@ -211,7 +204,7 @@ const SuperAdminClients = ({
                         <button onClick={() => toggleStatus(client.id)} title={client.status === 'Activo' ? 'Suspender' : 'Activar'} className={`p-2 rounded-lg transition-colors ${client.status === 'Activo' ? 'text-error hover:bg-error/10' : 'text-green-600 hover:bg-green-100'}`}>
                           {client.status === 'Activo' ? <MinusCircle className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
                         </button>
-                        <button onClick={() => handleDeleteClient(client.id)} title="Eliminar Cliente" className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                        <button onClick={() => setConfirmDialog({ show: true, clientId: client.id })} title="Eliminar Cliente" className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                           <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
@@ -227,13 +220,13 @@ const SuperAdminClients = ({
       {/* Client Modal */}
       <AnimatePresence>
         {showModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -247,7 +240,7 @@ const SuperAdminClients = ({
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              
+
               <form onSubmit={handleSaveClient} className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
@@ -271,7 +264,7 @@ const SuperAdminClients = ({
                     <input type="number" name="maxPosPerStore" defaultValue={editingClient?.maxPosPerStore || 1} required min="1" className="w-full p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-secondary outline-none font-medium" />
                   </div>
                 </div>
-                
+
                 <div className="pt-6 flex gap-3">
                   <button type="button" onClick={() => { setShowModal(false); setEditingClient(null); }} className="flex-1 py-3 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold transition-colors">
                     Cancelar
@@ -281,6 +274,44 @@ const SuperAdminClients = ({
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Confirmation Dialog */}
+      <AnimatePresence>
+        {confirmDialog.show && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-surface w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20"
+            >
+              <div className="p-6 text-center">
+                <h3 className="text-xl font-black font-headline text-on-surface mb-2">Eliminar Cliente</h3>
+                <p className="text-on-surface-variant mb-6">¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.</p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setConfirmDialog({ show: false, clientId: null })}
+                    className="flex-1 py-3 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => confirmDialog.clientId && handleDeleteClient(confirmDialog.clientId)}
+                    className="flex-1 py-3 px-4 bg-error hover:bg-error/90 text-white rounded-xl font-bold transition-colors shadow-md"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
