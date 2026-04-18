@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Store, POS } from '../types';
 
 interface POSContextType {
@@ -18,16 +18,48 @@ interface POSContextProviderProps {
   onUserAutoGrant?: (users: User[]) => void;
 }
 
+const SESSION_KEY = 'vantory_session_v1';
+
+type PersistedSession = {
+  currentUser: User | null;
+  currentStore: Store | null;
+  currentPOS: POS | null;
+};
+
+const readSession = (): PersistedSession => {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return { currentUser: null, currentStore: null, currentPOS: null };
+    const parsed = JSON.parse(raw);
+    return {
+      currentUser: parsed.currentUser ?? null,
+      currentStore: parsed.currentStore ?? null,
+      currentPOS: parsed.currentPOS ?? null
+    };
+  } catch {
+    return { currentUser: null, currentStore: null, currentPOS: null };
+  }
+};
+
 export const POSContextProvider: React.FC<POSContextProviderProps> = ({
   children,
   users = [],
   onUserAutoGrant
 }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentStore, setCurrentStore] = useState<Store | null>(null);
-  const [currentPOS, setCurrentPOS] = useState<POS | null>(null);
+  const initial = readSession();
+  const [currentUser, setCurrentUser] = useState<User | null>(initial.currentUser);
+  const [currentStore, setCurrentStore] = useState<Store | null>(initial.currentStore);
+  const [currentPOS, setCurrentPOS] = useState<POS | null>(initial.currentPOS);
 
-  // Auto-grant first user if no user is set
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        SESSION_KEY,
+        JSON.stringify({ currentUser, currentStore, currentPOS })
+      );
+    } catch {}
+  }, [currentUser, currentStore, currentPOS]);
+
   useEffect(() => {
     if (users.length > 0 && !currentUser) {
       setCurrentUser(users[0]);

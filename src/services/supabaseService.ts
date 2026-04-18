@@ -1,29 +1,37 @@
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Product, SaaSClient, Sale, User, Store, POS } from '../types';
+
+const notConfigured = () => !isSupabaseConfigured;
 
 export const supabaseService = {
   // === Clients ===
   async getClients(): Promise<SaaSClient[]> {
-    const { data, error } = await supabase
-      .from('saas_clients')
-      .select('*')
-      .order('name');
-    
-    if (error) throw error;
-    return data as SaaSClient[];
+    if (notConfigured()) return [];
+    try {
+      const { data, error } = await supabase
+        .from('saas_clients')
+        .select('*')
+        .order('name');
+      if (error) throw error;
+      return (data || []) as SaaSClient[];
+    } catch (e) {
+      console.error('getClients failed:', e);
+      return [];
+    }
   },
 
   async deleteClient(clientId: number) {
+    if (notConfigured()) return true;
     const { error } = await supabase
       .from('saas_clients')
       .delete()
       .eq('id', clientId);
-    
     if (error) throw error;
     return true;
   },
 
   async upsertClient(client: Partial<SaaSClient>) {
+    if (notConfigured()) return client;
     const upsertData: any = {
       name: client.name,
       email: client.email,
@@ -33,40 +41,41 @@ export const supabaseService = {
       status: client.status,
       join_date: client.joinDate
     };
-
-    // Only include id if it's defined (for updates, not inserts)
-    if (client.id) {
-      upsertData.id = client.id;
-    }
+    if (client.id) upsertData.id = client.id;
 
     const { data, error } = await supabase
       .from('saas_clients')
       .upsert(upsertData)
       .select();
-
     if (error) throw error;
-    return data[0];
+    return data?.[0];
   },
 
   // === Inventory ===
   async getProducts(clientId: number): Promise<Product[]> {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('client_id', clientId);
-    
-    if (error) throw error;
-    return data.map(p => ({
-      ...p,
-      clientId: p.client_id,
-      category: p.category_id,
-      stock: p.stock_quantity,
-      minStock: p.min_stock,
-      image: p.image_url
-    })) as Product[];
+    if (notConfigured()) return [];
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('client_id', clientId);
+      if (error) throw error;
+      return (data || []).map((p: any) => ({
+        ...p,
+        clientId: p.client_id,
+        category: p.category_id,
+        stock: p.stock_quantity,
+        minStock: p.min_stock,
+        image: p.image_url
+      })) as Product[];
+    } catch (e) {
+      console.error('getProducts failed:', e);
+      return [];
+    }
   },
 
   async upsertProduct(product: Partial<Product> & { clientId: number }) {
+    if (notConfigured()) return product;
     const { data, error } = await supabase
       .from('products')
       .upsert({
@@ -83,38 +92,42 @@ export const supabaseService = {
         image_url: product.image
       })
       .select();
-
     if (error) throw error;
-    return data[0];
+    return data?.[0];
   },
 
   async deleteProduct(productId: number) {
+    if (notConfigured()) return true;
     const { error } = await supabase
       .from('products')
       .delete()
       .eq('id', productId);
-
     if (error) throw error;
     return true;
   },
 
   // === Users ===
   async getUsers(clientId?: number): Promise<User[]> {
-    let query = supabase.from('users').select('*');
-    if (clientId) query = query.eq('client_id', clientId);
-    
-    const { data, error } = await query.order('name');
-    if (error) throw error;
-    
-    return data.map(u => ({
-      ...u,
-      clientId: u.client_id,
-      storeId: u.store_id,
-      modules: u.modules || []
-    })) as User[];
+    if (notConfigured()) return [];
+    try {
+      let query = supabase.from('users').select('*');
+      if (clientId) query = query.eq('client_id', clientId);
+      const { data, error } = await query.order('name');
+      if (error) throw error;
+      return (data || []).map((u: any) => ({
+        ...u,
+        clientId: u.client_id,
+        storeId: u.store_id,
+        modules: u.modules || []
+      })) as User[];
+    } catch (e) {
+      console.error('getUsers failed:', e);
+      return [];
+    }
   },
 
   async createUser(user: Partial<User> & { clientId: number; password?: string }) {
+    if (notConfigured()) throw new Error('Backend no configurado');
     const { data, error } = await supabase
       .from('users')
       .insert({
@@ -129,7 +142,6 @@ export const supabaseService = {
         image_url: user.image
       })
       .select();
-
     if (error) {
       console.error('Supabase createUser error:', error);
       throw new Error(`No se pudo crear usuario: ${error.message}`);
@@ -142,6 +154,7 @@ export const supabaseService = {
   },
 
   async updateUser(userId: number, updates: Partial<User>) {
+    if (notConfigured()) return updates;
     const { data, error } = await supabase
       .from('users')
       .update({
@@ -155,50 +168,60 @@ export const supabaseService = {
       })
       .eq('id', userId)
       .select();
-
     if (error) throw error;
-    return data[0];
+    return data?.[0];
   },
 
   async deleteUser(userId: number) {
+    if (notConfigured()) return true;
     const { error } = await supabase
       .from('users')
       .delete()
       .eq('id', userId);
-
     if (error) throw error;
     return true;
   },
 
   // === Stores & POS ===
   async getStores(clientId: number): Promise<Store[]> {
-    const { data, error } = await supabase
-      .from('stores')
-      .select('*')
-      .eq('client_id', clientId);
-    
-    if (error) throw error;
-    return data.map(s => ({
-      ...s,
-      clientId: s.client_id
-    })) as Store[];
+    if (notConfigured()) return [];
+    try {
+      const { data, error } = await supabase
+        .from('stores')
+        .select('*')
+        .eq('client_id', clientId);
+      if (error) throw error;
+      return (data || []).map((s: any) => ({
+        ...s,
+        clientId: s.client_id
+      })) as Store[];
+    } catch (e) {
+      console.error('getStores failed:', e);
+      return [];
+    }
   },
 
   async getPOSMachines(clientId: number): Promise<POS[]> {
-    const { data, error } = await supabase
-      .from('pos_machines')
-      .select('*')
-      .eq('client_id', clientId);
-    
-    if (error) throw error;
-    return data.map(p => ({
-      ...p,
-      clientId: p.client_id,
-      storeId: p.store_id
-    })) as POS[];
+    if (notConfigured()) return [];
+    try {
+      const { data, error } = await supabase
+        .from('pos_machines')
+        .select('*')
+        .eq('client_id', clientId);
+      if (error) throw error;
+      return (data || []).map((p: any) => ({
+        ...p,
+        clientId: p.client_id,
+        storeId: p.store_id
+      })) as POS[];
+    } catch (e) {
+      console.error('getPOSMachines failed:', e);
+      return [];
+    }
   },
 
   async createStore(store: Partial<Store> & { client_id: number }) {
+    if (notConfigured()) throw new Error('Backend no configurado');
     const { data, error } = await supabase
       .from('stores')
       .insert({
@@ -208,7 +231,6 @@ export const supabaseService = {
         pin: store.pin
       })
       .select();
-    
     if (error) throw error;
     return {
       ...data[0],
@@ -217,6 +239,7 @@ export const supabaseService = {
   },
 
   async createPOS(pos: Partial<POS> & { client_id: number; storeId: number }) {
+    if (notConfigured()) throw new Error('Backend no configurado');
     const { data, error } = await supabase
       .from('pos_machines')
       .insert({
@@ -227,13 +250,11 @@ export const supabaseService = {
         last_sync: new Date().toISOString()
       })
       .select();
-
     if (error) {
       console.error('Supabase createPOS error:', error);
       throw new Error(`No se pudo crear caja: ${error.message}`);
     }
     if (!data || data.length === 0) throw new Error('No se pudo crear la caja');
-
     return {
       ...data[0],
       clientId: data[0].client_id,
@@ -244,36 +265,46 @@ export const supabaseService = {
 
   // === Sales ===
   async getSales(clientId: number): Promise<Sale[]> {
-    const { data, error } = await supabase
-      .from('sales')
-      .select('*')
-      .eq('client_id', clientId)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data.map(s => ({
-      ...s,
-      clientId: s.client_id,
-      posId: s.pos_id,
-      date: s.created_at,
-      user: s.user_name
-    })) as Sale[];
+    if (notConfigured()) return [];
+    try {
+      const { data, error } = await supabase
+        .from('sales')
+        .select('*')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map((s: any) => ({
+        ...s,
+        clientId: s.client_id,
+        posId: s.pos_id,
+        date: s.created_at,
+        user: s.user_name
+      })) as Sale[];
+    } catch (e) {
+      console.error('getSales failed:', e);
+      return [];
+    }
   },
 
   async createSale(sale: Omit<Sale, 'id'>) {
-    const { data, error } = await supabase
-      .from('sales')
-      .insert({
-        client_id: sale.clientId,
-        pos_id: sale.posId,
-        total: sale.total,
-        payment_method: sale.paymentMethod,
-        cart: sale.cart,
-        user_name: sale.user
-      })
-      .select();
-    
-    if (error) throw error;
-    return data[0];
+    if (notConfigured()) return null;
+    try {
+      const { data, error } = await supabase
+        .from('sales')
+        .insert({
+          client_id: sale.clientId,
+          pos_id: sale.posId,
+          total: sale.total,
+          payment_method: sale.paymentMethod,
+          cart: sale.cart,
+          user_name: sale.user
+        })
+        .select();
+      if (error) throw error;
+      return data?.[0];
+    } catch (e) {
+      console.error('createSale failed:', e);
+      return null;
+    }
   }
 };

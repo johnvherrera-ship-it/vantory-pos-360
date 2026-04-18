@@ -71,6 +71,8 @@ interface AppContextProviderProps {
 }
 
 export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children, currentUser, currentPOS }) => {
+  const prevClientIdRef = React.useRef<string | number>(currentUser?.clientId ?? 'default');
+  const reloadingRef = React.useRef<boolean>(false);
   // ===== SaaS Clients =====
   const [vantoryClients, setVantoryClients] = useState(() => {
     const saved = localStorage.getItem('vantory_saas_clients');
@@ -182,31 +184,67 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     return `${baseKey}_client_${clientId}`;
   };
 
+  // Reload client-scoped data from localStorage when clientId changes (post-login)
   useEffect(() => {
+    const cid = currentUser?.clientId || 'default';
+    if (prevClientIdRef.current === cid) return;
+    prevClientIdRef.current = cid;
+    reloadingRef.current = true;
+
+    const load = <T,>(key: string, fallback: T): T => {
+      try {
+        const raw = localStorage.getItem(`${key}_client_${cid}`);
+        return raw ? (JSON.parse(raw) as T) : fallback;
+      } catch {
+        return fallback;
+      }
+    };
+
+    setInventory((prev) => load('vantory_inventory', prev));
+    setCategories((prev) => load('vantory_categories', prev));
+    setStockEntries((prev) => load('vantory_stock_entries', prev));
+    setSalesHistory((prev) => load('vantory_sales_history', prev));
+    setCashRegisters((prev) => load('vantory_cash_registers', prev));
+    setCashHistory((prev) => load('vantory_cash_history', prev));
+    setFiados((prev) => load('vantory_fiados', prev));
+
+    // Release guard on next tick so persistence effects skip the transitional render
+    const t = setTimeout(() => { reloadingRef.current = false; }, 0);
+    return () => clearTimeout(t);
+  }, [currentUser?.clientId]);
+
+  useEffect(() => {
+    if (reloadingRef.current) return;
     localStorage.setItem(getClientStorageKey('vantory_sales_history'), JSON.stringify(salesHistory));
   }, [salesHistory, currentUser?.clientId]);
 
   useEffect(() => {
+    if (reloadingRef.current) return;
     localStorage.setItem(getClientStorageKey('vantory_stock_entries'), JSON.stringify(stockEntries));
   }, [stockEntries, currentUser?.clientId]);
 
   useEffect(() => {
+    if (reloadingRef.current) return;
     localStorage.setItem(getClientStorageKey('vantory_inventory'), JSON.stringify(inventory));
   }, [inventory, currentUser?.clientId]);
 
   useEffect(() => {
+    if (reloadingRef.current) return;
     localStorage.setItem(getClientStorageKey('vantory_categories'), JSON.stringify(categories));
   }, [categories, currentUser?.clientId]);
 
   useEffect(() => {
+    if (reloadingRef.current) return;
     localStorage.setItem(getClientStorageKey('vantory_cash_registers'), JSON.stringify(cashRegisters));
   }, [cashRegisters, currentUser?.clientId]);
 
   useEffect(() => {
+    if (reloadingRef.current) return;
     localStorage.setItem(getClientStorageKey('vantory_fiados'), JSON.stringify(fiados));
   }, [fiados, currentUser?.clientId]);
 
   useEffect(() => {
+    if (reloadingRef.current) return;
     localStorage.setItem(getClientStorageKey('vantory_cash_history'), JSON.stringify(cashHistory));
   }, [cashHistory, currentUser?.clientId]);
 

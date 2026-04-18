@@ -21,6 +21,7 @@ import { CartItem } from '../../types';
 import { SideNavBar } from '../layout/SideNavBar';
 import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
+import { supabaseService } from '../../services/supabaseService';
 
 interface SalesDashboardProps {
   onSaleComplete?: (sale: any) => void;
@@ -30,7 +31,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   const { ui, pos, app } = useAppContexts();
   const { setCurrentPage, setShowCashRegisterModal, setShowNotificationsPanel } = ui;
   const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
-  const { clientInventory: inventory, setClientInventory: setInventory, clientFiados: fiados, setClientFiados: setFiados, clientCashRegister: cashRegister, setClientCashRegister: setCashRegister, clientUsers: users, setClientSalesHistory, activePosId } = app;
+  const { clientInventory: inventory, setClientInventory: setInventory, clientFiados: fiados, setClientFiados: setFiados, clientCashRegister: cashRegister, setClientCashRegister: setCashRegister, clientUsers: users, setClientSalesHistory, activePosId, activeClientId } = app;
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState('');
@@ -251,6 +252,19 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
     // Guardar venta en historial (conecta con KPIs, Dashboard y Historial)
     setClientSalesHistory((prev: any[]) => [saleData, ...prev]);
+
+    // Persistir venta en Supabase (si está configurado)
+    supabaseService.createSale({
+      clientId: activeClientId,
+      posId: activePosId,
+      date: saleData.date,
+      total,
+      subtotal,
+      paymentMethod: method,
+      cart: [...cart],
+      user: currentUser?.name || 'Sistema',
+      change
+    }).catch((err) => console.error('createSale persist error:', err));
 
     // Limpiar estado de pago en progreso y sincronizar venta completada al panel cliente
     localStorage.removeItem('pos-payment');

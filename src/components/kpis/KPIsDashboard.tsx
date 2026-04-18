@@ -717,7 +717,7 @@ export const KPIsDashboard = () => {
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                {Object.entries(revenueByMethod).length === 0 ? (
                  <p className="col-span-2 text-center py-6 text-[#0F172A]/60 font-bold">No hay ventas en este período.</p>
-               ) : Object.entries(revenueByMethod).sort((a, b) => b[1] - a[1]).map(([method, amount]) => {
+               ) : Object.entries(revenueByMethod).sort((a, b) => (b[1] as number) - (a[1] as number)).map(([method, amount]) => {
                  const cfg: Record<string, { icon: React.ReactNode, bg: string, iconBg: string }> = {
                    'Efectivo': { icon: <Banknote className="w-5 h-5 text-green-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-green-100' },
                    'Débito': { icon: <CreditCard className="w-5 h-5 text-blue-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-blue-100' },

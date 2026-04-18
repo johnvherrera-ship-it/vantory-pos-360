@@ -18,10 +18,9 @@ import { usePOSContext } from './context/POSContext';
 import { useAppContext } from './context/AppContext';
 
 function AppShell() {
-  const { currentPage, setCurrentPage, activeModal, setActiveModal, showCookies, setShowCookies, isScrolled, showBackToTop, scrollToTop } = useUIContext();
+  const { currentPage, setCurrentPage, activeModal, setActiveModal, showCookies, setShowCookies, isScrolled, showBackToTop, scrollToTop, showCashRegisterModal, setShowCashRegisterModal } = useUIContext();
   const { currentUser } = usePOSContext();
   const { clientCashRegister, setClientCashRegister, setClientCashHistory } = useAppContext();
-  const [showCashRegisterModal, setShowCashRegisterModal] = React.useState(false);
 
   return (
     <div className="bg-surface text-on-surface min-h-screen font-body selection:bg-secondary/20 selection:text-secondary">
