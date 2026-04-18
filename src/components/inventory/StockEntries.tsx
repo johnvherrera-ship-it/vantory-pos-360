@@ -74,6 +74,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
 
   const handleConfirmReception = async () => {
     if (receivingCart.length === 0) return;
+    console.log('Registering entries...');
 
     const newEntries = receivingCart.map(item => ({
       id: Date.now() + Math.random(),
@@ -88,10 +89,12 @@ export const StockEntries = ({}: StockEntriesProps) => {
       clientId: currentUser?.clientId,
       storeId: currentStore?.id
     }));
+    console.log('Entries to save:', newEntries);
 
     for (const entry of newEntries) {
       try {
-        await supabaseService.createStockEntry(entry);
+        const result = await supabaseService.createStockEntry(entry);
+        console.log('Saved entry:', result);
       } catch (err) {
         console.error('Error saving stock entry:', err);
       }
