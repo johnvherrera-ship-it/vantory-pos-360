@@ -99,6 +99,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
       return {
         id: item.id,
         clientId,
+        storeId: currentStore?.id ?? 0,
         name: current?.name ?? item.name,
         sku: current?.sku ?? item.sku,
         category: current?.category ?? item.category,
@@ -218,6 +219,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
         supabaseService.upsertProduct({
           id: product.id,
           clientId,
+          storeId: currentStore?.id ?? 0,
           name: product.name,
           sku: product.sku,
           category: product.category,
