@@ -89,7 +89,7 @@ export const FeaturesPage = ({ setCurrentPage = () => {} }: FeaturesPageProps) =
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.8 }}
-            className="text-6xl md:text-7xl lg:text-8xl font-black text-[#0F172A] tracking-tighter leading-[1.1] mb-8 font-headline"
+            className="text-4xl md:text-5xl lg:text-6xl font-black text-[#0F172A] tracking-tighter leading-[1.1] mb-8 font-headline"
           >
             Todo lo que necesitas para <span className="bg-gradient-to-r from-secondary to-secondary/70 bg-clip-text text-transparent">escalar tu negocio</span>
           </motion.h1>

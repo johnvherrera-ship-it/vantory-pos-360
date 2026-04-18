@@ -322,7 +322,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="sales" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       {/* Main Content Area */}
-      <main className="flex-1 ml-64 flex flex-col h-screen overflow-y-auto p-8">
+      <main className="flex-1 ml-64 flex flex-col min-h-screen p-8">
         <header className="mb-10 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Terminal de <span className="text-secondary">Ventas</span></h2>

@@ -72,7 +72,7 @@ export const UsersManagement = ({}: UsersManagementProps) => {
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="users" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
-      <main className="flex-1 ml-64 flex flex-col h-screen overflow-y-auto p-8">
+      <main className="flex-1 ml-64 flex flex-col min-h-screen p-8">
         <header className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Gestión de <span className="text-secondary">Usuarios</span></h1>

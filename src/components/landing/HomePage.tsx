@@ -79,7 +79,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
                 <div className="w-2 h-2 rounded-full bg-green-500"></div>
                 <span className="text-[10px] font-bold tracking-widest uppercase text-green-700">Usado en locales de Chile</span>
               </div>
-              <h1 className="text-7xl md:text-8xl lg:text-[7rem] font-black text-[#0F172A] tracking-tighter leading-[0.9] font-headline">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0F172A] tracking-tighter leading-[0.9] font-headline">
                 <motion.div className="flex flex-wrap gap-x-3 gap-y-2">
                   {["VANTORY", "POS", "360"].map((word, i) => (
                     <motion.span
@@ -177,7 +177,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.4 }}
-                className="relative z-20 transform lg:translate-x-12 lg:scale-110 animate-float"
+                className="relative z-20"
               >
                 <div className="bg-white p-3 rounded-[2.5rem] shadow-[0_50px_120px_-25px_rgba(38,124,220,0.35)] border-3 border-secondary/15 overflow-hidden group hover:border-secondary/40 hover:shadow-[0_70px_150px_-35px_rgba(38,124,220,0.45)] transition-all duration-700 animate-glow">
                   <motion.img
@@ -516,7 +516,6 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
                   Ver demo en video
                 </motion.button>
               </div>
-              <p className="text-white/70 text-sm font-medium pt-4">Sin contratos, sin letra chica. Cancela cuando quieras.</p>
             </div>
           </motion.div>
         </section>

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { 
-  Users, 
-  Shield, 
-  Eye, 
-  EyeOff, 
-  ArrowRight, 
-  History, 
-  LineChart, 
-  Package 
+import {
+  Users,
+  Shield,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ArrowLeft,
+  History,
+  LineChart,
+  Package
 } from 'lucide-react';
 import { Logo } from '../layout/Logo';
 import { supabase } from '../../lib/supabase';
@@ -153,6 +154,13 @@ export const LoginPage = ({
       </div>
 
       <main className="relative z-10 w-full max-w-lg px-6 py-4 flex flex-col items-center">
+        <button
+          onClick={() => setCurrentPage('home')}
+          className="self-start mb-4 flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-secondary transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Volver al inicio</span>
+        </button>
         <div className="mb-6">
           <Logo onClick={() => setCurrentPage('home')} />
         </div>
