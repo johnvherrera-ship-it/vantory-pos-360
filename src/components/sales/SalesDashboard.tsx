@@ -553,27 +553,27 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     <button onClick={() => setCart([])} className="text-xs font-bold text-error border border-error/30 px-3 py-1 rounded-full hover:bg-error/5 transition-colors">Limpiar</button>
                   </div>
                 </div>
-                <div className="p-4 overflow-y-auto flex-1 space-y-4">
+                <div className="p-2 overflow-y-auto flex-1 space-y-1">
                   {cart.map((item, index) => (
-                    <div key={`${item.id}-${index}`} className="flex justify-between items-center group py-2 border-b border-outline-variant/10 last:border-0">
-                      <div className="flex-1 pr-4">
-                        <p className="font-bold text-on-surface text-sm leading-tight line-clamp-1">{item.name}</p>
-                        <p className="text-xs text-[#0F172A] font-black">{formatCurrency(item.price)} c/u</p>
+                    <div key={`${item.id}-${index}`} className="flex justify-between items-center group py-1 px-2 border-b border-outline-variant/10 last:border-0">
+                      <div className="flex-1 pr-2 min-w-0">
+                        <p className="font-bold text-on-surface text-xs leading-tight line-clamp-1">{item.name}</p>
+                        <p className="text-[10px] text-[#0F172A] font-black">{formatCurrency(item.price)} c/u</p>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-surface-container-low rounded-lg p-1 border border-outline-variant/20">
-                          <button onClick={() => updateQuantity(index, -1)} className="w-6 h-6 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold">-</button>
-                          <span className="w-4 text-center text-sm font-bold">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(index, 1)} className="w-6 h-6 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold">+</button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1 bg-surface-container-low rounded-lg p-0.5 border border-outline-variant/20">
+                          <button onClick={() => updateQuantity(index, -1)} className="w-5 h-5 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-xs">-</button>
+                          <span className="w-3 text-center text-xs font-bold">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(index, 1)} className="w-5 h-5 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-xs">+</button>
                         </div>
-                        <div className="w-20 text-right">
-                          <p className="font-black text-on-surface text-sm">{formatCurrency(item.price * item.quantity)}</p>
+                        <div className="w-16 text-right">
+                          <p className="font-black text-on-surface text-xs">{formatCurrency(item.price * item.quantity)}</p>
                         </div>
-                        <button 
+                        <button
                           onClick={() => setCart(cart.filter((_, i) => i !== index))}
-                          className="text-error hover:bg-error/10 p-1 rounded transition-colors"
+                          className="text-error hover:bg-error/10 p-0.5 rounded transition-colors shrink-0"
                         >
-                          <X className="w-4 h-4" />
+                          <X className="w-3 h-3" />
                         </button>
                       </div>
                     </div>
