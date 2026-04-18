@@ -39,6 +39,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
 
   const [receivingCart, setReceivingCart] = useState<any[]>([]);
   const [isScanned, setIsScanned] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   const todayStr = new Date().toISOString().split('T')[0];
   const entriesToday = stockEntries.filter(entry => entry.date?.split('T')[0] === todayStr).length;
@@ -466,7 +467,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                   </div>
                 ))}
               </div>
-              <button className="p-4 text-xs font-bold text-secondary hover:bg-secondary/5 transition-colors border-t border-slate-100">
+              <button onClick={() => setShowHistoryModal(true)} className="p-4 text-xs font-bold text-secondary hover:bg-secondary/5 transition-colors border-t border-slate-100">
                 Ver historial completo
               </button>
             </div>
@@ -565,6 +566,64 @@ export const StockEntries = ({}: StockEntriesProps) => {
                   Crear y Agregar a Recepción
                 </button>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* History Modal */}
+      <AnimatePresence>
+        {showHistoryModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+            onClick={() => setShowHistoryModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden"
+            >
+              <div className="p-6 border-b border-slate-100 shrink-0 flex items-center justify-between">
+                <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <History className="w-5 h-5 text-secondary" /> Historial Completo de Ingresos
+                </h2>
+                <button
+                  onClick={() => setShowHistoryModal(false)}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-2">
+                {stockEntries.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-slate-400">
+                    <p className="text-sm">No hay ingresos registrados</p>
+                  </div>
+                ) : (
+                  stockEntries.map((entry) => (
+                    <div key={entry.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4">
+                      <img src={entry.image} alt="" className="w-12 h-12 rounded-lg object-cover" referrerPolicy="no-referrer" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-black text-slate-900 truncate">{entry.productName}</p>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className="text-xs font-bold text-secondary">+{entry.quantity} un.</span>
+                          <span className="text-xs font-medium text-slate-400">{entry.date}</span>
+                          <span className="text-xs font-medium text-slate-500">por {entry.user}</span>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Folio</p>
+                        <p className="text-sm font-black text-slate-900 leading-none">{entry.folio}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}
