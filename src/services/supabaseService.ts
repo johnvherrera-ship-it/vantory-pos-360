@@ -63,9 +63,9 @@ export const supabaseService = {
         ...p,
         clientId: p.client_id,
         storeId: p.store_id,
-        category: p.category_id,
-        stock: p.stock_quantity,
-        minStock: p.min_stock,
+        category: p.category,
+        stock: p.stock,
+        minStock: p.stock,
         image: p.image_url
       })) as Product[];
     } catch (e) {
@@ -81,15 +81,12 @@ export const supabaseService = {
       .upsert({
         id: product.id,
         client_id: product.clientId,
-        store_id: (product as any).storeId,
         name: product.name,
         sku: product.sku,
-        category_id: product.category,
+        category: product.category,
         price: product.price,
         cost: product.cost,
-        stock_quantity: product.stock,
-        min_stock: product.minStock,
-        unit: product.unit,
+        stock: product.stock,
         image_url: product.image
       })
       .select();
