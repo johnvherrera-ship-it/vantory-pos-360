@@ -24,6 +24,7 @@ import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
 import { supabaseService } from '../../services/supabaseService';
 import { queueService } from '../../services/queueService';
+import { cacheService } from '../../services/cacheService';
 
 interface SalesDashboardProps {
   onSaleComplete?: (sale: any) => void;
@@ -357,6 +358,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
       setFiados(updatedFiados);
       if (fiadoToSync) {
+        cacheService.delete(`fiados_${activeClientId}`);
         queueService.enqueue({
           type: 'fiado',
           data: fiadoToSync,

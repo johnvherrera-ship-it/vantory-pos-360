@@ -12,6 +12,7 @@ import { SideNavBar } from '../layout/SideNavBar';
 import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
 import { supabaseService } from '../../services/supabaseService';
+import { cacheService } from '../../services/cacheService';
 
 interface FiadosDashboardProps {}
 
@@ -19,7 +20,7 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
   const { ui, pos, app } = useAppContexts();
   const { setCurrentPage, setShowNotificationsPanel } = ui;
   const { currentUser, setCurrentUser, currentStore, currentPOS } = pos;
-  const { clientFiados: fiados, setClientFiados: setFiados, clientUsers: users } = app;
+  const { clientFiados: fiados, setClientFiados: setFiados, clientUsers: users, activeClientId } = app;
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<any>(null);
@@ -108,6 +109,7 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
     });
 
     setFiados(updatedFiados);
+    cacheService.delete(`fiados_${activeClientId}`);
     setShowPaymentModal(false);
     setSelectedClient(null);
     setPaymentAmount('');
