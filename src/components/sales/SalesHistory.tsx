@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SideNavBar } from '../layout/SideNavBar';
 import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
+import { supabaseService } from '../../services/supabaseService';
 
 interface SalesHistoryProps {}
 
@@ -40,6 +41,8 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
 
   const handleDelete = (id: number) => {
     setSalesHistory((prev: any[]) => prev.filter(s => s.id !== id));
+    supabaseService.deleteSale(id)
+      .catch(err => console.error('deleteSale persist error:', err));
     setSaleToDelete(null);
     if (viewingSale?.id === id) setViewingSale(null);
   };

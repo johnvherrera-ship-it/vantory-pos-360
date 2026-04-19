@@ -11,6 +11,7 @@ import {
 import { SideNavBar } from '../layout/SideNavBar';
 import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
+import { supabaseService } from '../../services/supabaseService';
 
 interface FiadosDashboardProps {}
 
@@ -89,7 +90,7 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
 
     const updatedFiados = fiados.map(client => {
       if (client.id === selectedClient.id) {
-        return {
+        const updated = {
           ...client,
           totalDebt: client.totalDebt - amount,
           history: [...client.history, {
@@ -99,6 +100,9 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
             type: 'payment'
           }]
         };
+        supabaseService.updateFiado(updated)
+          .catch(err => console.error('updateFiado persist error:', err));
+        return updated;
       }
       return client;
     });

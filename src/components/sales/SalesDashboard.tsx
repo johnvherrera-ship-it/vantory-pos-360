@@ -23,6 +23,7 @@ import { SideNavBar } from '../layout/SideNavBar';
 import { NotificationsPanel } from '../shared/NotificationsPanel';
 import { useAppContexts } from '../../hooks/useAppContexts';
 import { supabaseService } from '../../services/supabaseService';
+import { queueService } from '../../services/queueService';
 
 interface SalesDashboardProps {
   onSaleComplete?: (sale: any) => void;
@@ -317,7 +318,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
       } else {
         updatedFiados = updatedFiados.map(client => {
           if (client.id.toString() === selectedFiadoClient) {
-            return {
+            const updated = {
               ...client,
               totalDebt: client.totalDebt + total,
               history: [...client.history, {
@@ -329,6 +330,9 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 cart: [...cart]
               }]
             };
+            supabaseService.updateFiado(updated)
+              .catch(err => console.error('updateFiado persist error:', err));
+            return updated;
           }
           return client;
         });
@@ -342,19 +346,26 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     // Guardar venta en historial (conecta con KPIs, Dashboard y Historial)
     setClientSalesHistory((prev: any[]) => [saleData, ...prev]);
 
-    // Persistir venta en Supabase (si está configurado)
-    supabaseService.createSale({
-      clientId: activeClientId,
-      storeId: activeStoreId,
-      posId: activePosId,
-      date: saleData.date,
-      total,
-      subtotal,
-      paymentMethod: method,
-      cart: [...cart],
-      user: currentUser?.name || 'Sistema',
-      change
-    } as any).catch((err) => console.error('createSale persist error:', err));
+    // Encolar venta para sincronizar (offline-first con queueService)
+    queueService.enqueue({
+      type: 'sale',
+      data: {
+        sale: {
+          clientId: activeClientId,
+          storeId: activeStoreId,
+          posId: activePosId,
+          date: saleData.date,
+          total,
+          subtotal,
+          paymentMethod: method,
+          cart: [...cart],
+          user: currentUser?.name || 'Sistema',
+          change
+        },
+        clientId: activeClientId
+      },
+      maxRetries: 5
+    });
 
     // Limpiar estado de pago en progreso y sincronizar venta completada al panel cliente
     localStorage.removeItem('pos-payment');

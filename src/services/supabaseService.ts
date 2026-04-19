@@ -360,6 +360,42 @@ export const supabaseService = {
     }
   },
 
+  async updateSale(sale: Sale) {
+    if (notConfigured()) return null;
+    try {
+      const { data, error } = await supabase
+        .from('sales')
+        .update({
+          total: sale.total,
+          payment_method: sale.paymentMethod,
+          cart: sale.cart,
+          user_name: sale.user
+        })
+        .eq('id', sale.id)
+        .select();
+      if (error) throw error;
+      return data?.[0];
+    } catch (e) {
+      console.error('updateSale failed:', e);
+      return null;
+    }
+  },
+
+  async deleteSale(saleId: number | string) {
+    if (notConfigured()) return true;
+    try {
+      const { error } = await supabase
+        .from('sales')
+        .delete()
+        .eq('id', saleId);
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      console.error('deleteSale failed:', e);
+      return false;
+    }
+  },
+
   async decrementStockAtomic(clientId: number, items: Array<{ productId: number; quantity: number }>): Promise<Product[]> {
     if (notConfigured()) return [];
     if (!items.length) return [];
@@ -490,6 +526,27 @@ export const supabaseService = {
       return data?.[0];
     } catch (e) {
       console.error('createFiado failed:', e);
+      throw e;
+    }
+  },
+
+  async updateFiado(fiado: any) {
+    if (notConfigured()) return fiado;
+    try {
+      const { data, error } = await supabase
+        .from('fiados')
+        .update({
+          name: fiado.name || fiado.customerName,
+          phone: fiado.phone || '',
+          total_debt: fiado.totalDebt || fiado.total || 0,
+          history: fiado.history || []
+        })
+        .eq('id', fiado.id)
+        .select();
+      if (error) throw error;
+      return data?.[0];
+    } catch (e) {
+      console.error('updateFiado failed:', e);
       throw e;
     }
   }
