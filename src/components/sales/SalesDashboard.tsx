@@ -101,16 +101,16 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const change = amountReceived ? Math.max(0, parseInt(amountReceived.replace(/\D/g, '')) - total) : 0;
 
-  // Sync cart to localStorage for customer view
+  // Sync cart to localStorage for customer view (namespaced by clientId)
   useEffect(() => {
-    localStorage.setItem('pos-cart', JSON.stringify(cart));
-  }, [cart]);
+    localStorage.setItem(`pos-cart-client_${activeClientId}`, JSON.stringify(cart));
+  }, [cart, activeClientId]);
 
-  // Sync payment modal state in real-time to customer screen
+  // Sync payment modal state in real-time to customer screen (namespaced by clientId)
   useEffect(() => {
     if (showCashModal) {
       const received = parseInt(amountReceived.replace(/\D/g, '')) || 0;
-      localStorage.setItem('pos-payment', JSON.stringify({
+      localStorage.setItem(`pos-payment-client_${activeClientId}`, JSON.stringify({
         method: 'Efectivo',
         total,
         amountReceived: received,
@@ -121,15 +121,15 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
       const clientName = selectedFiadoClient === 'new'
         ? newFiadoClient.name
         : fiados.find(c => c.id.toString() === selectedFiadoClient)?.name || '';
-      localStorage.setItem('pos-payment', JSON.stringify({
+      localStorage.setItem(`pos-payment-client_${activeClientId}`, JSON.stringify({
         method: 'Fiado',
         total,
         clientName
       }));
     } else {
-      localStorage.removeItem('pos-payment');
+      localStorage.removeItem(`pos-payment-client_${activeClientId}`);
     }
-  }, [showCashModal, showFiadoModal, amountReceived, total, selectedFiadoClient, newFiadoClient.name]);
+  }, [showCashModal, showFiadoModal, amountReceived, total, selectedFiadoClient, newFiadoClient.name, activeClientId]);
 
   const playBeep = () => {
     try {
@@ -160,7 +160,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
     // Limpiar venta completada anterior si comienza una nueva compra
     if (cart.length === 0) {
-      localStorage.removeItem('pos-sale-completed');
+      localStorage.removeItem(`pos-sale-completed-client_${activeClientId}`);
     }
 
     setLastScanned({ name: product.name, price: product.price });
@@ -229,7 +229,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     }
   };
 
-  const handleConfirmSale = (method: string) => {
+  const handleConfirmSale = async (method: string) => {
     if (!cashRegister.isOpen) {
       setShowCashRegisterModal(true);
       return;
@@ -253,11 +253,22 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     });
     setInventory(updatedInventory);
 
-    // Atomic stock decrement: re-fetch from DB before upsert to avoid race conditions
+    // Validar stock final en BD antes de decrementar
     const decrementItems = cart
       .filter(ci => inventory.find(p => p.id === ci.id))
       .map(ci => ({ productId: ci.id, quantity: ci.quantity }));
+
     if (decrementItems.length) {
+      const dbProducts = await supabaseService.getProducts(activeClientId).catch(() => []);
+      for (const item of decrementItems) {
+        const dbProduct = dbProducts.find(p => p.id === item.productId);
+        if (!dbProduct || dbProduct.stock < item.quantity) {
+          alert(`Stock insuficiente: ${inventory.find(p => p.id === item.productId)?.name}`);
+          setInventory(dbProducts);
+          return;
+        }
+      }
+
       supabaseService.decrementStockAtomic(activeClientId, decrementItems)
         .then((fresh) => {
           if (fresh.length) {
@@ -269,7 +280,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
             );
           }
         })
-        .catch(err => console.error('decrementStockAtomic error:', err));
+        .catch(err => {
+          alert('Error al procesar venta: ' + err.message);
+          console.error('decrementStockAtomic error:', err);
+        });
     }
 
     // Save last sale for ticket
@@ -296,6 +310,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
         .catch(err => console.error('updateCashRegister persist error:', err));
     } else if (method === 'Fiado') {
       let updatedFiados = [...fiados];
+      let fiadoToSync: any = null;
+
       if (selectedFiadoClient === 'new') {
         const newFiadoPayload: any = {
           id: Date.now(),
@@ -316,8 +332,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
           }]
         };
         updatedFiados.push(newFiadoPayload);
-        supabaseService.createFiado(newFiadoPayload)
-          .catch(err => console.error('createFiado persist error:', err));
+        fiadoToSync = { action: 'create', data: newFiadoPayload };
       } else {
         updatedFiados = updatedFiados.map(client => {
           if (client.id.toString() === selectedFiadoClient) {
@@ -333,14 +348,21 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 cart: [...cart]
               }]
             };
-            supabaseService.updateFiado(updated)
-              .catch(err => console.error('updateFiado persist error:', err));
+            fiadoToSync = { action: 'update', data: updated };
             return updated;
           }
           return client;
         });
       }
+
       setFiados(updatedFiados);
+      if (fiadoToSync) {
+        queueService.enqueue({
+          type: 'fiado',
+          data: fiadoToSync,
+          maxRetries: 5
+        });
+      }
     }
 
     setLastSale({ ...saleData, date: new Date(saleData.date) });
@@ -371,12 +393,12 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     });
 
     // Limpiar estado de pago en progreso y sincronizar venta completada al panel cliente
-    localStorage.removeItem('pos-payment');
+    localStorage.removeItem(`pos-payment-client_${activeClientId}`);
     const fiadoClientName = selectedFiadoClient === 'new'
       ? newFiadoClient.name
       : fiados.find(c => c.id.toString() === selectedFiadoClient)?.name;
 
-    localStorage.setItem('pos-sale-completed', JSON.stringify({
+    localStorage.setItem(`pos-sale-completed-client_${activeClientId}`, JSON.stringify({
       id: saleId,
       cart: [...cart],
       total,

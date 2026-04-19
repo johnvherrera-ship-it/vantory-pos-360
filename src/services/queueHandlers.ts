@@ -22,11 +22,11 @@ export function registerQueueHandlers() {
   });
 
   queueService.registerHandler('fiado', async (op: QueuedOperation) => {
-    const { fiado, clientId } = op.data;
-    if (fiado.id) {
-      await supabaseService.updateFiado(fiado);
-    } else {
-      await supabaseService.createFiado(fiado);
+    const { action, data } = op.data;
+    if (action === 'create') {
+      await supabaseService.createFiado(data);
+    } else if (action === 'update') {
+      await supabaseService.updateFiado(data);
     }
   });
 }
