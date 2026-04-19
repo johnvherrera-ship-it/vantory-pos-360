@@ -542,12 +542,12 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       </div>
                     )}
                   </div>
-                  <div className="p-1.5 flex flex-col flex-1">
-                    <h4 className="font-bold text-on-surface text-[9px] leading-tight mb-0.5 group-hover:text-secondary transition-colors line-clamp-2">{product.name}</h4>
-                    <p className="text-[8px] text-[#0F172A] font-black mb-0.5">{product.category}</p>
+                  <div className="p-2 flex flex-col flex-1">
+                    <h4 className="font-bold text-on-surface text-[10px] leading-tight mb-1 group-hover:text-secondary transition-colors line-clamp-2">{product.name}</h4>
+                    <p className="text-[9px] text-[#0F172A] font-bold mb-1">{product.category}</p>
                     <div className="mt-auto">
-                      <p className="text-xs font-black text-green-600 mb-0.5">{formatCurrency(product.price)}</p>
-                      <p className={`text-[8px] font-black ${product.stock < 10 ? 'text-error' : 'text-[#0F172A]'}`}>
+                      <p className="text-sm font-black text-green-600 mb-1">{formatCurrency(product.price)}</p>
+                      <p className={`text-[9px] font-black ${product.stock < 10 ? 'text-error' : 'text-[#0F172A]'}`}>
                         {product.stock}u {product.stock < 10 && '⚠'}
                       </p>
                     </div>
@@ -583,21 +583,21 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 </div>
 
                 {/* Cart Items - Scrollable */}
-                <div className="p-1.5 overflow-y-auto flex-1 space-y-0.5">
+                <div className="p-2 overflow-y-auto flex-1 space-y-1">
                   {cart.map((item, index) => (
-                    <div key={`${item.id}-${index}`} className="flex justify-between items-center group py-0.5 px-1.5 border-b border-outline-variant/10 last:border-0">
+                    <div key={`${item.id}-${index}`} className="flex justify-between items-center group py-1 px-2 border-b border-outline-variant/10 last:border-0">
                       <div className="flex-1 pr-2 min-w-0">
-                        <p className="font-bold text-on-surface text-[11px] leading-tight line-clamp-1">{item.name}</p>
-                        <p className="text-[9px] text-[#0F172A] font-black">{formatCurrency(item.price)} c/u</p>
+                        <p className="font-bold text-on-surface text-xs leading-tight line-clamp-1">{item.name}</p>
+                        <p className="text-[10px] text-[#0F172A] font-bold">{formatCurrency(item.price)} c/u</p>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
-                        <div className="flex items-center gap-0.5 bg-surface-container-low rounded-lg p-0.5 border border-outline-variant/20">
-                          <button onClick={() => updateQuantity(index, -1)} className="w-4 h-4 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-[9px]">-</button>
-                          <span className="w-2.5 text-center text-[9px] font-bold">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(index, 1)} className="w-4 h-4 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-[9px]">+</button>
+                        <div className="flex items-center gap-0.5 bg-surface-container-low rounded-lg p-1 border border-outline-variant/20">
+                          <button onClick={() => updateQuantity(index, -1)} className="w-5 h-5 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-[10px]">-</button>
+                          <span className="w-3 text-center text-[10px] font-bold">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(index, 1)} className="w-5 h-5 flex items-center justify-center hover:bg-surface-container-high rounded text-on-surface font-bold text-[10px]">+</button>
                         </div>
-                        <div className="w-14 text-right">
-                          <p className="font-black text-on-surface text-[10px]">{formatCurrency(item.price * item.quantity)}</p>
+                        <div className="w-16 text-right">
+                          <p className="font-black text-on-surface text-xs">{formatCurrency(item.price * item.quantity)}</p>
                         </div>
                         <button
                           onClick={() => setCart(cart.filter((_, i) => i !== index))}
