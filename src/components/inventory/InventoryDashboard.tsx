@@ -196,7 +196,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="inventory" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
-      <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8 pb-20 md:pb-0">
         <header className="mb-10 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Inventario de <span className="text-secondary">Productos</span></h2>

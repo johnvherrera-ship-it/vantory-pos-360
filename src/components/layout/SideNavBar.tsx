@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Globe,
   Monitor,
@@ -9,9 +9,6 @@ import {
   Wallet,
   LineChart,
   History,
-  Users,
-  Menu,
-  X,
   LogOut
 } from 'lucide-react';
 import { Logo } from './Logo';
@@ -35,13 +32,12 @@ export const SideNavBar = ({
   currentStore,
   currentPOS
 }: SideNavBarProps) => {
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const NavItem = ({ page, icon: Icon, label }: { page: string, icon: any, label: string }) => {
     if (currentUser && currentUser.modules && !currentUser.modules.includes(page)) return null;
     return (
       <a
-        onClick={() => { setCurrentPage(page); setMobileOpen(false); }}
+        onClick={() => { setCurrentPage(page); }}
         className={`flex items-center gap-3 py-2.5 px-4 my-0.5 transition-all cursor-pointer rounded-lg mx-2 active:scale-[0.98] ${currentPage === page ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
       >
         <Icon className="w-5 h-5" />
@@ -50,10 +46,23 @@ export const SideNavBar = ({
     );
   };
 
-  const NavContent = () => (
+  const BottomNavItem = ({ page, icon: Icon, label }: { page: string, icon: any, label: string }) => {
+    if (currentUser && currentUser.modules && !currentUser.modules.includes(page)) return null;
+    return (
+      <button
+        onClick={() => { setCurrentPage(page); }}
+        className={`flex flex-col items-center gap-1 py-2 px-3 transition-all rounded-lg active:scale-95 flex-1 ${currentPage === page ? 'text-white bg-white/15' : 'text-white/60 hover:text-white'}`}
+      >
+        <Icon className="w-6 h-6" />
+        <span className="text-[10px] font-semibold text-center">{label}</span>
+      </button>
+    );
+  };
+
+  const DesktopNav = () => (
     <>
       <div className="px-6 mb-4">
-        <Logo onClick={() => { setCurrentPage('home'); setMobileOpen(false); }} light={true} />
+        <Logo onClick={() => { setCurrentPage('home'); }} light={true} />
       </div>
 
       {currentStore && currentPOS && (
@@ -106,29 +115,41 @@ export const SideNavBar = ({
     <>
       {/* Desktop sidebar */}
       <aside className="hidden md:flex fixed top-0 bottom-0 left-0 w-64 z-50 bg-secondary flex-col py-6 shadow-lg border-r border-white/10">
-        <NavContent />
+        <DesktopNav />
       </aside>
 
-      {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-secondary flex items-center justify-between px-4 py-3 shadow-lg">
-        <Logo onClick={() => setCurrentPage('home')} light={true} />
-        <button onClick={() => setMobileOpen(true)} className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors">
-          <Menu className="w-6 h-6" />
-        </button>
+      {/* Mobile top bar con info de sucursal/terminal */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-secondary px-4 py-2 shadow-md border-b border-white/10">
+        <div className="flex items-center justify-between">
+          <Logo onClick={() => setCurrentPage('home')} light={true} />
+          {currentStore && currentPOS && (
+            <div className="flex gap-3 text-[10px]">
+              <div className="text-right">
+                <div className="text-white/60">{currentStore.name}</div>
+                <div className="text-white/40 text-[9px]">{currentPOS.name}</div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Mobile drawer overlay */}
-      {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="relative w-72 bg-secondary flex flex-col py-6 shadow-2xl h-full overflow-y-auto">
-            <button onClick={() => setMobileOpen(false)} className="absolute top-4 right-4 text-white/70 hover:text-white p-1">
-              <X className="w-5 h-5" />
-            </button>
-            <NavContent />
-          </aside>
-        </div>
-      )}
+      {/* Mobile bottom navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-secondary border-t border-white/10 flex justify-around px-2 py-1 shadow-2xl">
+        <BottomNavItem page="dashboard" icon={LayoutDashboard} label="Mi Negocio" />
+        <BottomNavItem page="sales" icon={Receipt} label="Ventas" />
+        <BottomNavItem page="inventory" icon={Package} label="Inventario" />
+        <BottomNavItem page="fiados" icon={Wallet} label="Fiados" />
+        <BottomNavItem page="kpis" icon={LineChart} label="KPIs" />
+        <BottomNavItem page="history" icon={History} label="Historial" />
+        <button
+          onClick={() => { if (setCurrentUser) setCurrentUser(null); setCurrentPage('home'); }}
+          className="flex flex-col items-center gap-1 py-2 px-3 transition-all rounded-lg active:scale-95 flex-1 text-white/60 hover:text-white"
+          title="Cerrar Sesión"
+        >
+          <LogOut className="w-6 h-6" />
+          <span className="text-[10px] font-semibold">Salir</span>
+        </button>
+      </nav>
     </>
   );
 };

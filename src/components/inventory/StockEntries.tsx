@@ -246,7 +246,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
     <div className="flex min-h-screen bg-[#F8FAFC] text-slate-900 font-body">
       <SideNavBar currentPage="entries" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       
-      <main className="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden pt-16 md:pt-0">
+      <main className="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden pt-16 md:pt-0 pb-20 md:pb-0">
         <header className="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shrink-0">
           <div>
             <h1 className="text-2xl font-black text-slate-900 font-headline flex items-center gap-2">
