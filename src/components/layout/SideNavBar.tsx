@@ -134,10 +134,9 @@ export const SideNavBar = ({
       </div>
 
       {/* Mobile bottom navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-secondary border-t border-white/10 flex justify-around px-2 py-1 shadow-2xl">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-secondary border-t border-white/10 flex justify-around items-center px-2 py-2 shadow-2xl h-20">
         <BottomNavItem page="dashboard" icon={LayoutDashboard} label="Mi Negocio" />
         <BottomNavItem page="sales" icon={Receipt} label="Ventas" />
-        <BottomNavItem page="inventory" icon={Package} label="Inventario" />
         <BottomNavItem page="fiados" icon={Wallet} label="Fiados" />
         <BottomNavItem page="kpis" icon={LineChart} label="KPIs" />
         <BottomNavItem page="history" icon={History} label="Historial" />
@@ -150,6 +149,12 @@ export const SideNavBar = ({
           <span className="text-[10px] font-semibold">Salir</span>
         </button>
       </nav>
+
+      {/* Mobile connection indicator */}
+      <div className="md:hidden fixed bottom-20 right-4 flex items-center gap-1 bg-green-50 border border-green-200 px-2 py-1 rounded-full text-[10px] text-green-700 z-30">
+        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        <span className="font-semibold">Conectado</span>
+      </div>
     </>
   );
 };
