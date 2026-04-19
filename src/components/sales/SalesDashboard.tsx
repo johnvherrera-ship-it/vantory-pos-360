@@ -653,7 +653,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowCashModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#00FF41] hover:bg-[#00DD2D] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00FF41]/60"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#00CC33] hover:bg-[#00AA22] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00CC33]/60"
                     style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <Banknote className="w-4 h-4" />
