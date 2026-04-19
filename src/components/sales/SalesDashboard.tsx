@@ -158,6 +158,11 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     setCart(newCart);
   };
 
+  const handleSearchChange = (value: string) => {
+    setBarcode(value);
+    setSearchTerm(value); // Filtrar productos en tiempo real
+  };
+
   const handleScan = () => {
     if (!barcode) return;
     playBeep();
@@ -181,11 +186,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
     if (product) {
       handleAddToCart(product);
-      setSearchTerm(searchTerm); // Filtrar productos para mostrar solo el encontrado
+      setBarcode('');
     } else {
       alert(`Producto no encontrado: ${barcode}. Regístralo primero en Inventario.`);
     }
-    setBarcode('');
   };
 
   const handleConfirmSale = (method: string) => {
@@ -451,7 +455,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     placeholder="Escanea código o escribe nombre..."
                     type="text"
                     value={barcode}
-                    onChange={(e) => setBarcode(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     autoFocus
                   />
                   <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 bg-secondary text-white px-5 py-2 rounded-xl font-bold hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/20">
