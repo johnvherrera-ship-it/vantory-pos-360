@@ -181,6 +181,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
     if (product) {
       handleAddToCart(product);
+      setSearchTerm(searchTerm); // Filtrar productos para mostrar solo el encontrado
     } else {
       alert(`Producto no encontrado: ${barcode}. Regístralo primero en Inventario.`);
     }
