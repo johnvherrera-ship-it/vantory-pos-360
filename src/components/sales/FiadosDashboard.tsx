@@ -112,7 +112,7 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="fiados" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
-      <main className="flex-1 ml-64 flex flex-col min-h-screen p-8">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8">
         <header className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Gestión de <span className="text-secondary">Fiados</span></h1>
@@ -153,30 +153,30 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
         <div className="w-full space-y-8">
           {/* KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-outline-variant/10 flex flex-col">
-              <span className="text-xs font-black text-outline-variant uppercase tracking-widest mb-2">Total por Cobrar</span>
+            <div className="bg-white p-7 rounded-2xl shadow-md border border-error/20 flex flex-col hover:shadow-lg hover:border-error/60 transition-all">
+              <span className="text-xs font-black text-error uppercase tracking-widest mb-3">Total por Cobrar</span>
               <span className="text-4xl font-black text-error">${totalDebtAll.toLocaleString('es-CL')}</span>
             </div>
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-outline-variant/10 flex flex-col">
-              <span className="text-xs font-black text-outline-variant uppercase tracking-widest mb-2">Clientes con Deuda</span>
-              <span className="text-4xl font-black text-[#0F172A]">{clientsWithDebt}</span>
+            <div className="bg-white p-7 rounded-2xl shadow-md border border-secondary/20 flex flex-col hover:shadow-lg hover:border-secondary/60 transition-all">
+              <span className="text-xs font-black text-secondary uppercase tracking-widest mb-3">Clientes con Deuda</span>
+              <span className="text-4xl font-black text-secondary">{clientsWithDebt}</span>
             </div>
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-outline-variant/10 flex flex-col">
-              <span className="text-xs font-black text-outline-variant uppercase tracking-widest mb-2">Abonado este Mes</span>
+            <div className="bg-white p-7 rounded-2xl shadow-md border-2 border-green-500/40 flex flex-col hover:shadow-lg hover:border-green-500/60 transition-all">
+              <span className="text-xs font-black text-green-600 uppercase tracking-widest mb-3">Abonado este Mes</span>
               <span className="text-4xl font-black text-green-600">${totalPaidThisMonth.toLocaleString('es-CL')}</span>
             </div>
           </div>
 
           {/* Filters & Search */}
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-outline-variant/10">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-5 rounded-2xl shadow-md border border-secondary/10">
             <div className="relative w-full md:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant" />
-              <input 
-                type="text" 
-                placeholder="Buscar por nombre o teléfono..." 
+              <input
+                type="text"
+                placeholder="Buscar por nombre o teléfono..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-secondary/20 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
               />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
@@ -201,7 +201,7 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
             </div>
           </div>
 
-          <section className="bg-white rounded-3xl overflow-hidden shadow-sm border border-outline-variant/10">
+          <section className="bg-white rounded-3xl overflow-hidden shadow-md border border-secondary/10">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>

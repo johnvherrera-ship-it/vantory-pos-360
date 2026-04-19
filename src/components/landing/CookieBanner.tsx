@@ -22,7 +22,7 @@ export const CookieBanner = () => {
       exit={{ y: 100, opacity: 0 }}
       className="fixed bottom-8 left-8 right-8 md:left-auto md:right-8 md:max-w-md z-[100]"
     >
-      <div className="bg-white rounded-[2rem] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-2 border-secondary/20 hover:border-secondary/50 card-hover-enhance flex flex-col gap-4">
+      <div className="bg-white rounded-[2rem] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-secondary/10 hover:border-secondary/50 card-hover-enhance flex flex-col gap-4">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary shrink-0 group-hover:bg-secondary group-hover:text-white transition-all">
             <Shield className="w-6 h-6" />

@@ -108,7 +108,7 @@ export const BlogPage = () => {
               whileFocus={{ scale: 1.02 }}
               type="text"
               placeholder="Buscar artículos..."
-              className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-secondary/20 hover:border-secondary/40 focus:border-secondary rounded-2xl font-medium outline-none focus:ring-0 transition-all shadow-sm hover:shadow-md"
+              className="w-full pl-12 pr-4 py-3.5 bg-white border border-secondary/10 hover:border-secondary/40 focus:border-secondary rounded-2xl font-medium outline-none focus:ring-0 transition-all shadow-sm hover:shadow-md"
             />
           </div>
           <div className="flex flex-wrap gap-3">
@@ -120,7 +120,7 @@ export const BlogPage = () => {
                 className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
                   cat === 'Todos'
                     ? 'bg-gradient-secondary text-white shadow-lg shadow-secondary/30 hover:shadow-secondary/50'
-                    : 'bg-white text-on-surface-variant hover:text-secondary border-2 border-secondary/20 hover:border-secondary/50 hover:bg-secondary/5'
+                    : 'bg-white text-on-surface-variant hover:text-secondary border border-secondary/10 hover:border-secondary/50 hover:bg-secondary/5'
                 }`}
               >
                 {cat}

@@ -77,27 +77,27 @@ export const Dashboard = ({}: DashboardProps) => {
 
   // Trend Data (Last 7 days)
   const trendData = useMemo(() => {
-    const last7Days = [...Array(7)].map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      return d.toISOString().split('T')[0];
-    }).reverse();
+    const dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
 
-    return last7Days.map(date => {
-      const daySales = salesHistory.filter(s => s.date.split('T')[0] === date);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      const dateStr = d.toISOString().split('T')[0];
+      const daySales = salesHistory.filter(s => s.date.split('T')[0] === dateStr);
       const total = daySales.reduce((sum, s) => sum + s.total, 0);
-      return {
-        date: date.split('-').slice(1).reverse().join('/'),
-        ventas: total
-      };
+      return { date: dayNames[i], ventas: total };
     });
   }, [salesHistory]);
 
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="dashboard" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
-      <main className="flex-1 ml-64 flex flex-col min-h-screen p-8">
-        <header className="mb-10 flex justify-between items-center">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8">
+        <header className="mb-10 pb-8 flex justify-between items-center border-b border-secondary/10">
           <div>
             <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Mi <span className="text-secondary">Negocio</span></h2>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">PANEL &gt; MI NEGOCIO</p>
@@ -137,7 +137,7 @@ export const Dashboard = ({}: DashboardProps) => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-3xl shadow-sm border-2 border-secondary/15 hover:border-secondary/60 hover:shadow-lg transition-all group relative card-hover-enhance">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-secondary/10 hover:border-secondary/40 hover:shadow-lg transition-all group relative card-hover-enhance">
             <div className="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 mb-3">
               <TrendingUp className="w-5 h-5" />
             </div>
@@ -147,8 +147,8 @@ export const Dashboard = ({}: DashboardProps) => {
               Suma de todas las ventas registradas históricamente.
             </div>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow group relative">
-            <div className="w-10 h-10 bg-secondary/10 rounded-2xl flex items-center justify-center text-secondary mb-3">
+          <div className="bg-gradient-to-br from-white to-secondary/5 p-5 rounded-3xl shadow-sm border border-secondary/10 hover:border-secondary/40 hover:shadow-md transition-all group relative">
+            <div className="w-10 h-10 bg-secondary/15 rounded-2xl flex items-center justify-center text-secondary mb-3">
               <Zap className="w-5 h-5 fill-current" />
             </div>
             <p className="text-[10px] font-bold text-[#0F172A] uppercase tracking-widest mb-1">Ganancia Neta</p>
@@ -161,7 +161,7 @@ export const Dashboard = ({}: DashboardProps) => {
               Ingresos totales menos el costo de compra de los productos.
             </div>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow group relative">
+          <div className="bg-gradient-to-br from-white to-blue-50/30 p-5 rounded-3xl shadow-sm border border-secondary/10 hover:border-secondary/40 hover:shadow-md transition-all group relative">
             <div className="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-3">
               <Receipt className="w-5 h-5" />
             </div>
@@ -171,7 +171,7 @@ export const Dashboard = ({}: DashboardProps) => {
               Cantidad de tickets o boletas emitidas en el día actual.
             </div>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow group relative">
+          <div className="bg-gradient-to-br from-white to-orange-50/30 p-5 rounded-3xl shadow-sm border border-secondary/10 hover:border-secondary/40 hover:shadow-md transition-all group relative">
             <div className="w-10 h-10 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 mb-3">
               <Package className="w-5 h-5" />
             </div>
@@ -181,7 +181,7 @@ export const Dashboard = ({}: DashboardProps) => {
               Capital total invertido en los productos actualmente en stock.
             </div>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-outline-variant/10 hover:shadow-md transition-shadow group relative">
+          <div className="bg-gradient-to-br from-white to-red-50/30 p-5 rounded-3xl shadow-sm border border-secondary/10 hover:border-secondary/40 hover:shadow-md transition-all group relative">
             <div className="w-10 h-10 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 mb-3">
               <Bell className="w-5 h-5" />
             </div>
@@ -195,7 +195,7 @@ export const Dashboard = ({}: DashboardProps) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Trend Chart */}
-          <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] shadow-sm border-2 border-secondary/15 hover:border-secondary/60 hover:shadow-lg transition-all card-hover-enhance">
+          <div className="lg:col-span-2 bg-gradient-to-br from-white to-secondary/5 p-8 rounded-[2rem] shadow-sm border border-secondary/10 hover:border-secondary/40 hover:shadow-lg transition-all card-hover-enhance">
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h3 className="text-xl font-black text-[#0F172A] font-headline">Tendencia de Ventas</h3>
@@ -256,7 +256,7 @@ export const Dashboard = ({}: DashboardProps) => {
           </div>
 
           {/* Top Products */}
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border-2 border-secondary/15 hover:border-secondary/60 hover:shadow-lg transition-all card-hover-enhance">
+          <div className="bg-gradient-to-br from-white to-secondary/5 p-8 rounded-[2rem] shadow-sm border border-secondary/10 hover:border-secondary/40 hover:shadow-lg transition-all card-hover-enhance">
             <h3 className="text-xl font-black text-[#0F172A] font-headline mb-8">Top 5 Productos</h3>
             <div className="h-[300px] w-full">
               {productSales.length > 0 ? (
@@ -294,7 +294,7 @@ export const Dashboard = ({}: DashboardProps) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-secondary/15 hover:border-secondary/60 hover:shadow-lg transition-all card-hover-enhance">
+          <div className="bg-gradient-to-br from-white to-secondary/5 p-8 rounded-3xl shadow-sm border border-secondary/10 hover:border-secondary/40 hover:shadow-lg transition-all card-hover-enhance">
             <h3 className="text-xl font-black text-[#0F172A] mb-6 flex items-center gap-2">
               <History className="w-5 h-5 text-secondary" />
               Últimas <span className="text-secondary">Ventas</span>
@@ -324,7 +324,7 @@ export const Dashboard = ({}: DashboardProps) => {
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl shadow-sm border-2 border-error/15 hover:border-error/60 hover:shadow-lg transition-all card-hover-enhance">
+          <div className="bg-gradient-to-br from-white to-red-50/20 p-8 rounded-3xl shadow-sm border border-error/10 hover:border-error/40 hover:shadow-lg transition-all card-hover-enhance">
             <h3 className="text-xl font-black text-[#0F172A] mb-6 flex items-center gap-2">
               <Bell className="w-5 h-5 text-error" />
               Alertas de <span className="text-secondary">Reposición</span>

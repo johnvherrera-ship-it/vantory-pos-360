@@ -117,7 +117,7 @@ export const FeaturesPage = ({ setCurrentPage = () => {} }: FeaturesPageProps) =
               viewport={{ once: true }}
               transition={{ delay: i * 0.12, duration: 0.6 }}
               whileHover={{ y: -16, boxShadow: '0 0 40px rgba(51,95,157,0.5), 0 0 80px rgba(51,95,157,0.3)' }}
-              className="bg-gradient-to-br from-white to-surface-container-lowest/40 p-10 rounded-[2.8rem] border-2 border-secondary/20 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative overflow-hidden card-hover-enhance"
+              className="bg-gradient-to-br from-white to-surface-container-lowest/40 p-10 rounded-[2.8rem] border border-secondary/10 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative overflow-hidden card-hover-enhance"
             >
               {/* Gradient background on hover - animated */}
               <motion.div
@@ -313,7 +313,7 @@ export const FeaturesPage = ({ setCurrentPage = () => {} }: FeaturesPageProps) =
                 onClick={() => setCurrentPage('pricing')}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.92 }}
-                className="px-12 py-6 bg-white text-secondary border-2 border-secondary/30 hover:border-secondary font-black text-lg rounded-2xl shadow-lg hover:shadow-xl hover:bg-secondary/5 transition-all"
+                className="px-12 py-6 bg-white text-secondary border border-secondary/15 hover:border-secondary font-black text-lg rounded-2xl shadow-lg hover:shadow-xl hover:bg-secondary/5 transition-all"
               >
                 Ver Planes y Precios
               </motion.button>

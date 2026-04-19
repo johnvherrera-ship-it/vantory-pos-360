@@ -42,6 +42,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLowStock, setFilterLowStock] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Todas las Categorías');
+  const [filterStatus, setFilterStatus] = useState('Estado: Todos');
   const [pageNumber, setPageNumber] = useState(1);
   const ITEMS_PER_PAGE = 15;
 
@@ -162,12 +163,16 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
                          p.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLowStock = filterLowStock ? p.stock < 10 : true;
     const matchesCategory = selectedCategory === 'Todas las Categorías' ? true : p.category === selectedCategory;
-    return matchesSearch && matchesLowStock && matchesCategory;
+    let matchesStatus = true;
+    if (filterStatus === 'En Stock') matchesStatus = p.stock > 10;
+    else if (filterStatus === 'Bajo Stock') matchesStatus = p.stock > 0 && p.stock <= 10;
+    else if (filterStatus === 'Agotado') matchesStatus = p.stock === 0;
+    return matchesSearch && matchesLowStock && matchesCategory && matchesStatus;
   });
 
   React.useEffect(() => {
     setPageNumber(1);
-  }, [searchTerm, filterLowStock, selectedCategory]);
+  }, [searchTerm, filterLowStock, selectedCategory, filterStatus]);
 
   const totalPages = Math.max(1, Math.ceil(filteredInventory.length / ITEMS_PER_PAGE));
   const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE;
@@ -191,7 +196,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="inventory" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
-      <main className="flex-1 ml-64 flex flex-col min-h-screen p-8">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8">
         <header className="mb-10 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Inventario de <span className="text-secondary">Productos</span></h2>
@@ -201,9 +206,9 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline w-4 h-4" />
-              <input 
-                className="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-secondary/20 focus:bg-surface-container-lowest transition-all" 
-                placeholder="Buscar en inventario..." 
+              <input
+                className="pl-10 pr-4 py-2 bg-surface-container-low border border-secondary/20 rounded-lg text-sm w-64 focus:ring-2 focus:ring-secondary/20 focus:bg-surface-container-lowest focus:border-secondary transition-all"
+                placeholder="Buscar en inventario..."
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -237,7 +242,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30 group">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-md border border-secondary/20 hover:shadow-lg hover:border-opacity-60">
             <div>
               <span className="text-[#0F172A] font-black text-xs uppercase tracking-widest mb-2 block">Total Productos</span>
               <div className="flex items-baseline gap-2">
@@ -248,7 +253,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Cantidad total de artículos distintos registrados en tu catálogo actual.</p>
           </div>
 
-          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-md border border-secondary/20 hover:shadow-lg hover:border-opacity-60">
             <div>
               <span className="text-[#0F172A] font-black text-xs uppercase tracking-widest mb-2 block">Valor Inventario</span>
               <div className="flex items-baseline gap-2">
@@ -263,7 +268,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Inversión total basada en el costo de compra por la cantidad de unidades en stock.</p>
           </div>
 
-          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-sm border border-outline-variant/10 hover:border-secondary/30">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all shadow-md border border-error/20 hover:shadow-lg hover:border-opacity-60">
             <div>
               <span className="text-[#0F172A] font-black text-xs uppercase tracking-widest mb-2 block">Bajo Stock</span>
               <div className="flex items-baseline gap-2">
@@ -276,7 +281,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             <p className="text-xs text-[#0F172A] font-bold mt-2 leading-tight">Productos que requieren reposición inmediata (menos de 10 unidades disponibles).</p>
           </div>
 
-          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all border-2 border-secondary/20 shadow-md">
+          <div className="bg-surface-container-lowest p-4 rounded-2xl flex flex-col justify-between min-h-[120px] transition-all border border-secondary/10 shadow-md">
             <div>
               <span className="text-secondary font-black text-xs uppercase tracking-widest mb-2 block">Margen Promedio</span>
               <div className="flex items-baseline gap-2">
@@ -303,7 +308,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-surface-container-low rounded-2xl p-4 mb-6 flex flex-wrap items-center gap-4">
+        <div className="bg-surface-container-low rounded-2xl p-4 mb-6 flex flex-wrap items-center gap-4 border border-secondary/10 shadow-md">
           <div className="flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-xl shadow-sm">
             <Filter className="text-outline w-5 h-5" />
             <span className="text-sm font-bold font-label">Filtros Avanzados</span>
@@ -319,7 +324,11 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
-          <select className="bg-transparent border-none text-sm font-black focus:ring-0 text-[#0F172A] outline-none">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="bg-transparent border-none text-sm font-black focus:ring-0 text-[#0F172A] outline-none cursor-pointer"
+          >
             <option>Estado: Todos</option>
             <option>En Stock</option>
             <option>Bajo Stock</option>
@@ -347,7 +356,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
         </div>
 
         {/* Inventory Table */}
-        <div className="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm">
+        <div className="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-md border border-secondary/15">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-surface-container-low/50">
@@ -363,7 +372,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
             </thead>
             <tbody className="divide-y divide-surface-container-low">
               {paginatedInventory.map((product) => (
-                <tr key={product.id} className="hover:bg-surface-container-high transition-all group">
+                <tr key={product.id} className="hover:bg-secondary/5 transition-all group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <button 
@@ -419,18 +428,21 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
                   <td className="px-8 py-6 text-right">
                     <button
                       onClick={() => setViewingProduct(product)}
+                      title="Ver detalles"
                       className="p-2 text-outline hover:text-secondary transition-colors"
                     >
                       <Eye className="w-5 h-5" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => setEditingProduct(product)}
+                      title="Editar producto"
                       className="p-2 text-outline hover:text-secondary transition-colors"
                     >
                       <Edit className="w-5 h-5" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => setProductToDelete(product.id)}
+                      title="Eliminar producto"
                       className="p-2 text-outline hover:text-error transition-colors"
                     >
                       <Trash2 className="w-5 h-5" />
@@ -440,7 +452,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
               ))}
             </tbody>
           </table>
-          <div className="px-8 py-6 bg-surface-container-low/30 border-t border-outline-variant/10 flex justify-between items-center">
+          <div className="px-8 py-6 bg-surface-container-low/30 border-t border-secondary/10 flex justify-between items-center">
             <p className="text-sm text-on-surface-variant font-medium">Página {pageNumber} de {totalPages}</p>
             <div className="flex items-center gap-1">
               <button

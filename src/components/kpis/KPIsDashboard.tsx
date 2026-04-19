@@ -294,7 +294,7 @@ export const KPIsDashboard = () => {
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="kpis" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
-      <main className="flex-1 ml-64 flex flex-col min-h-screen p-8">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8">
         <header className="mb-10 flex justify-between items-end">
           <div>
             <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Rendimiento <span className="text-secondary">Operativo</span></h2>
@@ -340,7 +340,7 @@ export const KPIsDashboard = () => {
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div onClick={() => setShowTransactionsModal(true)} className="bg-white p-5 rounded-3xl border border-outline-variant/10 hover:border-secondary/30 transition-all flex flex-col justify-between group shadow-sm cursor-pointer">
+          <div onClick={() => setShowTransactionsModal(true)} className="bg-white p-5 rounded-3xl border border-secondary/20 shadow-md hover:shadow-lg hover:border-opacity-60 transition-all flex flex-col justify-between group cursor-pointer">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-secondary/5 rounded-xl group-hover:bg-secondary/10 transition-colors">
                 <Receipt className="w-5 h-5 text-secondary" />
@@ -361,7 +361,7 @@ export const KPIsDashboard = () => {
             </div>
           </div>
 
-          <div onClick={() => setShowRotationModal(true)} className="bg-white p-5 rounded-3xl border border-outline-variant/10 hover:border-secondary/30 transition-all flex flex-col justify-between group shadow-sm cursor-pointer">
+          <div onClick={() => setShowRotationModal(true)} className="bg-white p-5 rounded-3xl border border-secondary/20 shadow-md hover:shadow-lg hover:border-opacity-60 transition-all flex flex-col justify-between group cursor-pointer">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-amber-50 rounded-xl group-hover:bg-amber-100 transition-colors">
                 <Zap className="w-5 h-5 text-amber-600" />
@@ -375,7 +375,7 @@ export const KPIsDashboard = () => {
             </div>
           </div>
 
-          <div onClick={() => setShowCriticalStockModal(true)} className="bg-white p-5 rounded-3xl border border-outline-variant/10 hover:border-error/30 transition-all flex flex-col justify-between group shadow-sm cursor-pointer">
+          <div onClick={() => setShowCriticalStockModal(true)} className="bg-white p-5 rounded-3xl border border-error/20 shadow-md hover:shadow-lg hover:border-opacity-60 transition-all flex flex-col justify-between group cursor-pointer">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-red-50 rounded-xl group-hover:bg-red-100 transition-colors">
                 <Bell className="w-5 h-5 text-error" />
@@ -389,7 +389,7 @@ export const KPIsDashboard = () => {
             </div>
           </div>
 
-          <div onClick={() => setShowRevenueModal(true)} className="bg-white p-5 rounded-3xl border border-outline-variant/10 hover:border-secondary/30 transition-all flex flex-col justify-between group shadow-sm cursor-pointer">
+          <div onClick={() => setShowRevenueModal(true)} className="bg-white p-5 rounded-3xl border border-secondary/20 shadow-md hover:shadow-lg hover:border-opacity-60 transition-all flex flex-col justify-between group cursor-pointer">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-secondary/5 rounded-xl group-hover:bg-secondary/10 transition-colors">
                 <Banknote className="w-5 h-5 text-secondary" />
@@ -410,7 +410,7 @@ export const KPIsDashboard = () => {
             </div>
           </div>
 
-          <div onClick={() => setShowProfitModal(true)} className="bg-white p-5 rounded-3xl border border-outline-variant/10 hover:border-secondary/30 transition-all flex flex-col justify-between group shadow-sm cursor-pointer">
+          <div onClick={() => setShowProfitModal(true)} className="bg-white p-5 rounded-3xl border border-secondary/20 shadow-md hover:shadow-lg hover:border-opacity-60 transition-all flex flex-col justify-between group cursor-pointer">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-secondary/5 rounded-xl group-hover:bg-secondary/10 transition-colors">
                 <TrendingUp className="w-5 h-5 text-secondary" />
@@ -432,8 +432,8 @@ export const KPIsDashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 mb-8">
-          <div className="xl:col-span-3 bg-white p-8 rounded-[2rem] shadow-sm border border-outline-variant/10">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+          <div className="bg-white p-8 rounded-[2rem] shadow-md border border-secondary/15">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h3 className="text-xl font-black font-headline text-[#0F172A]">Ventas por <span className="text-secondary">Período</span></h3>
@@ -471,7 +471,7 @@ export const KPIsDashboard = () => {
                 )}
               </div>
             </div>
-            <div className="h-80 w-full flex items-end justify-between gap-4 px-2 relative border-b border-outline-variant/20">
+            <div className="h-64 w-full flex items-end justify-between gap-4 px-2 relative border-b border-secondary/20">
               <div className="absolute inset-x-0 top-0 border-t border-dashed border-outline-variant/10 h-1/4 w-full"></div>
               <div className="absolute inset-x-0 top-1/4 border-t border-dashed border-outline-variant/10 h-1/4 w-full"></div>
               <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-outline-variant/10 h-1/4 w-full"></div>
@@ -504,7 +504,7 @@ export const KPIsDashboard = () => {
             </div>
           </div>
 
-          <div className="xl:col-span-1 bg-white p-8 rounded-[2rem] shadow-sm border border-outline-variant/10">
+          <div className="bg-white p-8 rounded-[2rem] shadow-md border border-secondary/15">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-black font-headline text-[#0F172A]">Top <span className="text-secondary">Productos</span></h3>
               <button className="hover:bg-surface-container-low p-1.5 rounded-full transition-colors">
@@ -537,7 +537,7 @@ export const KPIsDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-          <div className="bg-white p-8 rounded-[2rem] border border-outline-variant/10 shadow-sm">
+          <div className="bg-white p-8 rounded-[2rem] border border-secondary/15 shadow-md">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-black font-headline text-[#0F172A]">Estado de <span className="text-secondary">Inventario Local</span></h3>
               <div className={`flex items-center gap-2 text-xs font-black px-3 py-1.5 rounded-lg ${inventoryHealth.critical > 20 ? 'bg-red-50 text-error' : 'bg-green-50 text-[#0F172A]'}`}>
@@ -562,7 +562,7 @@ export const KPIsDashboard = () => {
                 </div>
               ))}
             </div>
-            <div onClick={() => setShowCriticalStockModal(true)} className="mt-8 p-5 bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer rounded-2xl flex items-start gap-4 border border-outline-variant/10">
+            <div onClick={() => setShowCriticalStockModal(true)} className="mt-8 p-5 bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer rounded-2xl flex items-start gap-4 border border-secondary/15">
               <div className="p-2 bg-secondary/5 rounded-lg"><Zap className="w-5 h-5 text-secondary" /></div>
               <div>
                 <p className="text-sm font-black text-[#0F172A]">Recomendación de Compra</p>

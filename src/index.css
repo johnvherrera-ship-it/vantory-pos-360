@@ -272,6 +272,23 @@ h1, h2, h3, .font-headline {
   animation: bright-shine 8s ease-in-out infinite;
 }
 
+/* ===== CART SWING ANIMATION ===== */
+@keyframes cart-swing {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-8px) rotate(-3deg);
+  }
+  75% {
+    transform: translateX(8px) rotate(3deg);
+  }
+}
+
+.animate-cart-swing {
+  animation: cart-swing 2s ease-in-out infinite;
+}
+
 /* ===== ANIMATED BORDER GRADIENT ===== */
 @keyframes border-gradient-flow {
   0% {

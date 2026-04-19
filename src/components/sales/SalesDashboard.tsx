@@ -368,13 +368,13 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     setShowPausedModal(false);
   };
 
-  const formatCurrency = (num: number) => `$${num.toLocaleString('es-CL')}`;
+  const formatCurrency = (num: number) => `$${Math.round(num).toLocaleString()}`;
 
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="sales" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       {/* Main Content Area */}
-      <main className="flex-1 ml-64 flex flex-col min-h-screen p-8">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8">
         <header className="mb-10 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Terminal de <span className="text-secondary">Ventas</span></h2>
@@ -443,7 +443,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
             </div>
 
             {/* Barcode Area */}
-            <div className="bg-[#131b2e] rounded-3xl p-4 shadow-2xl border-2 border-secondary/30 shadow-secondary/10 overflow-hidden relative">
+            <div className="bg-[#131b2e] rounded-3xl p-4 shadow-2xl border border-secondary/15 shadow-secondary/10 overflow-hidden relative">
               <div className="absolute inset-0 animate-bright-shine pointer-events-none"></div>
               <h2 className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2 relative z-10">
                 <Search className="w-4 h-4 text-secondary" /> Buscar Producto
@@ -527,7 +527,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 <button
                   key={product.id}
                   onClick={() => handleAddToCart(product)}
-                  className="bg-surface-container-lowest p-0 rounded-lg border border-outline-variant/20 shadow-sm hover:border-secondary hover:shadow-md transition-all text-left flex flex-col h-full group overflow-hidden"
+                  className="bg-surface-container-lowest p-0 rounded-lg border border-secondary/20 shadow-sm hover:border-secondary hover:shadow-md transition-all text-left flex flex-col h-full group overflow-hidden"
                 >
                   <div className="aspect-square w-full bg-surface-container-low overflow-hidden relative">
                     <img
@@ -561,7 +561,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
           <section className="flex-1 bg-surface-container-low p-6 flex flex-col border-l border-outline-variant/20 overflow-hidden">
             {/* Cart - Max Height with Scroll */}
             <div className="max-h-[350px] flex flex-col overflow-hidden mb-2">
-              <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border-2 border-secondary/30 overflow-hidden flex-1 flex flex-col min-h-0">
+              <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border border-secondary/15 overflow-hidden flex-1 flex flex-col min-h-0">
                 {/* Cart Header */}
                 <div className="p-3 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
                   <h3 className="text-xs font-black text-[#0F172A] tracking-widest uppercase"><span className="text-secondary">CARRITO</span> <span className="text-[#0F172A]/70">({totalItems})</span></h3>
@@ -574,7 +574,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     <button
                       onClick={handlePauseSale}
                       disabled={cart.length === 0}
-                      className="text-xs font-bold text-secondary border border-secondary/30 px-3 py-1 rounded-full hover:bg-secondary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="text-xs font-bold text-secondary border border-secondary/30 px-3 py-1 rounded-full hover:bg-secondary/5 transition-colors disabled:cursor-not-allowed"
                     >
                       Pausar
                     </button>
@@ -610,7 +610,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                   ))}
                   {cart.length === 0 && (
                     <div className="text-center py-10 text-[#0F172A]">
-                      <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-30 animate-cart-swing" />
                       <p className="font-black">El carrito está vacío</p>
                     </div>
                   )}
@@ -619,33 +619,33 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
             </div>
 
             {/* Payment & Checkout - BOTTOM */}
-            <div className="bg-gradient-to-br from-secondary via-[#335f9d] to-[#174986] p-4 rounded-2xl border-2 border-secondary/30 shadow-lg">
-              <div className="space-y-3">
+            <div className="bg-gradient-to-br from-[#5b7ec9] via-[#6b8dd9] to-[#5b7ec9] p-3 rounded-2xl border-2 border-white/20 shadow-2xl">
+              <div className="space-y-2.5">
                 {/* Surcharge */}
-                <div className="flex items-center gap-2 bg-white/10 p-2 rounded-lg border border-white/20 backdrop-blur-sm">
+                <div className="flex items-center gap-2 bg-white/15 p-2 rounded-lg border border-white/30 backdrop-blur-md">
                   <span className="text-[10px] font-black text-white uppercase tracking-wider">Recargo ($)</span>
                   <input
                     type="number"
                     value={surcharge}
                     onChange={(e) => setSurcharge(e.target.value)}
-                    className="flex-1 bg-white/90 border border-white/30 rounded px-2 py-1 text-xs font-bold text-right outline-none focus:border-white focus:bg-white transition-all"
+                    className="flex-1 bg-white/95 border border-white/40 rounded-lg px-2 py-1 text-xs font-bold text-right outline-none focus:border-white focus:bg-white transition-all"
                   />
                 </div>
 
                 {/* Totals */}
-                <div className="space-y-1 bg-white/5 p-3 rounded-lg border border-white/10">
-                  <div className="flex justify-between items-center text-white/80">
-                    <span className="text-xs font-bold">Subtotal</span>
-                    <span className="text-xs font-bold">{formatCurrency(subtotal)}</span>
+                <div className="space-y-1 bg-white/10 p-2.5 rounded-lg border border-white/20 backdrop-blur-md">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-bold text-white/80 uppercase tracking-wider">Subtotal</span>
+                    <span className="text-xs font-bold text-white/90">{formatCurrency(subtotal)}</span>
                   </div>
-                  <div className="flex justify-between items-end pt-1.5 border-t border-white/20">
-                    <span className="text-base font-black text-white">Total</span>
-                    <span className="text-3xl font-black text-white drop-shadow-lg">{formatCurrency(total)}</span>
+                  <div className="flex justify-between items-end pt-1 border-t border-white/20">
+                    <span className="text-sm font-black text-white">Total</span>
+                    <span className="text-2xl font-black text-white drop-shadow-lg">{formatCurrency(total)}</span>
                   </div>
                 </div>
 
                 {/* Payment Buttons */}
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => {
                       if (!currentPOS) {
@@ -659,11 +659,11 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowCashModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#00AA44] hover:bg-[#009933] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00AA44]/60"
-                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+                    className="flex items-center justify-center gap-1.5 py-2.5 bg-[#009944] hover:bg-[#008833] text-white rounded-lg font-black text-xs transition-all disabled:cursor-not-allowed shadow-md shadow-[#009944]/50 hover:shadow-lg hover:shadow-[#009944]/70 border border-white/20"
+                    style={{ textShadow: '0 0 3px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.7)' }}
                   >
                     <Banknote className="w-4 h-4" />
-                    Efectivo (F10)
+                    Efectivo
                   </button>
                   <button
                     onClick={() => {
@@ -678,8 +678,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Débito');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#0066FF] hover:bg-[#0055DD] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#0066FF]/60"
-                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+                    className="flex items-center justify-center gap-2 py-3.5 bg-[#0077FF] hover:bg-[#0066EE] text-white rounded-xl font-black text-sm transition-all disabled:cursor-not-allowed shadow-lg shadow-[#0077FF]/50 hover:shadow-xl hover:shadow-[#0077FF]/70 border border-white/20"
+                    style={{ textShadow: '0 0 3px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.7)' }}
                   >
                     <CreditCard className="w-4 h-4" />
                     Débito
@@ -697,10 +697,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Pluxee');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#FFAA00] hover:bg-[#FF9900] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#FFAA00]/60"
-                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+                    className="flex items-center justify-center gap-2 py-3.5 bg-[#FFBB11] hover:bg-[#FFAA00] text-white rounded-xl font-black text-sm transition-all disabled:cursor-not-allowed shadow-lg shadow-[#FFBB11]/50 hover:shadow-xl hover:shadow-[#FFBB11]/70 border border-white/20"
+                    style={{ textShadow: '0 0 3px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.7)' }}
                   >
-                    <CreditCard className="w-3.5 h-3.5" />
+                    <CreditCard className="w-4 h-4" />
                     Pluxee
                   </button>
                   <button
@@ -716,10 +716,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('AmiPass');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#E91E8C] hover:bg-[#D71A7A] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#E91E8C]/60"
-                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+                    className="flex items-center justify-center gap-2 py-3.5 bg-[#F2277B] hover:bg-[#E51A6A] text-white rounded-xl font-black text-sm transition-all disabled:cursor-not-allowed shadow-lg shadow-[#F2277B]/50 hover:shadow-xl hover:shadow-[#F2277B]/70 border border-white/20"
+                    style={{ textShadow: '0 0 3px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.7)' }}
                   >
-                    <CreditCard className="w-3.5 h-3.5" />
+                    <CreditCard className="w-4 h-4" />
                     AmiPass
                   </button>
                   <button
@@ -735,10 +735,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowFiadoModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="col-span-2 flex items-center justify-center gap-1 py-2.5 bg-[#0088FF] hover:bg-[#0077DD] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#0088FF]/60"
-                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+                    className="col-span-2 flex items-center justify-center gap-2 py-3.5 bg-[#0099FF] hover:bg-[#0088EE] text-white rounded-xl font-black text-sm transition-all disabled:cursor-not-allowed shadow-lg shadow-[#0099FF]/50 hover:shadow-xl hover:shadow-[#0099FF]/70 border border-white/20"
+                    style={{ textShadow: '0 0 3px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.7)' }}
                   >
-                    <Wallet className="w-3.5 h-3.5" />
+                    <Wallet className="w-4 h-4" />
                     Fiado
                   </button>
                 </div>
@@ -972,7 +972,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     (selectedFiadoClient === 'new' && !newFiadoClient.name) ||
                     (selectedFiadoClient !== 'new' && fiados.find(c => c.id.toString() === selectedFiadoClient)?.creditLimit > 0 && (fiados.find(c => c.id.toString() === selectedFiadoClient)?.creditLimit - fiados.find(c => c.id.toString() === selectedFiadoClient)?.totalDebt) < total)
                   }
-                  className="flex-1 py-4 bg-secondary hover:bg-on-secondary-container text-white rounded-xl font-black transition-colors shadow-lg shadow-secondary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-4 bg-secondary hover:bg-on-secondary-container text-white rounded-xl font-black transition-colors shadow-lg shadow-secondary/20 disabled:cursor-not-allowed"
                 >
                   Confirmar Fiado
                 </button>
@@ -1066,7 +1066,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 </button>
                 <button 
                   onClick={() => setShowTicketModal(false)}
-                  className="w-full py-4 bg-white text-secondary border-2 border-secondary/20 rounded-2xl font-bold hover:bg-secondary/5 transition-all"
+                  className="w-full py-4 bg-white text-secondary border border-secondary/10 rounded-2xl font-bold hover:bg-secondary/5 transition-all"
                 >
                   Nueva Venta
                 </button>

@@ -151,7 +151,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
                   onClick={() => setCurrentPage('features')}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-10 py-5 text-lg font-bold text-secondary bg-white rounded-[1.25rem] border-2 border-secondary/20 hover:border-secondary/60 shadow-lg hover:shadow-xl transition-all group relative overflow-hidden"
+                  className="px-10 py-5 text-lg font-bold text-secondary bg-white rounded-[1.25rem] border border-secondary/10 hover:border-secondary/60 shadow-lg hover:shadow-xl transition-all group relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <span className="relative">Ver Funcionalidades</span>
@@ -233,7 +233,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
               <motion.div
                 variants={itemVariants}
                 whileHover={{ y: -16, boxShadow: '0 0 40px rgba(51,95,157,0.5), 0 0 80px rgba(51,95,157,0.3)' }}
-                className="md:col-span-6 md:row-span-2 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border-2 border-secondary/20 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group overflow-hidden relative card-hover-enhance"
+                className="md:col-span-6 md:row-span-2 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border border-secondary/10 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group overflow-hidden relative card-hover-enhance"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
@@ -266,7 +266,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
               <motion.div
                 variants={itemVariants}
                 whileHover={{ y: -14, boxShadow: '0 0 30px rgba(51,95,157,0.4), 0 0 60px rgba(51,95,157,0.2)' }}
-                className="md:col-span-3 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border-2 border-secondary/20 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative card-hover-enhance"
+                className="md:col-span-3 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border border-secondary/10 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative card-hover-enhance"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"
@@ -289,7 +289,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
               <motion.div
                 variants={itemVariants}
                 whileHover={{ y: -14, boxShadow: '0 0 30px rgba(51,95,157,0.4), 0 0 60px rgba(51,95,157,0.2)' }}
-                className="md:col-span-3 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border-2 border-secondary/20 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative card-hover-enhance"
+                className="md:col-span-3 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border border-secondary/10 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative card-hover-enhance"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"
@@ -312,7 +312,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
               <motion.div
                 variants={itemVariants}
                 whileHover={{ y: -14, boxShadow: '0 0 40px rgba(51,95,157,0.5), 0 0 80px rgba(51,95,157,0.3)' }}
-                className="md:col-span-6 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border-2 border-secondary/20 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all flex items-center gap-8 group relative overflow-hidden card-hover-enhance"
+                className="md:col-span-6 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border border-secondary/10 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all flex items-center gap-8 group relative overflow-hidden card-hover-enhance"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
@@ -338,7 +338,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
               <motion.div
                 variants={itemVariants}
                 whileHover={{ y: -14, boxShadow: '0 0 30px rgba(51,95,157,0.4), 0 0 60px rgba(51,95,157,0.2)' }}
-                className="md:col-span-3 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border-2 border-secondary/20 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative card-hover-enhance"
+                className="md:col-span-3 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border border-secondary/10 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative card-hover-enhance"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"
@@ -361,7 +361,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setCurrentPage }) => {
               <motion.div
                 variants={itemVariants}
                 whileHover={{ y: -14, boxShadow: '0 0 30px rgba(51,95,157,0.4), 0 0 60px rgba(51,95,157,0.2)' }}
-                className="md:col-span-3 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border-2 border-secondary/20 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative card-hover-enhance"
+                className="md:col-span-3 bg-gradient-to-br from-white to-surface-container-lowest p-8 rounded-3xl border border-secondary/10 hover:border-secondary/70 shadow-lg hover:shadow-2xl transition-all group relative card-hover-enhance"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-br from-secondary/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"

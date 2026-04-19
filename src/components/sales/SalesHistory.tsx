@@ -49,7 +49,7 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
   return (
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="history" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
-      <main className="flex-1 ml-64 flex flex-col min-h-screen p-8">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8">
         <header className="mb-10 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Historial / <span className="text-secondary">Salidas</span></h2>
@@ -256,7 +256,7 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
                 </button>
                 <button
                   onClick={() => setViewingSale(null)}
-                  className="w-full py-4 bg-white text-secondary border-2 border-secondary/20 rounded-2xl font-bold hover:bg-secondary/5 transition-all"
+                  className="w-full py-4 bg-white text-secondary border border-secondary/10 rounded-2xl font-bold hover:bg-secondary/5 transition-all"
                 >
                   Cerrar
                 </button>

@@ -47,8 +47,27 @@ interface UIContextProviderProps {
   children: React.ReactNode;
 }
 
+const PANEL_PAGES: CurrentPage[] = ['dashboard', 'sales', 'inventory', 'entries', 'kpis', 'fiados', 'history', 'users', 'superadmin-dashboard', 'superadmin-clients', 'superadmin-client-profile', 'lobby'];
+
+const getInitialPage = (): CurrentPage => {
+  try {
+    const session = localStorage.getItem('vantory_session_v1');
+    const savedPage = sessionStorage.getItem('vantory-current-page') as CurrentPage | null;
+    if (session && savedPage && PANEL_PAGES.includes(savedPage)) return savedPage;
+  } catch {}
+  return 'home';
+};
+
 export const UIContextProvider: React.FC<UIContextProviderProps> = ({ children }) => {
-  const [currentPage, setCurrentPage] = useState<CurrentPage>('home');
+  const [currentPage, setCurrentPageState] = useState<CurrentPage>(getInitialPage);
+
+  const setCurrentPage = (page: CurrentPage) => {
+    setCurrentPageState(page);
+    try {
+      if (PANEL_PAGES.includes(page)) sessionStorage.setItem('vantory-current-page', page);
+      else sessionStorage.removeItem('vantory-current-page');
+    } catch {}
+  };
   const [showCashRegisterModal, setShowCashRegisterModal] = useState(false);
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
   const [showCookies, setShowCookies] = useState(false);

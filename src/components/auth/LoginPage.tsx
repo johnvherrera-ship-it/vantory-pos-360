@@ -190,7 +190,7 @@ export const LoginPage = ({
                 <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary/50 group-focus-within:text-secondary w-5 h-5 transition-colors" />
                 <motion.input
                   whileFocus={{ scale: 1.02 }}
-                  className="w-full bg-surface-container-highest/30 border-2 border-secondary/20 hover:border-secondary/40 focus:border-secondary focus:shadow-[0_0_0_4px_rgba(51,95,157,0.2)] rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-white transition-all duration-200 outline-none font-medium"
+                  className="w-full bg-surface-container-highest/30 border border-secondary/10 hover:border-secondary/40 focus:border-secondary focus:shadow-[0_0_0_4px_rgba(51,95,157,0.2)] rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-0 focus:bg-white transition-all duration-200 outline-none font-medium"
                   id="usuario"
                   name="usuario"
                   placeholder="correo@empresa.com"

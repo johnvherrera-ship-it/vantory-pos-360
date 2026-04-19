@@ -246,7 +246,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
     <div className="flex min-h-screen bg-[#F8FAFC] text-slate-900 font-body">
       <SideNavBar currentPage="entries" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       
-      <main className="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden pt-16 md:pt-0">
         <header className="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shrink-0">
           <div>
             <h1 className="text-2xl font-black text-slate-900 font-headline flex items-center gap-2">
@@ -256,9 +256,9 @@ export const StockEntries = ({}: StockEntriesProps) => {
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">LOGÍSTICA &gt; RECEPCIÓN</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="bg-secondary/10 px-4 py-2 rounded-xl border border-secondary/20">
-              <p className="text-[10px] font-bold text-secondary uppercase leading-none mb-1">Entradas Hoy</p>
-              <p className="text-lg font-black text-secondary leading-none">{entriesToday}</p>
+            <div className="bg-white px-5 py-3 rounded-xl border border-secondary/20 shadow-md hover:shadow-lg hover:border-secondary/60 transition-all">
+              <p className="text-[10px] font-bold text-secondary uppercase leading-none mb-2">Entradas Hoy</p>
+              <p className="text-2xl font-black text-secondary leading-none">{entriesToday}</p>
             </div>
           </div>
         </header>
@@ -301,7 +301,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
             </div>
 
             {/* Receiving Cart */}
-            <div className="flex-1 min-h-0 bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+            <div className="flex-1 min-h-0 bg-white rounded-3xl shadow-md border border-secondary/15 flex flex-col overflow-hidden">
               <div className="p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
                 <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4" /> Productos en Recepción
@@ -313,16 +313,16 @@ export const StockEntries = ({}: StockEntriesProps) => {
 
               <div className="flex-1 min-h-0 overflow-hidden p-4">
                 {receivingCart.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-slate-300 space-y-4">
-                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
-                      <Package className="w-8 h-8" />
+                  <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
+                    <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center border border-secondary/15">
+                      <Package className="w-10 h-10 text-secondary" />
                     </div>
                     <p className="text-sm font-bold">No hay productos escaneados</p>
                   </div>
                 ) : (
                   <div className="space-y-2 h-full overflow-y-auto">
                     {receivingCart.map((item) => (
-                      <div key={item.id} className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-slate-100 group hover:border-secondary/30 transition-all">
+                      <div key={item.id} className="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-secondary/25 group hover:border-secondary/50 hover:shadow-md transition-all">
                         <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover border border-white shadow-sm" referrerPolicy="no-referrer" />
                         <div className="flex-1 min-w-0">
                           <h3 className="font-bold text-slate-900 text-xs truncate">{item.name}</h3>
@@ -376,7 +376,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                 )}
               </div>
 
-              <div className="p-6 bg-slate-50 border-t border-slate-200 shrink-0">
+              <div className="p-6 bg-white border-t border-secondary/10 shrink-0">
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <p className="text-xs font-bold text-slate-400 uppercase">Costo Total de Recepción</p>
@@ -398,7 +398,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
           {/* Right Side: History and Manual Entry */}
           <div className="w-full lg:w-96 min-h-0 flex flex-col gap-6 overflow-hidden">
             {/* Manual Entry Form */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-3xl p-6 shadow-md border border-secondary/15">
               <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                 <PlusCircle className="w-4 h-4" /> Ingreso Manual
               </h2>
@@ -408,7 +408,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                   <select 
                     value={manualProduct}
                     onChange={(e) => setManualProduct(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                    className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                   >
                     <option value="">Seleccionar producto...</option>
                     {inventory.map(p => (
@@ -423,7 +423,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                       type="number"
                       value={manualQuantity}
                       onChange={(e) => setManualQuantity(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                   <div>
@@ -432,7 +432,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                       type="date"
                       value={manualDate}
                       onChange={(e) => setManualDate(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                 </div>
@@ -443,7 +443,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
             </div>
 
             {/* Recent Entries */}
-            <div className="flex-1 min-h-0 bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+            <div className="flex-1 min-h-0 bg-white rounded-3xl shadow-md border border-secondary/15 flex flex-col overflow-hidden">
               <div className="p-6 border-b border-slate-100 shrink-0">
                 <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                   <History className="w-4 h-4" /> Últimos Ingresos
@@ -451,7 +451,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
               </div>
               <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
                 {stockEntries.slice(0, 10).map((entry) => (
-                  <div key={entry.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
+                  <div key={entry.id} className="p-3 bg-white rounded-lg border-2 border-secondary/25 hover:border-secondary/50 hover:shadow-md transition-all flex items-center gap-3">
                     <img src={entry.image} alt="" className="w-10 h-10 rounded-lg object-cover" referrerPolicy="no-referrer" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-black text-slate-900 truncate">{entry.productName}</p>
@@ -506,7 +506,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                       required
                       value={newProductForm.name}
                       onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                   <div>
@@ -516,7 +516,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                       required
                       value={newProductForm.sku}
                       onChange={(e) => setNewProductForm({ ...newProductForm, sku: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                   <div>
@@ -524,7 +524,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                     <select 
                       value={newProductForm.category}
                       onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     >
                       <option value="General">General</option>
                       <option value="Bebidas">Bebidas</option>
@@ -539,7 +539,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                       required
                       value={newProductForm.cost}
                       onChange={(e) => setNewProductForm({ ...newProductForm, cost: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                   <div>
@@ -549,7 +549,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                       required
                       value={newProductForm.price}
                       onChange={(e) => setNewProductForm({ ...newProductForm, price: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                   <div className="col-span-2">
@@ -558,7 +558,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
                       type="number" 
                       value={newProductForm.stock}
                       onChange={(e) => setNewProductForm({ ...newProductForm, stock: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-secondary"
+                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                 </div>
