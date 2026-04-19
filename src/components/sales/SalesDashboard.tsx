@@ -636,7 +636,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowCashModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#00FF41] hover:bg-[#00DD2D] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00FF41]/60"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#00FF41] hover:bg-[#00DD2D] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00FF41]/60"
                   >
                     <Banknote className="w-4 h-4" />
                     Efectivo (F10)
