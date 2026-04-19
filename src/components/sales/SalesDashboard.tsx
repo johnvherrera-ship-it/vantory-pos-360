@@ -561,7 +561,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
           <section className="flex-1 bg-surface-container-low p-6 flex flex-col border-l border-outline-variant/20 overflow-hidden">
             {/* Cart - Max Height with Scroll */}
             <div className="max-h-[350px] flex flex-col overflow-hidden mb-2">
-              <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border border-outline-variant/20 overflow-hidden flex-1 flex flex-col min-h-0">
+              <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border-2 border-secondary/30 overflow-hidden flex-1 flex flex-col min-h-0">
                 {/* Cart Header */}
                 <div className="p-3 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
                   <h3 className="text-xs font-black text-[#0F172A] tracking-widest uppercase"><span className="text-secondary">CARRITO</span> <span className="text-[#0F172A]/70">({totalItems})</span></h3>
@@ -659,7 +659,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowCashModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#00FF00] hover:bg-[#00CC00] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00FF00]/60"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#00AA44] hover:bg-[#009933] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00AA44]/60"
                     style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <Banknote className="w-4 h-4" />
