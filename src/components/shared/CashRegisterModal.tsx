@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X } from 'lucide-react';
+import { X, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface CashRegister {
   isOpen: boolean;
@@ -38,7 +38,10 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
   setClientCashHistory,
   currentUser
 }) => {
+  const [discrepancyModal, setDiscrepancyModal] = useState<{ show: boolean; type?: string; diff?: number; expected?: number; actual?: number }>({ show: false });
+  const [successModal, setSuccessModal] = useState(false);
   return (
+    <>
     <AnimatePresence>
       {showCashRegisterModal && (
         <motion.div
@@ -99,11 +102,29 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
 
                 if (diff !== 0) {
                   const type = diff > 0 ? 'sobrante' : 'faltante';
-                  if (!window.confirm(`Discrepancia en cierre de caja\n\nSe detectó un ${type} de $${Math.abs(diff).toLocaleString('es-CL')}.\n\nEfectivo registrado: $${expected.toLocaleString('es-CL')}\nEfectivo contado: $${actual.toLocaleString('es-CL')}\n\n¿Deseas continuar con el cierre?`)) {
-                    return;
-                  }
+                  setDiscrepancyModal({ show: true, type, diff, expected, actual });
+                  return;
                 } else {
-                  alert('Cierre de caja completado correctamente.');
+                  setSuccessModal(true);
+                  setTimeout(() => {
+                    // Continue with closing...
+                    const closingRecord = {
+                      id: Date.now(),
+                      openedAt: clientCashRegister.openedAt || new Date().toISOString(),
+                      closedAt: new Date().toISOString(),
+                      initialCash: clientCashRegister.initialCash,
+                      expectedCash: expected,
+                      actualCash: actual,
+                      difference: diff,
+                      user: currentUser?.name || 'Sistema',
+                      status: 'Cuadrada'
+                    };
+                    setClientCashHistory((prev: CashHistory[]) => [closingRecord, ...prev]);
+                    setClientCashRegister({ isOpen: false, initialCash: 0, currentCash: 0, openedAt: null });
+                    setShowCashRegisterModal(false);
+                    setSuccessModal(false);
+                  }, 1500);
+                  return;
                 }
 
                 // Save to history
@@ -162,5 +183,121 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
         </motion.div>
       )}
     </AnimatePresence>
+
+    {/* Modal Discrepancia */}
+    <AnimatePresence>
+      {discrepancyModal.show && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-[#0F172A]/80 backdrop-blur-sm"
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl"
+          >
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-[#0F172A]">Discrepancia detectada</h3>
+                <p className="text-sm text-[#0F172A]/60">Diferencia en cierre de caja</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-6 p-4 bg-amber-50 rounded-xl">
+              <div className="flex justify-between">
+                <span className="text-sm font-bold text-[#0F172A]/70">Tipo:</span>
+                <span className="text-sm font-black text-amber-600 capitalize">{discrepancyModal.type}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm font-bold text-[#0F172A]/70">Diferencia:</span>
+                <span className="text-sm font-black text-amber-600">${Math.abs(discrepancyModal.diff || 0).toLocaleString('es-CL')}</span>
+              </div>
+              <div className="h-px bg-amber-200"></div>
+              <div className="flex justify-between">
+                <span className="text-xs text-[#0F172A]/60">Registrado:</span>
+                <span className="text-xs font-bold text-[#0F172A]">${discrepancyModal.expected?.toLocaleString('es-CL')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs text-[#0F172A]/60">Contado:</span>
+                <span className="text-xs font-bold text-[#0F172A]">${discrepancyModal.actual?.toLocaleString('es-CL')}</span>
+              </div>
+            </div>
+
+            <p className="text-sm text-[#0F172A]/70 mb-6">¿Deseas continuar con el cierre de caja?</p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDiscrepancyModal({ show: false })}
+                className="flex-1 py-3 bg-surface-container-low text-[#0F172A] font-black rounded-xl hover:bg-surface-container-high transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  setDiscrepancyModal({ show: false });
+                  // Continue with closing
+                  const closingRecord = {
+                    id: Date.now(),
+                    openedAt: clientCashRegister.openedAt || new Date().toISOString(),
+                    closedAt: new Date().toISOString(),
+                    initialCash: clientCashRegister.initialCash,
+                    expectedCash: discrepancyModal.expected || 0,
+                    actualCash: discrepancyModal.actual || 0,
+                    difference: discrepancyModal.diff || 0,
+                    user: currentUser?.name || 'Sistema',
+                    status: discrepancyModal.type === 'sobrante' ? 'Sobrante' : 'Faltante'
+                  };
+                  setClientCashHistory((prev: CashHistory[]) => [closingRecord, ...prev]);
+                  setClientCashRegister({ isOpen: false, initialCash: 0, currentCash: 0, openedAt: null });
+                  setShowCashRegisterModal(false);
+                  setSuccessModal(true);
+                  setTimeout(() => setSuccessModal(false), 1500);
+                }}
+                className="flex-1 py-3 bg-secondary text-white font-black rounded-xl hover:bg-secondary/90 transition-colors"
+              >
+                Continuar
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* Modal Éxito */}
+    <AnimatePresence>
+      {successModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-[#0F172A]/80 backdrop-blur-sm"
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring' }}
+              className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </motion.div>
+            <h3 className="text-2xl font-black text-[#0F172A] mb-2">¡Cierre completado!</h3>
+            <p className="text-sm text-[#0F172A]/70">La caja ha sido cerrada correctamente.</p>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
 };
