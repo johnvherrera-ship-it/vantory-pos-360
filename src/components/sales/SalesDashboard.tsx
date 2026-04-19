@@ -290,7 +290,10 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
     };
 
     if (method === 'Efectivo') {
-      setCashRegister({ ...cashRegister, currentCash: cashRegister.currentCash + total });
+      const updatedCashRegister = { ...cashRegister, currentCash: cashRegister.currentCash + total };
+      setCashRegister(updatedCashRegister);
+      supabaseService.updateCashRegister(updatedCashRegister)
+        .catch(err => console.error('updateCashRegister persist error:', err));
     } else if (method === 'Fiado') {
       let updatedFiados = [...fiados];
       if (selectedFiadoClient === 'new') {

@@ -396,33 +396,56 @@ export const supabaseService = {
     }
   },
 
+  async updateCashRegister(register: any) {
+    if (notConfigured()) return register;
+    try {
+      const { data, error } = await supabase
+        .from('cash_registers')
+        .update({
+          current_cash: register.currentCash,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', register.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.error('updateCashRegister failed:', e);
+      throw e;
+    }
+  },
+
   async decrementStockAtomic(clientId: number, items: Array<{ productId: number; quantity: number }>): Promise<Product[]> {
     if (notConfigured()) return [];
     if (!items.length) return [];
-    const ids = items.map(i => i.productId);
-    const { data: current, error: fetchErr } = await supabase
-      .from('products')
-      .select('*')
-      .in('id', ids)
-      .eq('client_id', clientId);
-    if (fetchErr) throw fetchErr;
-    const payload = (current || []).map((row: any) => {
-      const decrement = items.find(i => i.productId === row.id)?.quantity ?? 0;
-      return {
-        id: row.id,
-        client_id: row.client_id,
-        name: row.name,
-        sku: row.sku,
-        category: row.category,
-        price: row.price,
-        cost: row.cost,
-        stock: Math.max(0, (row.stock ?? 0) - decrement),
-        image_url: row.image_url
-      };
-    });
-    const { data, error } = await supabase.from('products').upsert(payload).select();
-    if (error) throw error;
-    return (data || []).map(supabaseService._normalizeProduct);
+
+    const results: Product[] = [];
+    for (const item of items) {
+      const { data: current, error: fetchErr } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', item.productId)
+        .eq('client_id', clientId)
+        .single();
+      if (fetchErr) throw fetchErr;
+
+      const newStock = Math.max(0, (current.stock ?? 0) - item.quantity);
+      const { data: updated, error: updateErr } = await supabase
+        .from('products')
+        .update({ stock: newStock })
+        .eq('id', item.productId)
+        .eq('client_id', clientId)
+        .eq('stock', current.stock)
+        .select()
+        .single();
+
+      if (updateErr) throw updateErr;
+      if (!updated) throw new Error(`Stock conflict: Product ${item.productId} was modified concurrently`);
+
+      results.push(supabaseService._normalizeProduct(updated));
+    }
+    return results;
   },
 
   // === Stock Entries ===
