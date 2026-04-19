@@ -99,11 +99,11 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
 
                 if (diff !== 0) {
                   const type = diff > 0 ? 'sobrante' : 'faltante';
-                  if (!window.confirm(`⚠️ ADVERTENCIA: Hay un ${type} de $${Math.abs(diff).toLocaleString('es-CL')}.\n\nEfectivo Esperado: $${expected.toLocaleString('es-CL')}\nEfectivo Real: $${actual.toLocaleString('es-CL')}\n\n¿Deseas registrar este cierre con la diferencia?`)) {
+                  if (!window.confirm(`Discrepancia en cierre de caja\n\nSe detectó un ${type} de $${Math.abs(diff).toLocaleString('es-CL')}.\n\nEfectivo registrado: $${expected.toLocaleString('es-CL')}\nEfectivo contado: $${actual.toLocaleString('es-CL')}\n\n¿Deseas continuar con el cierre?`)) {
                     return;
                   }
                 } else {
-                  alert('¡Caja cuadrada perfectamente!');
+                  alert('Cierre de caja completado correctamente.');
                 }
 
                 // Save to history
