@@ -97,18 +97,18 @@ export const Dashboard = ({}: DashboardProps) => {
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="dashboard" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8 pb-20 md:pb-0">
-        <header className="mb-10 pb-8 flex justify-between items-center border-b border-secondary/10">
+        <header className="mb-10 pb-8 flex flex-col md:flex-row md:justify-between md:items-center border-b border-secondary/10 gap-4">
           <div>
-            <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Mi <span className="text-secondary">Negocio</span></h2>
+            <h2 className="text-2xl md:text-3xl font-black text-[#0F172A] font-headline mb-1">Mi <span className="text-secondary">Negocio</span></h2>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">PANEL &gt; MI NEGOCIO</p>
-            <p className="text-[#0F172A]/70 font-bold text-lg">Resumen ejecutivo de tu negocio en tiempo real.</p>
+            <p className="text-[#0F172A]/70 font-bold text-sm md:text-lg">Resumen ejecutivo de tu negocio en tiempo real.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-4">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative flex-shrink-0">
               <Bell className="w-5 h-5 text-on-surface-variant" />
               {lowStockProducts.length > 0 && <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-error rounded-full text-white text-[9px] font-black flex items-center justify-center border border-white">{lowStockProducts.length > 9 ? '9+' : lowStockProducts.length}</span>}
             </button>
-            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button onClick={() => setCurrentPage('users')} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors flex-shrink-0">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
@@ -123,12 +123,12 @@ export const Dashboard = ({}: DashboardProps) => {
                 alt="User"
               />
             </div>
-            <button 
+            <button
               onClick={() => {
                 setCurrentUser(null);
                 setCurrentPage('home');
               }}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2" 
+              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2 flex-shrink-0"
               title="Cerrar Sesión"
             >
               <LogOut className="w-5 h-5" />

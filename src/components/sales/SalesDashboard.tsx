@@ -375,22 +375,22 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
       <SideNavBar currentPage="sales" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       {/* Main Content Area */}
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8 pb-20 md:pb-0">
-        <header className="mb-10 flex justify-between items-center">
+        <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Terminal de <span className="text-secondary">Ventas</span></h2>
+            <h2 className="text-2xl md:text-3xl font-black text-[#0F172A] font-headline mb-1">Terminal de <span className="text-secondary">Ventas</span></h2>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">PUNTO DE VENTA &gt; CAJA</p>
-            <p className="text-[#0F172A]/70 font-bold text-lg">Escanea productos o selecciónalos manualmente para procesar una venta.</p>
+            <p className="text-[#0F172A]/70 font-bold text-sm md:text-lg">Escanea productos o selecciónalos manualmente para procesar una venta.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <button 
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-4 w-full md:w-auto">
+            <button
               onClick={() => setShowCashRegisterModal(true)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${cashRegister.isOpen ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}
+              className={`flex items-center justify-center gap-2 px-4 md:px-4 py-3 md:py-2 rounded-xl font-bold transition-all min-h-12 md:min-h-auto ${cashRegister.isOpen ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}
             >
               <Banknote className="w-5 h-5" />
-              <span>{cashRegister.isOpen ? 'Caja Abierta' : 'Abrir Caja'}</span>
+              <span className="text-sm">{cashRegister.isOpen ? 'Caja Abierta' : 'Abrir Caja'}</span>
             </button>
             <button
-              className="flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary font-bold rounded-lg hover:bg-secondary/20 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 md:px-4 py-3 md:py-2 bg-secondary/10 text-secondary font-bold rounded-lg hover:bg-secondary/20 transition-colors min-h-12 md:min-h-auto"
               onClick={() => {
                 localStorage.setItem('pos-store-info', JSON.stringify({
                   storeName: currentStore?.name,
@@ -400,9 +400,9 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
               }}
             >
               <Monitor className="w-5 h-5" />
-              <span className="hidden sm:inline">Pantalla Cliente</span>
+              <span className="text-sm">Pantalla Cliente</span>
             </button>
-            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-12 h-12 md:w-10 md:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative flex-shrink-0">
               <Bell className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
@@ -433,9 +433,9 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
         <div className="bg-[#ced5ff] h-[1px] w-full"></div>
 
         {/* POS Workspace */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden gap-4 md:gap-0">
           {/* Left Side: Sales Operations */}
-          <section className="flex-[1.8] p-6 overflow-y-auto flex flex-col gap-6">
+          <section className="flex-[1.8] p-3 md:p-6 overflow-y-auto flex flex-col gap-3 md:gap-6">
             {/* Shortcuts Info */}
             <div className="flex items-center gap-4 text-sm text-[#0F172A] font-bold">
               <div className="flex items-center gap-2"><kbd className="bg-surface-container-low px-2 py-1 rounded border border-outline-variant/40 font-mono text-xs">F10</kbd> Cobrar en efectivo</div>
@@ -516,7 +516,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-1.5">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-2 md:gap-1.5">
               {inventory
                 .filter(p =>
                   p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -558,7 +558,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
           </section>
 
           {/* Right Side: Cart / Summary */}
-          <section className="flex-1 bg-surface-container-low p-6 flex flex-col border-l border-outline-variant/20 overflow-hidden">
+          <section className="flex-1 bg-surface-container-low p-3 md:p-6 flex flex-col border-t md:border-t-0 md:border-l border-outline-variant/20 overflow-hidden">
             {/* Cart - Max Height with Scroll */}
             <div className="max-h-[350px] flex flex-col overflow-hidden mb-2">
               <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border border-secondary/15 overflow-hidden flex-1 flex flex-col min-h-0">
@@ -645,7 +645,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 </div>
 
                 {/* Payment Buttons */}
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <button
                     onClick={() => {
                       if (!currentPOS) {

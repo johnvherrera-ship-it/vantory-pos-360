@@ -478,53 +478,53 @@ export const StockEntries = ({}: StockEntriesProps) => {
       {/* New Product Modal */}
       <AnimatePresence>
         {showNewProductModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/80 backdrop-blur-sm"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl"
+              className="bg-white rounded-2xl md:rounded-3xl p-4 sm:p-8 w-full md:max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-black text-slate-900 font-headline">Nuevo <span className="text-secondary">Producto</span></h3>
-                <button onClick={() => setShowNewProductModal(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 font-headline">Nuevo <span className="text-secondary">Producto</span></h3>
+                <button onClick={() => setShowNewProductModal(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors flex-shrink-0">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
               <form onSubmit={handleNewProductSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre del Producto</label>
-                    <input 
-                      type="text" 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="col-span-1 sm:col-span-2">
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Nombre del Producto</label>
+                    <input
+                      type="text"
                       required
                       value={newProductForm.name}
                       onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-4 py-3 sm:py-2 bg-white border border-secondary/15 rounded-lg sm:rounded-xl text-base sm:text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">SKU / Barcode</label>
-                    <input 
-                      type="text" 
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">SKU / Barcode</label>
+                    <input
+                      type="text"
                       required
                       value={newProductForm.sku}
                       onChange={(e) => setNewProductForm({ ...newProductForm, sku: e.target.value })}
-                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-4 py-3 sm:py-2 bg-white border border-secondary/15 rounded-lg sm:rounded-xl text-base sm:text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Categoría</label>
-                    <select 
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Categoría</label>
+                    <select
                       value={newProductForm.category}
                       onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value })}
-                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-4 py-3 sm:py-2 bg-white border border-secondary/15 rounded-lg sm:rounded-xl text-base sm:text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     >
                       <option value="General">General</option>
                       <option value="Bebidas">Bebidas</option>
@@ -533,36 +533,36 @@ export const StockEntries = ({}: StockEntriesProps) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Costo de Compra</label>
-                    <input 
-                      type="number" 
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Costo de Compra</label>
+                    <input
+                      type="number"
                       required
                       value={newProductForm.cost}
                       onChange={(e) => setNewProductForm({ ...newProductForm, cost: e.target.value })}
-                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-4 py-3 sm:py-2 bg-white border border-secondary/15 rounded-lg sm:rounded-xl text-base sm:text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Precio de Venta</label>
-                    <input 
-                      type="number" 
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Precio de Venta</label>
+                    <input
+                      type="number"
                       required
                       value={newProductForm.price}
                       onChange={(e) => setNewProductForm({ ...newProductForm, price: e.target.value })}
-                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-4 py-3 sm:py-2 bg-white border border-secondary/15 rounded-lg sm:rounded-xl text-base sm:text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
-                  <div className="col-span-2">
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Stock Inicial</label>
-                    <input 
-                      type="number" 
+                  <div className="col-span-1 sm:col-span-2">
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Stock Inicial</label>
+                    <input
+                      type="number"
                       value={newProductForm.stock}
                       onChange={(e) => setNewProductForm({ ...newProductForm, stock: e.target.value })}
-                      className="w-full px-4 py-3 bg-white border border-secondary/15 rounded-xl text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-4 py-3 sm:py-2 bg-white border border-secondary/15 rounded-lg sm:rounded-xl text-base sm:text-sm font-bold outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                     />
                   </div>
                 </div>
-                <button type="submit" className="w-full py-4 bg-secondary text-white font-black rounded-xl shadow-lg shadow-secondary/20 hover:scale-[1.02] transition-transform mt-4">
+                <button type="submit" className="w-full py-3 sm:py-2.5 bg-secondary text-white font-black rounded-lg sm:rounded-xl shadow-lg shadow-secondary/20 hover:scale-[1.02] transition-transform mt-6 sm:mt-4 text-base sm:text-sm">
                   Crear y Agregar a Recepción
                 </button>
               </form>
@@ -578,7 +578,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/80 backdrop-blur-sm"
             onClick={() => setShowHistoryModal(false)}
           >
             <motion.div
@@ -586,15 +586,15 @@ export const StockEntries = ({}: StockEntriesProps) => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden"
+              className="bg-white rounded-2xl md:rounded-3xl shadow-2xl w-full md:max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
             >
-              <div className="p-6 border-b border-slate-100 shrink-0 flex items-center justify-between">
-                <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                  <History className="w-5 h-5 text-secondary" /> Historial Completo de Ingresos
+              <div className="p-4 sm:p-6 border-b border-slate-100 shrink-0 flex items-center justify-between">
+                <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                  <History className="w-4 sm:w-5 h-4 sm:h-5 text-secondary" /> <span className="truncate">Historial Completo de Ingresos</span>
                 </h2>
                 <button
                   onClick={() => setShowHistoryModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
                 >
                   <X className="w-5 h-5" />
                 </button>

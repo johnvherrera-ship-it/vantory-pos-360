@@ -63,11 +63,11 @@ export const UsersManagement = ({ setCurrentPage, users, setUsers, currentUser, 
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">SISTEMA &gt; CONFIGURACIÓN</p>
           </div>
           <div className="flex items-center gap-4">
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+            <button className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
               <Bell className="w-5 h-5 text-on-surface-variant" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
             </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
@@ -76,13 +76,13 @@ export const UsersManagement = ({ setCurrentPage, users, setUsers, currentUser, 
                 <p className="text-xs font-bold text-on-surface leading-none">Admin Vantory</p>
                 <p className="text-[10px] text-on-surface-variant">Soporte Técnico</p>
               </div>
-              <img 
-                alt="User profile" 
-                className="w-10 h-10 rounded-full border-2 border-surface-container-highest object-cover" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPTOJksruGaNQm6gW0cTKsmHx_gthleGI0Hy70R56Q1oJ4i9lW0iL4JU8oXMoZAshoKE8S3a1-5NvKCV26POVasYgktSZtJpP6RHaMYbMEtqakjdL7rtnYFQso4Kzl5w6R3449pD-nViJIAngGkUqQijX4Zz9xtfKBk4SztlssTnGEGmOQeqPZsahAs-DUJ7tdh68w9VguZXCBAxiCk5XRvvm-GQdW31C8hvfujnZJlbpJ3SVzXGcnVimo2ARlMqv9ks88IY_RN2o_" 
+              <img
+                alt="User profile"
+                className="w-10 h-10 rounded-full border-2 border-surface-container-highest object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPTOJksruGaNQm6gW0cTKsmHx_gthleGI0Hy70R56Q1oJ4i9lW0iL4JU8oXMoZAshoKE8S3a1-5NvKCV26POVasYgktSZtJpP6RHaMYbMEtqakjdL7rtnYFQso4Kzl5w6R3449pD-nViJIAngGkUqQijX4Zz9xtfKBk4SztlssTnGEGmOQeqPZsahAs-DUJ7tdh68w9VguZXCBAxiCk5XRvvm-GQdW31C8hvfujnZJlbpJ3SVzXGcnVimo2ARlMqv9ks88IY_RN2o_"
               />
             </div>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2" title="Cerrar Sesión">
+            <button className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2 flex-shrink-0" title="Cerrar Sesión">
               <LogOut className="w-5 h-5" />
             </button>
           </div>

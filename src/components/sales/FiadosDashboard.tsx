@@ -113,21 +113,21 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="fiados" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8 pb-20 md:pb-0">
-        <header className="mb-8 flex justify-between items-center">
+        <header className="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Gestión de <span className="text-secondary">Fiados</span></h1>
+            <h1 className="text-2xl md:text-3xl font-black text-[#0F172A] font-headline mb-1">Gestión de <span className="text-secondary">Fiados</span></h1>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">OPERACIONES &gt; FIADOS</p>
-            <p className="text-[#0F172A]/70 font-bold text-lg">Control de créditos y deudas de clientes.</p>
+            <p className="text-[#0F172A]/70 font-bold text-sm md:text-lg">Control de créditos y deudas de clientes.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-4">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative flex-shrink-0">
               <Bell className="w-5 h-5 text-on-surface-variant" />
               {clientsWithDebt > 0 && <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-error rounded-full text-white text-[9px] font-black flex items-center justify-center border border-white">{clientsWithDebt > 9 ? '9+' : clientsWithDebt}</span>}
             </button>
-            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button onClick={() => setCurrentPage('users')} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors flex-shrink-0">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
-            <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
+            <div className="h-8 w-px bg-outline-variant/30 mx-2 hidden md:block"></div>
             <div className="flex items-center gap-3">
               <div className="text-right hidden md:block">
                 <p className="text-sm font-black text-[#0F172A]">{currentUser?.name || 'Admin Vantory'}</p>
@@ -142,7 +142,7 @@ export const FiadosDashboard = ({}: FiadosDashboardProps) => {
             </div>
             <button
               onClick={() => { setCurrentUser(null); setCurrentPage('home'); }}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2"
+              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2 flex-shrink-0"
               title="Cerrar Sesión"
             >
               <LogOut className="w-5 h-5" />

@@ -79,11 +79,11 @@ export const UsersManagement = ({}: UsersManagementProps) => {
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">SISTEMA &gt; CONFIGURACIÓN</p>
           </div>
           <div className="flex items-center gap-4">
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+            <button className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
               <Bell className="w-5 h-5 text-on-surface-variant" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
             </button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
@@ -92,14 +92,14 @@ export const UsersManagement = ({}: UsersManagementProps) => {
                 <p className="text-xs font-bold text-on-surface leading-none">Admin Vantory</p>
                 <p className="text-[10px] text-on-surface-variant">Soporte Técnico</p>
               </div>
-              <img 
-                alt="User profile" 
-                className="w-10 h-10 rounded-full border-2 border-surface-container-highest object-cover" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPTOJksruGaNQm6gW0cTKsmHx_gthleGI0Hy70R56Q1oJ4i9lW0iL4JU8oXMoZAshoKE8S3a1-5NvKCV26POVasYgktSZtJpP6RHaMYbMEtqakjdL7rtnYFQso4Kzl5w6R3449pD-nViJIAngGkUqQijX4Zz9xtfKBk4SztlssTnGEGmOQeqPZsahAs-DUJ7tdh68w9VguZXCBAxiCk5XRvvm-GQdW31C8hvfujnZJlbpJ3SVzXGcnVimo2ARlMqv9ks88IY_RN2o_" 
+              <img
+                alt="User profile"
+                className="w-10 h-10 rounded-full border-2 border-surface-container-highest object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPTOJksruGaNQm6gW0cTKsmHx_gthleGI0Hy70R56Q1oJ4i9lW0iL4JU8oXMoZAshoKE8S3a1-5NvKCV26POVasYgktSZtJpP6RHaMYbMEtqakjdL7rtnYFQso4Kzl5w6R3449pD-nViJIAngGkUqQijX4Zz9xtfKBk4SztlssTnGEGmOQeqPZsahAs-DUJ7tdh68w9VguZXCBAxiCk5XRvvm-GQdW31C8hvfujnZJlbpJ3SVzXGcnVimo2ARlMqv9ks88IY_RN2o_"
                 referrerPolicy="no-referrer"
               />
             </div>
-            <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2" title="Cerrar Sesión">
+            <button className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2 flex-shrink-0" title="Cerrar Sesión">
               <LogOut className="w-5 h-5" />
             </button>
           </div>
@@ -259,65 +259,65 @@ export const UsersManagement = ({}: UsersManagementProps) => {
 
       <AnimatePresence>
         {showUserModal && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#0F172A]/80 backdrop-blur-sm"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl flex flex-col"
+              className="bg-white rounded-2xl md:rounded-3xl p-4 sm:p-8 w-full md:max-w-md shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h3 className="text-2xl font-black text-[#0F172A] font-headline">{editingUser ? 'Editar' : 'Nuevo'} <span className="text-secondary">Usuario</span></h3>
+                  <h3 className="text-xl sm:text-2xl font-black text-[#0F172A] font-headline">{editingUser ? 'Editar' : 'Nuevo'} <span className="text-secondary">Usuario</span></h3>
                 </div>
-                <button onClick={() => setShowUserModal(false)} className="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+                <button onClick={() => setShowUserModal(false)} className="p-2 hover:bg-surface-container-low rounded-full transition-colors flex-shrink-0">
                   <X className="w-6 h-6 text-[#0F172A]" />
                 </button>
               </div>
 
               <form onSubmit={handleSaveUser} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-[#0F172A] mb-1">Nombre Completo</label>
-                    <input 
+                    <label className="block text-xs sm:text-sm font-bold text-[#0F172A] mb-2">Nombre Completo</label>
+                    <input
                       name="name"
-                      type="text" 
+                      type="text"
                       required
                       defaultValue={editingUser?.name}
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                      className="w-full px-4 py-3 sm:py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-lg sm:rounded-xl text-base sm:text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-[#0F172A] mb-1">Correo Electrónico</label>
-                    <input 
+                    <label className="block text-xs sm:text-sm font-bold text-[#0F172A] mb-2">Correo Electrónico</label>
+                    <input
                       name="email"
-                      type="email" 
+                      type="email"
                       required
                       defaultValue={editingUser?.email}
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                      className="w-full px-4 py-3 sm:py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-lg sm:rounded-xl text-base sm:text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-[#0F172A] mb-1">Contraseña {editingUser && <span className="text-xs text-outline-variant font-normal">(Opcional)</span>}</label>
-                    <input 
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs sm:text-sm font-bold text-[#0F172A] mb-2">Contraseña {editingUser && <span className="text-xs text-outline-variant font-normal">(Opcional)</span>}</label>
+                    <input
                       name="password"
-                      type="password" 
+                      type="password"
                       required={!editingUser}
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                      className="w-full px-4 py-3 sm:py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-lg sm:rounded-xl text-base sm:text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-[#0F172A] mb-1">Rol</label>
-                    <select 
+                    <label className="block text-xs sm:text-sm font-bold text-[#0F172A] mb-2">Rol</label>
+                    <select
                       name="role"
                       required
                       defaultValue={editingUser?.role || 'Cajero'}
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                      className="w-full px-4 py-3 sm:py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-lg sm:rounded-xl text-base sm:text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
                     >
                       <option value="Administrador">Administrador</option>
                       <option value="Supervisor">Supervisor</option>
@@ -325,11 +325,11 @@ export const UsersManagement = ({}: UsersManagementProps) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-[#0F172A] mb-1">Local Asignado</label>
-                    <select 
+                    <label className="block text-xs sm:text-sm font-bold text-[#0F172A] mb-2">Local Asignado</label>
+                    <select
                       name="storeId"
                       defaultValue={editingUser?.storeId || ''}
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                      className="w-full px-4 py-3 sm:py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-lg sm:rounded-xl text-base sm:text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
                     >
                       <option value="">Todos los locales (Global)</option>
                       {stores.map((store: any) => (
@@ -338,12 +338,12 @@ export const UsersManagement = ({}: UsersManagementProps) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-[#0F172A] mb-1">Estado</label>
-                    <select 
+                    <label className="block text-xs sm:text-sm font-bold text-[#0F172A] mb-2">Estado</label>
+                    <select
                       name="status"
                       required
                       defaultValue={editingUser?.status || 'Activo'}
-                      className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
+                      className="w-full px-4 py-3 sm:py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-lg sm:rounded-xl text-base sm:text-sm font-medium text-[#0F172A] focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all"
                     >
                       <option value="Activo">Activo</option>
                       <option value="Inactivo">Inactivo</option>
@@ -352,8 +352,8 @@ export const UsersManagement = ({}: UsersManagementProps) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-[#0F172A] mb-2">Módulos Permitidos</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-xs sm:text-sm font-bold text-[#0F172A] mb-3">Módulos Permitidos</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {[
                       { id: 'dashboard', label: 'Dashboard' },
                       { id: 'inventory', label: 'Inventario' },
@@ -364,25 +364,25 @@ export const UsersManagement = ({}: UsersManagementProps) => {
                       { id: 'users', label: 'Usuarios' },
                       { id: 'fiados', label: 'Fiados' }
                     ].map(module => (
-                      <label key={module.id} className="flex items-center gap-2 p-2 bg-surface-container-low rounded-lg cursor-pointer hover:bg-surface-container-high transition-colors">
-                        <input 
-                          type="checkbox" 
-                          name="modules" 
-                          value={module.id} 
+                      <label key={module.id} className="flex items-center gap-2 p-2 sm:p-1.5 bg-surface-container-low rounded-lg cursor-pointer hover:bg-surface-container-high transition-colors">
+                        <input
+                          type="checkbox"
+                          name="modules"
+                          value={module.id}
                           defaultChecked={editingUser ? editingUser.modules?.includes(module.id) : ['sales', 'history'].includes(module.id)}
-                          className="w-4 h-4 text-secondary rounded border-outline-variant/30 focus:ring-secondary"
+                          className="w-4 h-4 sm:w-3 sm:h-3 text-secondary rounded border-outline-variant/30 focus:ring-secondary"
                         />
-                        <span className="text-xs font-bold text-[#0F172A]">{module.label}</span>
+                        <span className="text-xs sm:text-[10px] font-bold text-[#0F172A]">{module.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-4 flex gap-3">
-                  <button type="button" onClick={() => setShowUserModal(false)} className="flex-1 py-3 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold transition-colors">
+                <div className="pt-6 sm:pt-4 flex flex-col-reverse sm:flex-row gap-3">
+                  <button type="button" onClick={() => setShowUserModal(false)} className="flex-1 py-3 sm:py-2.5 px-4 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg sm:rounded-xl font-bold transition-colors text-base sm:text-sm">
                     Cancelar
                   </button>
-                  <button type="submit" className="flex-[2] py-3 px-4 bg-secondary text-white rounded-xl font-bold hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20">
+                  <button type="submit" className="flex-1 py-3 sm:py-2.5 px-4 bg-secondary text-white rounded-lg sm:rounded-xl font-bold hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/20 text-base sm:text-sm">
                     Guardar Usuario
                   </button>
                 </div>

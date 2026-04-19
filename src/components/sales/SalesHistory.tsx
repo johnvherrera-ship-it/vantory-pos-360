@@ -50,27 +50,27 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="history" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8 pb-20 md:pb-0">
-        <header className="mb-10 flex justify-between items-center">
+        <header className="mb-10 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Historial / <span className="text-secondary">Salidas</span></h2>
+            <h2 className="text-2xl md:text-3xl font-black text-[#0F172A] font-headline mb-1">Historial / <span className="text-secondary">Salidas</span></h2>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">PANEL &gt; HISTORIAL / SALIDAS</p>
-            <p className="text-[#0F172A]/70 font-bold text-lg">Registro detallado de todas las transacciones realizadas.</p>
+            <p className="text-[#0F172A]/70 font-bold text-sm md:text-lg">Registro detallado de todas las transacciones realizadas.</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline w-4 h-4" />
               <input
-                className="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-secondary/20 focus:bg-surface-container-lowest transition-all"
+                className="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-sm w-full sm:w-64 focus:ring-2 focus:ring-secondary/20 focus:bg-surface-container-lowest transition-all"
                 placeholder="Buscar por ID, método, producto..."
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative flex-shrink-0">
               <Bell className="w-5 h-5 text-on-surface-variant" />
             </button>
-            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button onClick={() => setCurrentPage('users')} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors flex-shrink-0">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
@@ -88,7 +88,7 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
             </div>
             <button
               onClick={() => { setCurrentUser(null); setCurrentPage('home'); }}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2"
+              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2 flex-shrink-0"
               title="Cerrar Sesión"
             >
               <LogOut className="w-5 h-5" />

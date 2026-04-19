@@ -197,28 +197,28 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="inventory" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8 pb-20 md:pb-0">
-        <header className="mb-10 flex justify-between items-center">
+        <header className="mb-10 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Inventario de <span className="text-secondary">Productos</span></h2>
+            <h2 className="text-2xl md:text-3xl font-black text-[#0F172A] font-headline mb-1">Inventario de <span className="text-secondary">Productos</span></h2>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">INVENTARIO &gt; PRODUCTOS</p>
-            <p className="text-[#0F172A]/70 font-bold text-lg">Administra tu catálogo, precios y niveles de stock global.</p>
+            <p className="text-[#0F172A]/70 font-bold text-sm md:text-lg">Administra tu catálogo, precios y niveles de stock global.</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-outline w-4 h-4" />
               <input
-                className="pl-10 pr-4 py-2 bg-surface-container-low border border-secondary/20 rounded-lg text-sm w-64 focus:ring-2 focus:ring-secondary/20 focus:bg-surface-container-lowest focus:border-secondary transition-all"
+                className="pl-10 pr-4 py-2 md:py-2 bg-surface-container-low border border-secondary/20 rounded-lg text-sm w-full sm:w-64 focus:ring-2 focus:ring-secondary/20 focus:bg-surface-container-lowest focus:border-secondary transition-all"
                 placeholder="Buscar en inventario..."
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button onClick={() => setShowNotificationsPanel(true)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative">
+            <button onClick={() => setShowNotificationsPanel(true)} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative flex-shrink-0">
               <Bell className="w-5 h-5 text-on-surface-variant" />
               {lowStockCount > 0 && <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-error rounded-full text-white text-[9px] font-black flex items-center justify-center border border-white">{lowStockCount > 9 ? '9+' : lowStockCount}</span>}
             </button>
-            <button onClick={() => setCurrentPage('users')} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors">
+            <button onClick={() => setCurrentPage('users')} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors flex-shrink-0">
               <Settings className="w-5 h-5 text-on-surface-variant" />
             </button>
             <div className="h-8 w-px bg-outline-variant/30 mx-2"></div>
@@ -234,7 +234,7 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
                 referrerPolicy="no-referrer"
               />
             </div>
-            <button onClick={() => { setCurrentUser(null); setCurrentPage('home'); }} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2" title="Cerrar Sesión">
+            <button onClick={() => { setCurrentUser(null); setCurrentPage('home'); }} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-error-container/20 text-error transition-colors ml-2 flex-shrink-0" title="Cerrar Sesión">
               <LogOut className="w-5 h-5" />
             </button>
           </div>
@@ -356,24 +356,24 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
         </div>
 
         {/* Inventory Table */}
-        <div className="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-md border border-secondary/15">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-surface-container-lowest rounded-3xl overflow-x-auto md:overflow-hidden shadow-md border border-secondary/15">
+          <table className="w-full text-left border-collapse min-w-max md:min-w-0">
             <thead>
               <tr className="bg-surface-container-low/50">
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Producto</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Código</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label text-center">Stock</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Costo</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Precio Venta</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Margen</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Ganancia</th>
-                <th className="px-8 py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label text-right">Acciones</th>
+                <th className="px-3 md:px-8 py-3 md:py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label">Producto</th>
+                <th className="px-3 md:px-8 py-3 md:py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label hidden sm:table-cell">Código</th>
+                <th className="px-3 md:px-8 py-3 md:py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label text-center">Stock</th>
+                <th className="px-3 md:px-8 py-3 md:py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label hidden md:table-cell">Costo</th>
+                <th className="px-3 md:px-8 py-3 md:py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label hidden lg:table-cell">Precio Venta</th>
+                <th className="px-3 md:px-8 py-3 md:py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label hidden lg:table-cell">Margen</th>
+                <th className="px-3 md:px-8 py-3 md:py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label hidden lg:table-cell">Ganancia</th>
+                <th className="px-3 md:px-8 py-3 md:py-5 text-xs font-black uppercase tracking-widest text-[#0F172A] font-label text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container-low">
               {paginatedInventory.map((product) => (
-                <tr key={product.id} className="hover:bg-secondary/5 transition-all group">
-                  <td className="px-8 py-6">
+                <tr key={product.id} className="hover:bg-secondary/5 transition-all group text-xs md:text-sm">
+                  <td className="px-3 md:px-8 py-3 md:py-6">
                     <div className="flex items-center gap-4">
                       <button 
                         onClick={() => toggleFavorite(product.id)}

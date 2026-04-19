@@ -14,6 +14,7 @@ import { Logo } from './components/layout/Logo';
 import { LegalModal } from './components/landing/LegalModal';
 import { CookieBanner } from './components/landing/CookieBanner';
 import { Router } from './components/Router';
+import { ConnectionStatus } from './components/shared/ConnectionStatus';
 import { usePOSContext } from './context/POSContext';
 import { useAppContext } from './context/AppContext';
 
@@ -137,6 +138,8 @@ function AppShell() {
         setClientCashHistory={setClientCashHistory}
         currentUser={currentUser}
       />
+
+      <ConnectionStatus />
     </div>
   );
 }

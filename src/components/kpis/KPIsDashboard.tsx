@@ -295,16 +295,16 @@ export const KPIsDashboard = () => {
     <div className="flex min-h-screen bg-surface text-on-surface font-body">
       <SideNavBar currentPage="kpis" setCurrentPage={setCurrentPage} currentUser={currentUser} users={users} setCurrentUser={setCurrentUser} currentStore={currentStore} currentPOS={currentPOS} />
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen p-4 md:p-8 pt-20 md:pt-8 pb-20 md:pb-0">
-        <header className="mb-10 flex justify-between items-end">
+        <header className="mb-10 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
           <div>
-            <h2 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Rendimiento <span className="text-secondary">Operativo</span></h2>
+            <h2 className="text-2xl md:text-3xl font-black text-[#0F172A] font-headline mb-1">Rendimiento <span className="text-secondary">Operativo</span></h2>
             <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">PANEL &gt; KPIS &amp; ANALÍTICA</p>
-            <p className="text-[#0F172A]/70 font-bold text-lg">Visualización en tiempo real de métricas críticas de ventas y salud del inventario de tu local.</p>
+            <p className="text-[#0F172A]/70 font-bold text-sm md:text-lg">Visualización en tiempo real de métricas críticas de ventas y salud del inventario de tu local.</p>
           </div>
-          <div className="flex items-center gap-3 mb-1">
-            <button 
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3 md:mb-1">
+            <button
               onClick={() => setShowCashHistoryModal(true)}
-              className="flex items-center gap-2 px-6 py-2.5 bg-white text-secondary border border-secondary/20 font-black rounded-xl shadow-lg hover:scale-[1.02] transition-transform"
+              className="flex items-center justify-center gap-2 px-4 md:px-6 py-3 md:py-2.5 bg-white text-secondary border border-secondary/20 font-black rounded-xl shadow-lg hover:scale-[1.02] transition-transform min-h-12 md:min-h-auto"
             >
               <History className="w-5 h-5" />
               <span className="text-sm">Historial de Caja</span>
