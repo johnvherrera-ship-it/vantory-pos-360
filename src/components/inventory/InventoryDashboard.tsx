@@ -535,9 +535,9 @@ export const InventoryDashboard = ({}: InventoryDashboardProps) => {
       </main>
 
       {/* Floating Action Button */}
-      <button 
+      <button
         onClick={() => setShowAddProduct(true)}
-        className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-br from-secondary to-blue-800 text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-105 active:scale-95 transition-all"
+        className="fixed bottom-24 md:bottom-8 right-8 w-16 h-16 bg-gradient-to-br from-secondary to-blue-800 text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-105 active:scale-95 transition-all"
       >
         <Plus className="w-8 h-8" />
       </button>
