@@ -811,6 +811,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                         setShowCashRegisterModal(true);
                         return;
                       }
+                      cacheService.delete(`fiados_${activeClientId}`);
                       setShowFiadoModal(true);
                     }}
                     disabled={cart.length === 0}
