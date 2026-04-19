@@ -658,7 +658,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowCashModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#00CC33] hover:bg-[#00AA22] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00CC33]/60"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#00FF00] hover:bg-[#00CC00] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00FF00]/60"
                     style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <Banknote className="w-4 h-4" />
@@ -696,7 +696,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Pluxee');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#FF8C00] hover:bg-[#FF7700] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#FF8C00]/60"
+                    className="flex items-center justify-center gap-1 py-2.5 bg-[#FF9900] hover:bg-[#FF8800] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#FF9900]/60"
                     style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <CreditCard className="w-3.5 h-3.5" />
