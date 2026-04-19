@@ -637,6 +637,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                     }}
                     disabled={cart.length === 0}
                     className="flex items-center justify-center gap-1 py-3 bg-[#00FF41] hover:bg-[#00DD2D] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00FF41]/60"
+                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <Banknote className="w-4 h-4" />
                     Efectivo (F10)
@@ -654,7 +655,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Débito');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#0080FF] hover:bg-[#0060FF] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#0080FF]/60"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#0080FF] hover:bg-[#0060FF] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#0080FF]/60"
+                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <CreditCard className="w-4 h-4" />
                     Débito
@@ -672,7 +674,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Pluxee');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#FF8C00] hover:bg-[#FF7700] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#FF8C00]/60"
+                    className="flex items-center justify-center gap-1 py-2.5 bg-[#FF8C00] hover:bg-[#FF7700] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#FF8C00]/60"
+                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <CreditCard className="w-3.5 h-3.5" />
                     Pluxee
@@ -690,7 +693,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('AmiPass');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#D71CE6] hover:bg-[#C500D0] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#D71CE6]/60"
+                    className="flex items-center justify-center gap-1 py-2.5 bg-[#D71CE6] hover:bg-[#C500D0] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#D71CE6]/60"
+                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <CreditCard className="w-3.5 h-3.5" />
                     AmiPass
@@ -708,7 +712,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowFiadoModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="col-span-2 flex items-center justify-center gap-1 py-2.5 bg-[#0099FF] hover:bg-[#0077FF] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#0099FF]/60"
+                    className="col-span-2 flex items-center justify-center gap-1 py-2.5 bg-[#0099FF] hover:bg-[#0077FF] text-white rounded-lg font-black text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#0099FF]/60"
+                    style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     <Wallet className="w-3.5 h-3.5" />
                     Fiado
