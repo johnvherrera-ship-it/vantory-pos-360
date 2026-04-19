@@ -161,7 +161,24 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   const handleScan = () => {
     if (!barcode) return;
     playBeep();
-    const product = inventory.find(p => p.sku === barcode || p.name.toLowerCase().includes(barcode.toLowerCase()));
+    const searchTerm = barcode.toLowerCase().trim();
+
+    // Buscar por SKU exacto primero
+    let product = inventory.find(p => p.sku.toLowerCase() === searchTerm);
+
+    // Si no encuentra por SKU, buscar por nombre exacto
+    if (!product) {
+      product = inventory.find(p => p.name.toLowerCase() === searchTerm);
+    }
+
+    // Si aún no encuentra, buscar por coincidencia parcial
+    if (!product) {
+      product = inventory.find(p =>
+        p.sku.toLowerCase().includes(searchTerm) ||
+        p.name.toLowerCase().includes(searchTerm)
+      );
+    }
+
     if (product) {
       handleAddToCart(product);
     } else {
