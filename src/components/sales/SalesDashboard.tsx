@@ -636,7 +636,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowCashModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#00C853] hover:bg-[#00B040] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#00C853]/40"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#00FF41] hover:bg-[#00DD2D] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#00FF41]/60"
                   >
                     <Banknote className="w-4 h-4" />
                     Efectivo (F10)
@@ -654,7 +654,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Débito');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#1976D2] hover:bg-[#1565C0] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#1976D2]/40"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#0080FF] hover:bg-[#0060FF] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#0080FF]/60"
                   >
                     <CreditCard className="w-4 h-4" />
                     Débito
@@ -672,7 +672,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Pluxee');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#FF6F00] hover:bg-[#E65100] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#FF6F00]/40"
+                    className="flex items-center justify-center gap-1 py-2.5 bg-[#FF8C00] hover:bg-[#FF7700] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#FF8C00]/60"
                   >
                     <CreditCard className="w-3.5 h-3.5" />
                     Pluxee
@@ -690,7 +690,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('AmiPass');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#7B1FA2] hover:bg-[#6A1B9A] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#7B1FA2]/40"
+                    className="flex items-center justify-center gap-1 py-2.5 bg-[#D71CE6] hover:bg-[#C500D0] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#D71CE6]/60"
                   >
                     <CreditCard className="w-3.5 h-3.5" />
                     AmiPass
@@ -708,7 +708,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowFiadoModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="col-span-2 flex items-center justify-center gap-1 py-2.5 bg-[#1565C0] hover:bg-[#0D47A1] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#1565C0]/40"
+                    className="col-span-2 flex items-center justify-center gap-1 py-2.5 bg-[#0099FF] hover:bg-[#0077FF] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#0099FF]/60"
                   >
                     <Wallet className="w-3.5 h-3.5" />
                     Fiado
