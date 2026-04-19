@@ -253,6 +253,25 @@ h1, h2, h3, .font-headline {
   animation: shake 0.5s;
 }
 
+/* ===== BRIGHT SHINE EFFECT ===== */
+@keyframes bright-shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-bright-shine {
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%);
+  background-size: 200% 100%;
+  animation: bright-shine 3s ease-in-out infinite;
+}
+
 /* ===== ANIMATED BORDER GRADIENT ===== */
 @keyframes border-gradient-flow {
   0% {

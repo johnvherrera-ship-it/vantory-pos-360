@@ -420,20 +420,27 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
             </div>
 
             {/* Barcode Area */}
-            <div className="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-secondary/20">
-              <div className="relative flex items-center">
-                <input 
-                  className="w-full pl-4 pr-32 py-3 bg-transparent border-2 border-secondary rounded-lg text-lg font-bold focus:ring-4 focus:ring-secondary/10 placeholder:text-[#0F172A]/50 outline-none transition-all" 
-                  placeholder="Escanea o escribe código / nombre del producto..." 
-                  type="text"
-                  value={barcode}
-                  onChange={(e) => setBarcode(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleScan()}
-                />
-                <button onClick={handleScan} className="absolute right-2 bg-secondary text-white px-6 py-2 rounded-md font-bold flex items-center justify-center hover:bg-secondary/90 transition-colors">
-                  <Plus className="w-4 h-4 mr-2" /> Agregar
-                </button>
-              </div>
+            <div className="bg-[#131b2e] rounded-3xl p-4 shadow-2xl border-2 border-secondary/30 shadow-secondary/10 overflow-hidden relative">
+              <div className="absolute inset-0 animate-bright-shine pointer-events-none"></div>
+              <h2 className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2 relative z-10">
+                <Search className="w-4 h-4 text-secondary" /> Buscar Producto
+              </h2>
+              <form onSubmit={(e) => { e.preventDefault(); handleScan(); }} className="relative z-10">
+                <div className="relative flex items-center">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-white/30" />
+                  <input
+                    className="w-full pl-16 pr-24 py-4 bg-white/5 border-2 border-white/10 rounded-2xl text-lg font-bold text-white focus:border-secondary focus:ring-4 focus:ring-secondary/10 placeholder:text-white/20 outline-none transition-all"
+                    placeholder="Escanea código o escribe nombre..."
+                    type="text"
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    autoFocus
+                  />
+                  <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 bg-secondary text-white px-5 py-2 rounded-xl font-bold hover:bg-secondary/90 transition-all shadow-lg shadow-secondary/20">
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* Favorites Section */}
@@ -629,7 +636,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowCashModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#0f9d58] hover:bg-[#0b8043] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#0f9d58]/20"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#00C853] hover:bg-[#00B040] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#00C853]/40"
                   >
                     <Banknote className="w-4 h-4" />
                     Efectivo (F10)
@@ -647,7 +654,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Débito');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-3 bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#3b82f6]/20"
+                    className="flex items-center justify-center gap-1 py-3 bg-[#1976D2] hover:bg-[#1565C0] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#1976D2]/40"
                   >
                     <CreditCard className="w-4 h-4" />
                     Débito
@@ -665,7 +672,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('Pluxee');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#ff5e00] hover:bg-[#cc4b00] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#ff5e00]/20"
+                    className="flex items-center justify-center gap-1 py-2.5 bg-[#FF6F00] hover:bg-[#E65100] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#FF6F00]/40"
                   >
                     <CreditCard className="w-3.5 h-3.5" />
                     Pluxee
@@ -683,7 +690,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       handleConfirmSale('AmiPass');
                     }}
                     disabled={cart.length === 0}
-                    className="flex items-center justify-center gap-1 py-2.5 bg-[#e91e63] hover:bg-[#c2185b] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#e91e63]/20"
+                    className="flex items-center justify-center gap-1 py-2.5 bg-[#7B1FA2] hover:bg-[#6A1B9A] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#7B1FA2]/40"
                   >
                     <CreditCard className="w-3.5 h-3.5" />
                     AmiPass
@@ -701,7 +708,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       setShowFiadoModal(true);
                     }}
                     disabled={cart.length === 0}
-                    className="col-span-2 flex items-center justify-center gap-1 py-2.5 bg-surface-container-highest hover:bg-outline-variant/30 text-on-surface rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                    className="col-span-2 flex items-center justify-center gap-1 py-2.5 bg-[#1565C0] hover:bg-[#0D47A1] text-white rounded-lg font-bold text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#1565C0]/40"
                   >
                     <Wallet className="w-3.5 h-3.5" />
                     Fiado

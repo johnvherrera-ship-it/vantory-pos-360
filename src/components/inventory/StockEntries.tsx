@@ -267,7 +267,8 @@ export const StockEntries = ({}: StockEntriesProps) => {
           {/* Left Side: Scanning and Cart */}
           <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
             {/* Scanner Area */}
-            <div className={`rounded-3xl p-4 shadow-2xl border-2 transition-all duration-300 shrink-0 ${isScanned ? 'bg-green-900/20 border-green-500 shadow-green-500/20' : 'bg-[#131b2e] border-secondary/30 shadow-secondary/10'}`}>
+            <div className={`rounded-3xl p-4 shadow-2xl border-2 transition-all duration-300 shrink-0 overflow-hidden relative ${isScanned ? 'bg-green-900/20 border-green-500 shadow-green-500/20' : 'bg-[#131b2e] border-secondary/30 shadow-secondary/10'}`}>
+              <div className="absolute inset-0 animate-bright-shine pointer-events-none"></div>
               <h2 className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2">
                 <Scan className="w-4 h-4 text-secondary" /> Escanear Productos
               </h2>
