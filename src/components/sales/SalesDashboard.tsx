@@ -134,6 +134,11 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   };
 
   const handleAddToCart = (product: any) => {
+    if (product.stock <= 0) {
+      alert(`${product.name} no tiene stock disponible`);
+      return;
+    }
+
     playBeep();
 
     // Limpiar venta completada anterior si comienza una nueva compra
@@ -143,6 +148,13 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
     setLastScanned({ name: product.name, price: product.price });
     const existing = cart.find(item => item.id === product.id);
+    const cartQuantity = existing ? existing.quantity : 0;
+
+    if (cartQuantity >= product.stock) {
+      alert(`Stock insuficiente de ${product.name}`);
+      return;
+    }
+
     if (existing) {
       setCart(cart.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item));
     } else {
@@ -152,10 +164,17 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
   const updateQuantity = (index: number, delta: number) => {
     const newCart = [...cart];
-    newCart[index].quantity += delta;
-    if (newCart[index].quantity <= 0) {
+    const newQuantity = newCart[index].quantity + delta;
+
+    if (newQuantity <= 0) {
       newCart.splice(index, 1);
+    } else if (newQuantity > newCart[index].stock) {
+      alert(`Stock insuficiente. Disponible: ${newCart[index].stock}`);
+      return;
+    } else {
+      newCart[index].quantity = newQuantity;
     }
+
     setCart(newCart);
   };
 
