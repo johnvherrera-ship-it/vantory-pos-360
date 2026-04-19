@@ -486,7 +486,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
+            <div className="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-1.5">
               {inventory
                 .filter(p =>
                   p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -507,17 +507,17 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                       referrerPolicy="no-referrer"
                     />
                     {product.stock < 10 && (
-                      <div className="absolute top-1 right-1 bg-error text-white text-[8px] font-black px-1.5 py-0.5 rounded-full shadow-lg">
+                      <div className="absolute top-0.5 right-0.5 bg-error text-white text-[7px] font-black px-1 py-0.5 rounded-full shadow-lg">
                         BAJO
                       </div>
                     )}
                   </div>
-                  <div className="p-2 flex flex-col flex-1">
-                    <h4 className="font-bold text-on-surface text-xs leading-tight mb-0.5 group-hover:text-secondary transition-colors line-clamp-2">{product.name}</h4>
-                    <p className="text-[10px] text-[#0F172A] font-black mb-1">{product.category}</p>
+                  <div className="p-1.5 flex flex-col flex-1">
+                    <h4 className="font-bold text-on-surface text-[9px] leading-tight mb-0.5 group-hover:text-secondary transition-colors line-clamp-2">{product.name}</h4>
+                    <p className="text-[8px] text-[#0F172A] font-black mb-0.5">{product.category}</p>
                     <div className="mt-auto">
-                      <p className="text-sm font-black text-green-600 mb-0.5">{formatCurrency(product.price)}</p>
-                      <p className={`text-[10px] font-black ${product.stock < 10 ? 'text-error' : 'text-[#0F172A]'}`}>
+                      <p className="text-xs font-black text-green-600 mb-0.5">{formatCurrency(product.price)}</p>
+                      <p className={`text-[8px] font-black ${product.stock < 10 ? 'text-error' : 'text-[#0F172A]'}`}>
                         {product.stock}u {product.stock < 10 && '⚠'}
                       </p>
                     </div>
@@ -529,8 +529,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
           {/* Right Side: Cart / Summary */}
           <section className="flex-1 bg-surface-container-low p-6 flex flex-col border-l border-outline-variant/20 overflow-hidden">
-            {/* Cart - Grows Dynamically - TOP */}
-            <div className="flex-1 flex flex-col overflow-hidden min-h-0 mb-2">
+            {/* Cart - Max Height with Scroll */}
+            <div className="max-h-[350px] flex flex-col overflow-hidden mb-2">
               <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border border-outline-variant/20 overflow-hidden flex-1 flex flex-col min-h-0">
                 {/* Cart Header */}
                 <div className="p-3 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
