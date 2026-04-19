@@ -530,8 +530,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
           {/* Right Side: Cart / Summary */}
           <section className="flex-1 bg-surface-container-low p-6 flex flex-col border-l border-outline-variant/20 overflow-hidden">
             {/* Cart - Grows Dynamically - TOP */}
-            <div className="flex-1 flex flex-col overflow-hidden min-h-0 mb-6">
-              <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border border-outline-variant/20 overflow-hidden flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col overflow-hidden min-h-0 mb-2">
+              <div className="bg-surface-container-lowest rounded-2xl flex flex-col shadow-sm border border-outline-variant/20 overflow-hidden flex-1 flex flex-col min-h-0">
                 {/* Cart Header */}
                 <div className="p-3 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
                   <h3 className="text-xs font-black text-[#0F172A] tracking-widest uppercase"><span className="text-secondary">CARRITO</span> <span className="text-[#0F172A]/70">({totalItems})</span></h3>
