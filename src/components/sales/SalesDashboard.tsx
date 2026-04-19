@@ -15,7 +15,8 @@ import {
   CheckCircle,
   Bell,
   Settings,
-  LogOut
+  LogOut,
+  ShoppingCart
 } from 'lucide-react';
 import { CartItem } from '../../types';
 import { SideNavBar } from '../layout/SideNavBar';
@@ -609,7 +610,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                   ))}
                   {cart.length === 0 && (
                     <div className="text-center py-10 text-[#0F172A]">
-                      <Package className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                      <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-30" />
                       <p className="font-black">El carrito está vacío</p>
                     </div>
                   )}
