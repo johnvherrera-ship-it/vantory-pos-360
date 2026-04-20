@@ -1211,20 +1211,26 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
       <AnimatePresence>
         {stockAlert?.show && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-lg max-w-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <AlertCircle className="w-5 h-5 text-amber-600" />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="bg-amber-50 border-2 border-amber-200 rounded-3xl p-12 shadow-2xl max-w-md w-full text-center"
+            >
+              <div className="flex justify-center mb-6">
+                <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center">
+                  <AlertCircle className="w-10 h-10 text-amber-600" />
+                </div>
               </div>
-              <div>
-                <p className="font-black text-sm text-amber-900">{stockAlert.product}</p>
-                <p className="text-xs text-amber-700">Sin inventario disponible</p>
-              </div>
-            </div>
+              <h2 className="text-3xl font-black text-amber-900 mb-2">{stockAlert.product}</h2>
+              <p className="text-lg text-amber-700 font-semibold">Sin inventario disponible</p>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
