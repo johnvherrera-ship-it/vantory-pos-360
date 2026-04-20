@@ -3,6 +3,7 @@ import { Product, Sale, StockEntry, User, Store, POS, Fiado, CashRegister, CashH
 import { supabaseService } from '../services/supabaseService';
 import { cacheService } from '../services/cacheService';
 import { supabase } from '../lib/supabase';
+import { registerQueueHandlers } from '../services/queueHandlers';
 
 interface AppContextType {
   // SaaS Clients
@@ -221,6 +222,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   }, [users]);
 
   useEffect(() => {
+    registerQueueHandlers();
     const loadInitialData = async () => {
       try {
         const clients = await supabaseService.getClients();
