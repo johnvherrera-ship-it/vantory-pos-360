@@ -110,9 +110,9 @@ export const KPIsDashboard = () => {
     return inventory.map(p => {
       const soldIn30Days = productSalesCount[p.id] || 0;
       const dailyVelocity = soldIn30Days / 30;
-      const daysUntilDepletion = dailyVelocity > 0 ? Math.floor(p.stock / dailyVelocity) : Infinity;
+      const daysUntilDepletion = p.stock === 0 ? 0 : (dailyVelocity > 0 ? Math.floor(p.stock / dailyVelocity) : Infinity);
       return { ...p, dailyVelocity, daysUntilDepletion };
-    }).filter(p => p.stock > 0).sort((a, b) => a.daysUntilDepletion - b.daysUntilDepletion);
+    }).sort((a, b) => a.daysUntilDepletion - b.daysUntilDepletion);
   }, [salesHistory, inventory]);
 
   const lowStockProducts = stockProjections.filter(p => p.stock < 10 || p.daysUntilDepletion <= 7);

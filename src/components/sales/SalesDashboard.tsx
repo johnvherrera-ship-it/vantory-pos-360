@@ -13,6 +13,7 @@ import {
   Printer,
   X,
   CheckCircle,
+  AlertCircle,
   Bell,
   Settings,
   LogOut,
@@ -60,6 +61,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const [dropdownRect, setDropdownRect] = React.useState<DOMRect | null>(null);
+  const [stockAlert, setStockAlert] = useState<{ product: string; show: boolean } | null>(null);
 
   const updateDropdownPosition = () => {
     if (searchInputRef.current) {
@@ -153,7 +155,8 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
   const handleAddToCart = (product: any) => {
     if (product.stock <= 0) {
-      alert(`${product.name} no tiene stock disponible`);
+      setStockAlert({ product: product.name, show: true });
+      setTimeout(() => setStockAlert(null), 3000);
       return;
     }
 
@@ -1200,6 +1203,28 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                 )}
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Stock Alert Notification */}
+      <AnimatePresence>
+        {stockAlert?.show && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-lg max-w-sm"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="font-black text-sm text-amber-900">{stockAlert.product}</p>
+                <p className="text-xs text-amber-700">Sin inventario disponible</p>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
