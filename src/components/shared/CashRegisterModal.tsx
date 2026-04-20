@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, AlertCircle, CheckCircle } from 'lucide-react';
 import { queueService } from '../../services/queueService';
+import { usePOSContext } from '../../context/POSContext';
 
 interface CashRegister {
   isOpen: boolean;
@@ -39,6 +40,7 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
   setClientCashHistory,
   currentUser
 }) => {
+  const { currentPOS } = usePOSContext();
   const [discrepancyModal, setDiscrepancyModal] = useState<{ show: boolean; type?: string; diff?: number; expected?: number; actual?: number }>({ show: false });
   const [successModal, setSuccessModal] = useState(false);
   return (
@@ -78,7 +80,7 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
                 queueService.enqueue('cash_register_open', {
                   clientId: (currentUser as any).clientId,
                   storeId: (currentUser as any).storeId,
-                  posId: null,
+                  posId: currentPOS?.id || null,
                   initialCash: initial,
                   openedAt
                 });
@@ -121,7 +123,7 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
                     const closingRecord = {
                       clientId: (currentUser as any).clientId,
                       storeId: (currentUser as any).storeId,
-                      posId: null,
+                      posId: currentPOS?.id || null,
                       openedAt: clientCashRegister.openedAt || new Date().toISOString(),
                       closedAt: new Date().toISOString(),
                       initialCash: clientCashRegister.initialCash,
@@ -241,7 +243,7 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
                   const closingRecord = {
                     clientId: (currentUser as any).clientId,
                     storeId: (currentUser as any).storeId,
-                    posId: null,
+                    posId: currentPOS?.id || null,
                     openedAt: clientCashRegister.openedAt || new Date().toISOString(),
                     closedAt: new Date().toISOString(),
                     initialCash: clientCashRegister.initialCash,
