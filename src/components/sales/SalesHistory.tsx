@@ -28,9 +28,44 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [saleToDelete, setSaleToDelete] = useState<number | null>(null);
+  const [currentPage, setCurrentPageNum] = useState(1);
+  const [dateFilter, setDateFilter] = useState<'today' | 'week' | 'month' | 'year'>('month');
+
+  const getDateRange = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    switch (dateFilter) {
+      case 'today':
+        return { start: today, end: new Date(today.getTime() + 24 * 60 * 60 * 1000) };
+      case 'week': {
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+        return { start: weekStart, end: weekEnd };
+      }
+      case 'month': {
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        return { start: monthStart, end: monthEnd };
+      }
+      case 'year': {
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+        const yearEnd = new Date(now.getFullYear() + 1, 0, 1);
+        return { start: yearStart, end: yearEnd };
+      }
+    }
+  };
+
+  const dateRange = getDateRange();
 
   const filteredSales = salesHistory.filter(sale => {
+    const saleDate = new Date(sale.date);
+    const inDateRange = saleDate >= dateRange.start && saleDate < dateRange.end;
+
+    if (!inDateRange) return false;
     if (!searchTerm) return true;
+
     const term = searchTerm.toLowerCase();
     return (
       sale.id.toString().includes(term) ||
@@ -38,6 +73,18 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
       sale.cart.some((item: any) => item.name.toLowerCase().includes(term))
     );
   });
+
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil(filteredSales.length / ITEMS_PER_PAGE);
+  const paginatedSales = filteredSales.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const resetPaginationOnSearch = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPageNum(1);
+  };
 
   const handleDelete = (id: number) => {
     setSalesHistory((prev: any[]) => prev.filter(s => s.id !== id));
@@ -67,9 +114,22 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
                 placeholder="Buscar por ID, método, producto..."
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => resetPaginationOnSearch(e.target.value)}
               />
             </div>
+            <select
+              value={dateFilter}
+              onChange={(e) => {
+                setDateFilter(e.target.value as any);
+                setCurrentPageNum(1);
+              }}
+              className="px-4 py-2 bg-surface-container-low border-none rounded-lg text-sm focus:ring-2 focus:ring-secondary/20 focus:bg-surface-container-lowest transition-all cursor-pointer"
+            >
+              <option value="today">Hoy</option>
+              <option value="week">Esta semana</option>
+              <option value="month">Este mes</option>
+              <option value="year">Este año</option>
+            </select>
             <button onClick={() => setShowNotificationsPanel(true)} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#f2f3ff] transition-colors relative flex-shrink-0">
               <Bell className="w-5 h-5 text-on-surface-variant" />
             </button>
@@ -112,7 +172,7 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container-low">
-              {filteredSales.map((sale) => (
+              {paginatedSales.map((sale) => (
                 <tr
                   key={sale.id}
                   className="hover:bg-surface-container-high transition-all cursor-pointer"
@@ -157,15 +217,52 @@ export const SalesHistory = ({}: SalesHistoryProps) => {
                   </td>
                 </tr>
               ))}
-              {filteredSales.length === 0 && (
+              {paginatedSales.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-8 py-20 text-center text-outline-variant font-medium">
-                    {searchTerm ? 'No hay resultados para tu búsqueda.' : 'No hay transacciones registradas en el historial.'}
+                    {searchTerm ? 'No hay resultados para tu búsqueda.' : 'No hay transacciones en este período.'}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+
+          {filteredSales.length > 0 && (
+            <div className="px-8 py-6 bg-surface-container-lowest border-t border-outline-variant/10 flex items-center justify-between">
+              <div className="text-sm text-outline-variant font-medium">
+                Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredSales.length)} de {filteredSales.length} transacciones
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPageNum(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-lg bg-surface-container-low text-on-surface disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-container-high transition-colors font-bold text-sm"
+                >
+                  Anterior
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPageNum(page)}
+                    className={`w-10 h-10 rounded-lg font-bold text-sm transition-colors ${
+                      currentPage === page
+                        ? 'bg-secondary text-white'
+                        : 'bg-surface-container-low text-on-surface hover:bg-surface-container-high'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPageNum(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 rounded-lg bg-surface-container-low text-on-surface disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface-container-high transition-colors font-bold text-sm"
+                >
+                  Siguiente
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
