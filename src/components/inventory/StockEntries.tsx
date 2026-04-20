@@ -14,6 +14,7 @@ import {
 import { SideNavBar } from '../layout/SideNavBar';
 import { useAppContexts } from '../../hooks/useAppContexts';
 import { supabaseService } from '../../services/supabaseService';
+import { queueService } from '../../services/queueService';
 
 interface StockEntriesProps {}
 
@@ -82,6 +83,18 @@ export const StockEntries = ({}: StockEntriesProps) => {
     }
 
     const nowDate = new Date().toISOString();
+
+    // 1. ACTUALIZAR ESTADO LOCAL INMEDIATAMENTE
+    const updatedInventory = inventory.map(invItem => {
+      const cartItem = receivingCart.find(item => item.id === invItem.id);
+      if (cartItem) {
+        return { ...invItem, stock: invItem.stock + cartItem.quantity };
+      }
+      return invItem;
+    });
+    setInventory(updatedInventory);
+
+    // 2. CREAR ENTRADAS DE STOCK
     const newEntries = receivingCart.map(item => ({
       folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
       productName: item.name,
@@ -95,42 +108,32 @@ export const StockEntries = ({}: StockEntriesProps) => {
       storeId: currentStore?.id ?? 0
     }));
 
-    const productsToUpdate = receivingCart.map(item => {
-      const current = inventory.find(p => p.id === item.id);
-      return {
-        id: item.id,
-        clientId,
-        storeId: currentStore?.id ?? 0,
-        name: current?.name ?? item.name,
-        sku: current?.sku ?? item.sku,
-        category: current?.category ?? item.category,
-        price: current?.price ?? item.price,
-        cost: item.newCost,
-        stock: (current?.stock ?? 0) + item.quantity,
-        image: current?.image ?? item.image
-      };
+    const finalEntries = newEntries.map((e, i) => ({ ...e, id: Date.now() + i })) as any[];
+    setStockEntries([...finalEntries, ...stockEntries]);
+
+    // 3. ENQUEUE OPERACIONES PARA SINCRONIZACIÓN
+    receivingCart.forEach(item => {
+      const updated = updatedInventory.find(p => p.id === item.id);
+      queueService.enqueue({
+        type: 'inventory',
+        data: {
+          product: updated,
+          clientId
+        }
+      });
     });
 
-    try {
-      const [savedEntries, savedProducts] = await Promise.all([
-        supabaseService.bulkCreateStockEntries(newEntries),
-        supabaseService.bulkUpsertProducts(productsToUpdate)
-      ]);
-
-      const finalEntries = (savedEntries && savedEntries.length ? savedEntries : newEntries.map((e, i) => ({ ...e, id: Date.now() + i }))) as any[];
-      setStockEntries([...finalEntries, ...stockEntries]);
-
-      const savedById = new Map(savedProducts.map((p: any) => [p.id, p]));
-      const updatedInventory = inventory.map(invItem => {
-        const saved = savedById.get(invItem.id);
-        return saved ? saved : invItem;
+    newEntries.forEach((entry, i) => {
+      queueService.enqueue({
+        type: 'entry',
+        data: {
+          entry: { ...entry, id: finalEntries[i].id },
+          clientId
+        }
       });
-      setInventory(updatedInventory);
-      setReceivingCart([]);
-    } catch (err) {
-      console.error('Error guardando recepción:', err);
-      alert('Error al guardar la recepción en la base de datos');
-    }
+    });
+
+    setReceivingCart([]);
   };
 
   const handleNewProductSubmit = async (e: React.FormEvent) => {
@@ -144,55 +147,69 @@ export const StockEntries = ({}: StockEntriesProps) => {
     const priceNum = parseInt(newProductForm.price) || 0;
     const stockNum = parseInt(newProductForm.stock) || 0;
 
-    try {
-      const savedProduct = await supabaseService.upsertProduct({
-        clientId,
-        storeId: currentStore?.id ?? 0,
-        name: newProductForm.name,
-        sku: newProductForm.sku,
-        category: newProductForm.category,
-        cost: costNum,
-        price: priceNum,
-        stock: stockNum,
-        image: newProductForm.image
-      } as any);
+    // CREAR PRODUCTO LOCALMENTE PRIMERO
+    const newProduct = {
+      id: Date.now(),
+      clientId,
+      storeId: currentStore?.id ?? 0,
+      name: newProductForm.name,
+      sku: newProductForm.sku,
+      category: newProductForm.category,
+      cost: costNum,
+      price: priceNum,
+      stock: stockNum,
+      image: newProductForm.image,
+      createdAt: new Date().toISOString()
+    };
 
-      setInventory([...inventory, savedProduct]);
+    // ACTUALIZAR ESTADO LOCAL INMEDIATAMENTE
+    setInventory([...inventory, newProduct]);
 
-      const entry = {
-        folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
-        productName: savedProduct.name,
-        productId: savedProduct.id,
-        quantity: stockNum,
-        cost: costNum,
-        date: new Date().toISOString(),
-        user: currentUser?.name || 'Admin User',
-        image: savedProduct.image,
-        clientId,
-        storeId: currentStore?.id ?? 0
-      };
-      try {
-        const saved = await supabaseService.createStockEntry(entry);
-        setStockEntries([saved || { ...entry, id: Date.now() + 1 }, ...stockEntries]);
-      } catch {
-        setStockEntries([{ ...entry, id: Date.now() + 1 }, ...stockEntries]);
+    // CREAR ENTRADA DE STOCK
+    const entryId = Date.now();
+    const entry = {
+      id: entryId,
+      folio: `ENT-${Math.floor(Math.random() * 9000) + 1000}`,
+      productName: newProduct.name,
+      productId: newProduct.id,
+      quantity: stockNum,
+      cost: costNum,
+      date: new Date().toISOString(),
+      user: currentUser?.name || 'Admin User',
+      image: newProduct.image,
+      clientId,
+      storeId: currentStore?.id ?? 0
+    };
+    setStockEntries([entry as any, ...stockEntries]);
+
+    // ENQUEUE OPERACIONES PARA SINCRONIZACIÓN
+    queueService.enqueue({
+      type: 'inventory',
+      data: {
+        product: newProduct,
+        clientId
       }
+    });
 
-      setShowNewProductModal(false);
-      setNewProductForm({
-        name: '',
-        sku: '',
-        category: 'General',
-        cost: '',
-        price: '',
-        image: 'https://picsum.photos/seed/product/200/200',
-        stock: ''
-      });
-      setBarcode('');
-    } catch (err) {
-      console.error('Error creando producto:', err);
-      alert('Error al crear el producto en la base de datos');
-    }
+    queueService.enqueue({
+      type: 'entry',
+      data: {
+        entry,
+        clientId
+      }
+    });
+
+    setShowNewProductModal(false);
+    setNewProductForm({
+      name: '',
+      sku: '',
+      category: 'General',
+      cost: '',
+      price: '',
+      image: 'https://picsum.photos/seed/product/200/200',
+      stock: ''
+    });
+    setBarcode('');
   };
 
   const handleManualSubmit = async (e: React.FormEvent) => {
