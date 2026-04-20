@@ -3,7 +3,7 @@ import { Product, Sale, StockEntry, User, Store, POS, Fiado, CashRegister, CashH
 import { supabaseService } from '../services/supabaseService';
 import { cacheService } from '../services/cacheService';
 import { supabase } from '../lib/supabase';
-import { registerQueueHandlers } from '../services/queueHandlers';
+import { registerQueueHandlers, CACHE_INVALIDATED_EVENT } from '../services/queueHandlers';
 
 interface AppContextType {
   // SaaS Clients
@@ -347,6 +347,48 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
   useEffect(() => {
     localStorage.setItem('vantory_pos', JSON.stringify(posMachines));
   }, [posMachines]);
+
+  useEffect(() => {
+    const handleCacheInvalidated = async (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { table, clientId } = customEvent.detail;
+
+      if (clientId !== activeClientId) return;
+
+      try {
+        if (table === 'products') {
+          const products = await supabaseService.getProducts(activeClientId);
+          setInventory(prev => {
+            const keepLocal = prev.filter(p => p.clientId !== activeClientId);
+            return [...keepLocal, ...products];
+          });
+        } else if (table === 'sales') {
+          const sales = await supabaseService.getSales(activeClientId);
+          setSalesHistory(prev => {
+            const keepLocal = prev.filter(s => s.clientId !== activeClientId);
+            return [...keepLocal, ...sales];
+          });
+        } else if (table === 'stockEntries') {
+          const entries = await supabaseService.getStockEntries(activeClientId);
+          setStockEntries(prev => {
+            const keepLocal = prev.filter(e => e.clientId !== activeClientId);
+            return [...keepLocal, ...entries];
+          });
+        } else if (table === 'fiados') {
+          const fiados = await supabaseService.getFiados(activeClientId, activeStoreId);
+          setFiados(prev => {
+            const keepLocal = prev.filter(f => !(f.clientId === activeClientId && f.storeId === activeStoreId));
+            return [...keepLocal, ...fiados];
+          });
+        }
+      } catch (e) {
+        console.error(`Error refetching ${table}:`, e);
+      }
+    };
+
+    window.addEventListener(CACHE_INVALIDATED_EVENT, handleCacheInvalidated);
+    return () => window.removeEventListener(CACHE_INVALIDATED_EVENT, handleCacheInvalidated);
+  }, [activeClientId, activeStoreId]);
 
   const createClientSetter = useCallback((globalSetter: any) => (action: any) => {
     globalSetter((prev: any[]) => {
