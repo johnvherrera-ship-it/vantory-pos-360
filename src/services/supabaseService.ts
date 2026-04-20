@@ -346,8 +346,6 @@ export const supabaseService = {
           client_id: sale.clientId,
           store_id: (sale as any).storeId ?? null,
           pos_id: sale.posId,
-          date: (sale as any).date || new Date().toISOString(),
-          subtotal: (sale as any).subtotal || sale.total,
           total: sale.total,
           payment_method: sale.paymentMethod,
           cart: sale.cart,
