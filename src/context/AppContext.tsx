@@ -246,7 +246,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         const products = await cacheService.getOrFetch(
           `products_${activeClientId}`,
           () => supabaseService.getProducts(activeClientId),
-          5 * 60 * 1000
+          5
         );
         setInventory(prev => {
           const keepLocal = prev.filter(p => p.clientId !== activeClientId);
@@ -262,7 +262,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         const sales = await cacheService.getOrFetch(
           `sales_${activeClientId}`,
           () => supabaseService.getSales(activeClientId),
-          3 * 60 * 1000
+          3
         );
         setSalesHistory(prev => {
           const keepLocal = prev.filter(s => s.clientId !== activeClientId);
@@ -278,7 +278,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         const entries = await cacheService.getOrFetch(
           `stockEntries_${activeClientId}`,
           () => supabaseService.getStockEntries(activeClientId),
-          5 * 60 * 1000
+          5
         );
         setStockEntries(prev => {
           const keepLocal = prev.filter(e => e.clientId !== activeClientId);
@@ -294,7 +294,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         const fiados = await cacheService.getOrFetch(
           `fiados_${activeClientId}`,
           () => supabaseService.getFiados(activeClientId),
-          5 * 60 * 1000
+          5
         );
         setFiados(prev => {
           const keepLocal = prev.filter(f => f.clientId !== activeClientId);

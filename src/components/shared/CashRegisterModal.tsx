@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, AlertCircle, CheckCircle } from 'lucide-react';
+import { queueService } from '../../services/queueService';
 
 interface CashRegister {
   isOpen: boolean;
@@ -109,7 +110,9 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
                   setTimeout(() => {
                     // Continue with closing...
                     const closingRecord = {
-                      id: Date.now(),
+                      clientId: (currentUser as any).clientId,
+                      storeId: (currentUser as any).storeId,
+                      posId: null,
                       openedAt: clientCashRegister.openedAt || new Date().toISOString(),
                       closedAt: new Date().toISOString(),
                       initialCash: clientCashRegister.initialCash,
@@ -119,30 +122,14 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
                       user: currentUser?.name || 'Sistema',
                       status: 'Cuadrada'
                     };
-                    setClientCashHistory((prev: CashHistory[]) => [closingRecord, ...prev]);
+                    setClientCashHistory((prev: CashHistory[]) => [{ id: Date.now(), ...closingRecord } as any, ...prev]);
+                    queueService.enqueue('cash_history', { record: closingRecord });
                     setClientCashRegister({ isOpen: false, initialCash: 0, currentCash: 0, openedAt: null });
                     setShowCashRegisterModal(false);
                     setSuccessModal(false);
                   }, 1500);
                   return;
                 }
-
-                // Save to history
-                const closingRecord = {
-                  id: Date.now(),
-                  openedAt: clientCashRegister.openedAt || new Date().toISOString(),
-                  closedAt: new Date().toISOString(),
-                  initialCash: clientCashRegister.initialCash,
-                  expectedCash: expected,
-                  actualCash: actual,
-                  difference: diff,
-                  user: currentUser?.name || 'Sistema',
-                  status: diff === 0 ? 'Cuadrada' : (diff > 0 ? 'Sobrante' : 'Faltante')
-                };
-
-                setClientCashHistory((prev: CashHistory[]) => [closingRecord, ...prev]);
-                setClientCashRegister({ isOpen: false, initialCash: 0, currentCash: 0, openedAt: null });
-                setShowCashRegisterModal(false);
               }} className="space-y-6">
                 <div className="bg-surface-container-low p-4 rounded-xl space-y-3">
                   <div className="flex justify-between items-center">
@@ -243,7 +230,9 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
                   setDiscrepancyModal({ show: false });
                   // Continue with closing
                   const closingRecord = {
-                    id: Date.now(),
+                    clientId: (currentUser as any).clientId,
+                    storeId: (currentUser as any).storeId,
+                    posId: null,
                     openedAt: clientCashRegister.openedAt || new Date().toISOString(),
                     closedAt: new Date().toISOString(),
                     initialCash: clientCashRegister.initialCash,
@@ -253,7 +242,8 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
                     user: currentUser?.name || 'Sistema',
                     status: discrepancyModal.type === 'sobrante' ? 'Sobrante' : 'Faltante'
                   };
-                  setClientCashHistory((prev: CashHistory[]) => [closingRecord, ...prev]);
+                  setClientCashHistory((prev: CashHistory[]) => [{ id: Date.now(), ...closingRecord } as any, ...prev]);
+                  queueService.enqueue('cash_history', { record: closingRecord });
                   setClientCashRegister({ isOpen: false, initialCash: 0, currentCash: 0, openedAt: null });
                   setShowCashRegisterModal(false);
                   setSuccessModal(true);

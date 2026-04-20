@@ -29,4 +29,9 @@ export function registerQueueHandlers() {
       await supabaseService.updateFiado(data);
     }
   });
+
+  queueService.registerHandler('cash_history', async (op: QueuedOperation) => {
+    const { record } = op.data;
+    await supabaseService.createCashHistory(record);
+  });
 }

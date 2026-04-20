@@ -416,6 +416,33 @@ export const supabaseService = {
     }
   },
 
+  async createCashHistory(record: any) {
+    if (notConfigured()) return record;
+    try {
+      const { data, error } = await supabase
+        .from('cash_history')
+        .insert({
+          client_id: record.clientId,
+          store_id: record.storeId,
+          pos_id: record.posId,
+          opened_at: record.openedAt,
+          closed_at: record.closedAt,
+          initial_cash: record.initialCash,
+          expected_cash: record.expectedCash,
+          actual_cash: record.actualCash,
+          difference: record.difference,
+          user_name: record.user,
+          status: record.status
+        })
+        .select();
+      if (error) throw error;
+      return data?.[0];
+    } catch (e) {
+      console.error('createCashHistory failed:', e);
+      throw e;
+    }
+  },
+
   async decrementStockAtomic(clientId: number, items: Array<{ productId: number; quantity: number }>): Promise<Product[]> {
     if (notConfigured()) return [];
     if (!items.length) return [];
@@ -458,7 +485,14 @@ export const supabaseService = {
         .eq('client_id', clientId)
         .order('date', { ascending: false });
       if (error) throw error;
-      return (data || []) as StockEntry[];
+      return (data || []).map((entry: any) => ({
+        ...entry,
+        clientId: entry.client_id,
+        productId: entry.product_id,
+        productName: entry.product_name,
+        userName: entry.user_name,
+        imageUrl: entry.image_url
+      })) as StockEntry[];
     } catch (e) {
       console.error('getStockEntries failed:', e);
       return [];
@@ -516,6 +550,17 @@ export const supabaseService = {
   },
 
   // === Fiados ===
+  _normalizeFiado(f: any): any {
+    return {
+      ...f,
+      clientId: f.client_id,
+      storeId: f.store_id,
+      totalDebt: f.total_debt,
+      customerName: f.name,
+      createdAt: f.created_at
+    };
+  },
+
   async getFiados(clientId: number): Promise<any[]> {
     if (notConfigured()) return [];
     try {
@@ -525,7 +570,7 @@ export const supabaseService = {
         .eq('client_id', clientId)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data || []) as any[];
+      return (data || []).map(supabaseService._normalizeFiado);
     } catch (e) {
       console.error('getFiados failed:', e);
       return [];

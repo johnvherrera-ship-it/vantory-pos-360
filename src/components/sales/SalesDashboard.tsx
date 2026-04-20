@@ -261,12 +261,14 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
     if (decrementItems.length) {
       const dbProducts = await supabaseService.getProducts(activeClientId).catch(() => []);
-      for (const item of decrementItems) {
-        const dbProduct = dbProducts.find(p => p.id === item.productId);
-        if (!dbProduct || dbProduct.stock < item.quantity) {
-          alert(`Stock insuficiente: ${inventory.find(p => p.id === item.productId)?.name}`);
-          setInventory(dbProducts);
-          return;
+      if (dbProducts.length > 0) {
+        for (const item of decrementItems) {
+          const dbProduct = dbProducts.find(p => p.id === item.productId);
+          if (!dbProduct || dbProduct.stock < item.quantity) {
+            alert(`Stock insuficiente: ${inventory.find(p => p.id === item.productId)?.name}`);
+            setInventory(dbProducts);
+            return;
+          }
         }
       }
 
