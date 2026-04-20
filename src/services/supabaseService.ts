@@ -349,7 +349,6 @@ export const supabaseService = {
           date: (sale as any).date || new Date().toISOString(),
           subtotal: (sale as any).subtotal || sale.total,
           total: sale.total,
-          change: (sale as any).change || 0,
           payment_method: sale.paymentMethod,
           cart: sale.cart,
           user_name: sale.user
