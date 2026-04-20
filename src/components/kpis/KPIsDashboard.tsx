@@ -720,7 +720,7 @@ export const KPIsDashboard = () => {
                ) : Object.entries(revenueByMethod).sort((a, b) => (b[1] as number) - (a[1] as number)).map(([method, amount]) => {
                  const cfg: Record<string, { icon: React.ReactNode, bg: string, iconBg: string }> = {
                    'Efectivo': { icon: <Banknote className="w-5 h-5 text-green-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-green-100' },
-                   'Débito': { icon: <CreditCard className="w-5 h-5 text-blue-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-blue-100' },
+                   'Tarjeta': { icon: <CreditCard className="w-5 h-5 text-blue-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-blue-100' },
                    'Fiado': { icon: <Receipt className="w-5 h-5 text-orange-700" />, bg: 'bg-orange-50', iconBg: 'bg-orange-100' },
                    'Pluxee': { icon: <CreditCard className="w-5 h-5 text-[#ff5e00]" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-orange-50' },
                    'AmiPass': { icon: <CreditCard className="w-5 h-5 text-pink-700" />, bg: 'bg-surface-container-lowest', iconBg: 'bg-pink-100' },

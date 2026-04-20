@@ -759,14 +759,14 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
                         setShowCashRegisterModal(true);
                         return;
                       }
-                      handleConfirmSale('Débito');
+                      handleConfirmSale('Tarjeta');
                     }}
                     disabled={cart.length === 0}
                     className="flex items-center justify-center gap-2 py-3 bg-[#0077FF] hover:bg-[#0066EE] text-white rounded-lg font-black text-sm transition-all disabled:cursor-not-allowed shadow-lg shadow-[#0077FF]/50 hover:shadow-xl hover:shadow-[#0077FF]/70 border border-white/20"
                     style={{ textShadow: '0 0 3px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.7)' }}
                   >
                     <CreditCard className="w-4 h-4" />
-                    Débito
+                    Tarjeta
                   </button>
                   <button
                     onClick={() => {
