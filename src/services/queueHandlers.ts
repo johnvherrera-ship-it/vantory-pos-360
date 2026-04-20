@@ -13,12 +13,26 @@ export function registerQueueHandlers() {
 
   queueService.registerHandler('inventory', async (op: QueuedOperation) => {
     const { product, clientId } = op.data;
-    await supabaseService.upsertProduct(product);
+    try {
+      console.log('📦 Sincronizando inventario:', product);
+      await supabaseService.upsertProduct(product);
+      console.log('✅ Inventario sincronizado:', product.id);
+    } catch (error) {
+      console.error('❌ Error sincronizando inventario:', error);
+      throw error;
+    }
   });
 
   queueService.registerHandler('entry', async (op: QueuedOperation) => {
     const { entry, clientId } = op.data;
-    await supabaseService.createStockEntry(entry);
+    try {
+      console.log('📝 Sincronizando entrada de stock:', entry);
+      await supabaseService.createStockEntry(entry);
+      console.log('✅ Entrada sincronizada:', entry.folio);
+    } catch (error) {
+      console.error('❌ Error sincronizando entrada:', error);
+      throw error;
+    }
   });
 
   queueService.registerHandler('fiado', async (op: QueuedOperation) => {
