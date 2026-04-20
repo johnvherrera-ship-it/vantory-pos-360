@@ -360,7 +360,7 @@ export const SalesDashboard = ({ onSaleComplete }: SalesDashboardProps) => {
 
       setFiados(updatedFiados);
       if (fiadoToSync) {
-        cacheService.delete(`fiados_${activeClientId}`);
+        cacheService.delete(`fiados_${activeClientId}_${activeStoreId}`);
         queueService.enqueue({
           type: 'fiado',
           data: fiadoToSync,

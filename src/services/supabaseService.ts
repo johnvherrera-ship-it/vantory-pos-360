@@ -585,6 +585,7 @@ export const supabaseService = {
         .from('fiados')
         .insert({
           client_id: fiado.clientId,
+          store_id: fiado.storeId,
           name: fiado.name || fiado.customerName,
           phone: fiado.phone || '',
           total_debt: fiado.totalDebt || fiado.total || 0,
@@ -605,6 +606,7 @@ export const supabaseService = {
       const { data, error } = await supabase
         .from('fiados')
         .update({
+          store_id: fiado.storeId,
           name: fiado.name || fiado.customerName,
           phone: fiado.phone || '',
           total_debt: fiado.totalDebt || fiado.total || 0,
