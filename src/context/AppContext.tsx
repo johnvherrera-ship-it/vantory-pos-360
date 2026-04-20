@@ -292,12 +292,12 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     const refetchFiados = async () => {
       try {
         const fiados = await cacheService.getOrFetch(
-          `fiados_${activeClientId}`,
-          () => supabaseService.getFiados(activeClientId),
+          `fiados_${activeClientId}_${activeStoreId}`,
+          () => supabaseService.getFiados(activeClientId, activeStoreId),
           5
         );
         setFiados(prev => {
-          const keepLocal = prev.filter(f => f.clientId !== activeClientId);
+          const keepLocal = prev.filter(f => !(f.clientId === activeClientId && f.storeId === activeStoreId));
           return [...keepLocal, ...fiados];
         });
       } catch (e) {

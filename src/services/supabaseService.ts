@@ -561,13 +561,14 @@ export const supabaseService = {
     };
   },
 
-  async getFiados(clientId: number): Promise<any[]> {
+  async getFiados(clientId: number, storeId: number): Promise<any[]> {
     if (notConfigured()) return [];
     try {
       const { data, error } = await supabase
         .from('fiados')
         .select('*')
         .eq('client_id', clientId)
+        .eq('store_id', storeId)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return (data || []).map(supabaseService._normalizeFiado);
