@@ -88,7 +88,7 @@ export const StockEntries = ({}: StockEntriesProps) => {
     const updatedInventory = inventory.map(invItem => {
       const cartItem = receivingCart.find(item => item.id === invItem.id);
       if (cartItem) {
-        return { ...invItem, stock: invItem.stock + cartItem.quantity };
+        return { ...invItem, stock: (invItem.stock ?? 0) + (cartItem.quantity ?? 0) };
       }
       return invItem;
     });
@@ -155,9 +155,9 @@ export const StockEntries = ({}: StockEntriesProps) => {
       name: newProductForm.name,
       sku: newProductForm.sku,
       category: newProductForm.category,
-      cost: costNum,
-      price: priceNum,
-      stock: stockNum,
+      cost: costNum || 0,
+      price: priceNum || 0,
+      stock: stockNum || 0,
       image: newProductForm.image,
       createdAt: new Date().toISOString()
     };
