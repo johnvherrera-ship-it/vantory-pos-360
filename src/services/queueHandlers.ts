@@ -34,4 +34,15 @@ export function registerQueueHandlers() {
     const { record } = op.data;
     await supabaseService.createCashHistory(record);
   });
+
+  queueService.registerHandler('cash_register_open', async (op: QueuedOperation) => {
+    const { clientId, storeId, posId, initialCash, openedAt } = op.data;
+    await supabaseService.createCashRegister({
+      clientId,
+      storeId,
+      posId,
+      initialCash,
+      openedAt
+    });
+  });
 }

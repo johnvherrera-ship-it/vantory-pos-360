@@ -399,6 +399,30 @@ export const supabaseService = {
     }
   },
 
+  async createCashRegister(register: any) {
+    if (notConfigured()) return register;
+    try {
+      const { data, error } = await supabase
+        .from('cash_registers')
+        .insert({
+          client_id: register.clientId,
+          store_id: register.storeId,
+          pos_id: register.posId,
+          initial_cash: register.initialCash,
+          current_cash: register.initialCash,
+          opened_at: register.openedAt || new Date().toISOString(),
+          status: 'Abierta'
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.error('createCashRegister failed:', e);
+      throw e;
+    }
+  },
+
   async updateCashRegister(register: any) {
     if (notConfigured()) return register;
     try {

@@ -72,7 +72,16 @@ export const CashRegisterModal: React.FC<CashRegisterModalProps> = ({
                 e.preventDefault();
                 const form = e.target as HTMLFormElement;
                 const initial = parseInt((form.elements.namedItem('initialCash') as HTMLInputElement).value);
-                setClientCashRegister({ isOpen: true, initialCash: initial, currentCash: initial, openedAt: new Date().toISOString() });
+                const openedAt = new Date().toISOString();
+                const registerData = { isOpen: true, initialCash: initial, currentCash: initial, openedAt };
+                setClientCashRegister(registerData);
+                queueService.enqueue('cash_register_open', {
+                  clientId: (currentUser as any).clientId,
+                  storeId: (currentUser as any).storeId,
+                  posId: null,
+                  initialCash: initial,
+                  openedAt
+                });
                 setShowCashRegisterModal(false);
               }} className="space-y-6">
                 <div>
