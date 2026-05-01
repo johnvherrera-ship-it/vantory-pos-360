@@ -10,7 +10,10 @@
     "logs:db": "docker-compose logs -f postgres-pos",
     "status": "docker-compose ps",
     "ps": "docker-compose ps",
-    "build": "docker-compose build",
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "build:docker": "docker-compose build",
     "clean": "docker-compose down -v",
     "reset": "npm run clean && npm run start",
     "test": "node scripts/test-workflow.js",
@@ -33,7 +36,8 @@
   "author": "Tu Nombre",
   "license": "MIT",
   "devDependencies": {
-    "node-fetch": "^2.6.11"
+    "node-fetch": "^2.6.11",
+    "vite": "^6.3.5"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
