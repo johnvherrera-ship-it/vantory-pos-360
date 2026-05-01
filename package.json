@@ -1,0 +1,52 @@
+{
+  "name": "vantory-pos-360-n8n",
+  "version": "1.0.0",
+  "description": "Automatización de Inventario POS 360 con n8n",
+  "scripts": {
+    "start": "docker-compose up -d && npm run logs",
+    "stop": "docker-compose down",
+    "restart": "docker-compose restart",
+    "logs": "docker-compose logs -f n8n",
+    "logs:db": "docker-compose logs -f postgres-pos",
+    "status": "docker-compose ps",
+    "ps": "docker-compose ps",
+    "build": "docker-compose build",
+    "clean": "docker-compose down -v",
+    "reset": "npm run clean && npm run start",
+    "test": "node scripts/test-workflow.js",
+    "test:webhook": "curl -X POST http://localhost:5678/webhook/venta -H 'Content-Type: application/json' -d '{\"producto_id\": 1, \"cantidad_vendida\": 5}'",
+    "db:connect": "docker-compose exec postgres-pos psql -U pos_user -d pos_360",
+    "db:backup": "docker-compose exec postgres-pos pg_dump -U pos_user pos_360 > backup-pos360-$(date +%Y%m%d-%H%M%S).sql",
+    "db:restore": "docker-compose exec -T postgres-pos psql -U pos_user pos_360 < backup-file.sql",
+    "export-workflow": "node scripts/export-workflow.js",
+    "import-workflow": "node scripts/import-workflow.js",
+    "health": "curl -s http://localhost:5678/healthz && echo 'n8n is healthy'",
+    "n8n:open": "open http://localhost:5678 || xdg-open http://localhost:5678 || start http://localhost:5678"
+  },
+  "keywords": [
+    "n8n",
+    "automation",
+    "inventory",
+    "pos",
+    "workflow"
+  ],
+  "author": "Tu Nombre",
+  "license": "MIT",
+  "devDependencies": {
+    "node-fetch": "^2.6.11"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "^10.5.0",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.8.0",
+    "postcss": "^8.5.10",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "recharts": "^3.8.1",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^6.0.2",
+    "xlsx": "^0.18.5"
+  }
+}

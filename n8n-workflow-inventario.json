@@ -1,0 +1,181 @@
+{
+  "name": "Actualizar Inventario POS",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "venta",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook - Recibir Venta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "abcd1234"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, nombre_producto, cantidad, precio FROM inventario WHERE id = {{$json.body.producto_id}}",
+        "options": {}
+      },
+      "id": "db-read",
+      "name": "PostgreSQL - Leer Stock",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": "postgres_creds"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhook = $input.first().json.body;\nconst dbData = $('PostgreSQL - Leer Stock').first().json;\n\nconst productoId = webhook.producto_id;\nconst cantidadVendida = webhook.cantidad_vendida || 1;\nconst stockActual = dbData.cantidad || 0;\nconst nuevoStock = stockActual - cantidadVendida;\nconst timestamp = new Date().toISOString();\n\nif (nuevoStock < 0) {\n  throw new Error(`Stock insuficiente. Disponible: ${stockActual}, Solicitado: ${cantidadVendida}`);\n}\n\nreturn {\n  json: {\n    producto_id: productoId,\n    nombre_producto: dbData.nombre_producto,\n    stock_anterior: stockActual,\n    stock_vendido: cantidadVendida,\n    stock_nuevo: nuevoStock,\n    precio: dbData.precio,\n    total_venta: cantidadVendida * dbData.precio,\n    timestamp: timestamp,\n    valido: true\n  }\n};"
+      },
+      "id": "code-calcular",
+      "name": "Code - Calcular Nuevo Stock",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.stock_nuevo}}",
+              "value2": 0,
+              "operation": "greaterEqual"
+            }
+          ]
+        }
+      },
+      "id": "if-validar",
+      "name": "IF - Stock Válido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE inventario SET cantidad = {{$json.stock_nuevo}}, fecha_actualizado = NOW() WHERE id = {{$json.producto_id}} RETURNING id, nombre_producto, cantidad, fecha_actualizado;",
+        "options": {}
+      },
+      "id": "db-update",
+      "name": "PostgreSQL - Actualizar Stock",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1050, 200],
+      "credentials": {
+        "postgres": "postgres_creds"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "postMessage",
+        "channelId": "C1234567890",
+        "text": "✅ *Venta Procesada*\n• Producto: {{$json.nombre_producto}}\n• Cantidad vendida: {{$json.stock_vendido}}\n• Stock anterior: {{$json.stock_anterior}}\n• Stock nuevo: {{$json.stock_nuevo}}\n• Total venta: ${{$json.total_venta}}\n• Hora: {{$json.timestamp}}"
+      },
+      "id": "slack-success",
+      "name": "Slack - Notificar Venta",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "slackApi": "slack_creds"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "postMessage",
+        "channelId": "C0987654321",
+        "text": "⚠️ *Alerta: Stock Insuficiente*\n• Producto ID: {{$json.body.producto_id}}\n• Cantidad solicitada: {{$json.body.cantidad_vendida}}\n• Stock disponible: {{$json.stock_anterior}}\n• Timestamp: {{$json.timestamp}}"
+      },
+      "id": "slack-error",
+      "name": "Slack - Alerta Stock",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [1050, 400],
+      "credentials": {
+        "slackApi": "slack_creds"
+      }
+    }
+  ],
+  "connections": {
+    "webhook": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL - Leer Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL - Leer Stock": {
+      "main": [
+        [
+          {
+            "node": "Code - Calcular Nuevo Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Calcular Nuevo Stock": {
+      "main": [
+        [
+          {
+            "node": "IF - Stock Válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Stock Válido?": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL - Actualizar Stock",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack - Alerta Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL - Actualizar Stock": {
+      "main": [
+        [
+          {
+            "node": "Slack - Notificar Venta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "any"
+  },
+  "staticData": null,
+  "hash": "abc123",
+  "id": "1"
+}

@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&family=Rubik:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Colores Primarios - Azul Corporativo Profesional */
+  --color-primary: #0052cc;
+  --color-primary-light: #52a8ff;
+  --color-primary-dark: #0047b2;
+
+  /* Colores Secundarios - Azul Corporativo (CAMBIO CLAVE) */
+  --color-secondary: #0052cc;
+  --color-secondary-light: #e0ecff;
+  --color-secondary-dark: #0047b2;
+
+  /* Superficies */
+  --color-background: #f9fafb;
+  --color-surface: #ffffff;
+  --color-surface-dim: #e5e7eb;
+  --color-surface-bright: #ffffff;
+
+  /* Estados */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Tipografía - Rubik (Headings) + Nunito Sans (Body) */
+  --font-headline: "Rubik", -apple-system, sans-serif;
+  --font-body: "Nunito Sans", -apple-system, sans-serif;
+  --font-label: "Nunito Sans", -apple-system, sans-serif;
+}
+
+* {
+  @apply transition-colors duration-200;
+}
+
+html {
+  @apply scroll-smooth;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 font-sans;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-headline font-bold;
+}
+
+h1 {
+  @apply text-4xl;
+}
+
+h2 {
+  @apply text-3xl;
+}
+
+h3 {
+  @apply text-2xl;
+}
+
+/* Smooth scrolling */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-400 rounded-full hover:bg-slate-500;
+}
+
+/* ============================================ */
+/* ANIMACIONES GLOBALES PARA MICRO-INTERACCIONES */
+/* ============================================ */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 82, 204, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 82, 204, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 82, 204, 0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+/* ============================================ */
+/* UTILITY CLASSES PARA COMPONENTES */
+/* ============================================ */
+
+@layer utilities {
+  /* Focus ring profesional */
+  .focus-ring {
+    @apply outline-none ring-2 ring-offset-2 ring-blue-500;
+  }
+
+  /* Animación de card al hover */
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:scale-105;
+  }
+
+  /* Animación de botón al presionar */
+  .btn-press {
+    @apply transition-all duration-150 active:scale-95;
+  }
+
+  /* Skeleton loading state */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 0%,
+      #e0e0e0 50%,
+      #f0f0f0 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Badge animado con pulso */
+  .pulse-ring {
+    animation: pulse-ring 2s infinite;
+  }
+
+  /* Shake animation para errores */
+  .shake {
+    animation: shake 0.5s;
+  }
+
+  /* Slide in desde abajo */
+  .slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  /* Fade in suave */
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+}

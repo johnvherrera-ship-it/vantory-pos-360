@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm install *)",
+      "Bash(uipro init *)",
+      "Bash(cp -r /tmp/n8n-skills/skills/* ~/.claude/skills/)",
+      "Read(//c/Users/johnv/.claude/**)",
+      "Bash(mkdir -p ~/.claude/skills)",
+      "Bash(claude mcp *)"
+    ]
+  }
+}

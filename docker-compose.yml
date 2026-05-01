@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # n8n - Automation Platform
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-inventario
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_TUNNEL_URL=http://localhost:5678/
+
+      # Database Configuration
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n_user
+      - DB_POSTGRESDB_PASSWORD=n8n_password
+
+      # Encryption
+      - N8N_ENCRYPTION_KEY=your-secret-key-change-this-in-production
+
+      # Credentials
+      - CREDENTIALS_OVERRIDE_DATA='{"postgres_creds":{"host":"postgres","port":5432,"database":"pos_360","user":"pos_user","password":"pos_password"},"slack_creds":{"accessToken":"xoxb-your-slack-token"}}'
+
+    volumes:
+      - ./n8n-data:/home/node/.n8n
+      - ./workflows:/home/node/.n8n/workflows
+
+    depends_on:
+      - postgres
+
+    networks:
+      - n8n-network
+
+    command: n8n start
+
+    restart: unless-stopped
+
+  # PostgreSQL - Database for n8n
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-n8n
+    environment:
+      POSTGRES_DB: n8n
+      POSTGRES_USER: n8n_user
+      POSTGRES_PASSWORD: n8n_password
+
+    volumes:
+      - postgres_n8n_data:/var/lib/postgresql/data
+
+    networks:
+      - n8n-network
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U n8n_user -d n8n"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL - Database for POS 360 (Inventario)
+  postgres-pos:
+    image: postgres:15-alpine
+    container_name: postgres-pos-360
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: pos_360
+      POSTGRES_USER: pos_user
+      POSTGRES_PASSWORD: pos_password
+
+    volumes:
+      - postgres_pos_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+
+    networks:
+      - n8n-network
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pos_user -d pos_360"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_n8n_data:
+  postgres_pos_data:
+
+networks:
+  n8n-network:
+    driver: bridge
