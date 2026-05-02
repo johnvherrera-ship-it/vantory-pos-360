@@ -102,8 +102,8 @@ export const FiadosDashboard = ({ setCurrentPage, fiados, setFiados, currentUser
       <main className="flex-1 ml-64 flex flex-col h-screen overflow-y-auto p-8">
         <header className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Gestión de <span className="text-secondary">Fiados</span></h1>
-            <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">OPERACIONES &gt; FIADOS</p>
+            <h1 className="text-3xl font-black text-[#0F172A] font-headline mb-1">Gestión de <span className="text-secondary">Base de Clientes</span></h1>
+            <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-3">OPERACIONES &gt; BASE DE CLIENTES</p>
           </div>
         </header>
 
@@ -330,7 +330,7 @@ export const FiadosDashboard = ({ setCurrentPage, fiados, setFiados, currentUser
                         <div className="flex justify-between items-start mb-2">
                           <div>
                             <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md ${record.type === 'payment' ? 'bg-green-200 text-green-800' : 'bg-error-container text-error'}`}>
-                              {record.type === 'payment' ? 'Abono' : 'Cargo (Fiado)'}
+                              {record.type === 'payment' ? 'Abono' : 'Cargo'}
                             </span>
                             <p className="text-xs text-on-surface-variant mt-2">{new Date(record.date).toLocaleString()}</p>
                             {record.dueDate && record.type === 'charge' && (
