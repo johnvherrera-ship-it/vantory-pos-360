@@ -94,7 +94,7 @@ export const SideNavBar = ({
         <NavItem page="sales" icon={Receipt} label="Ventas" />
         <NavItem page="inventory" icon={Package} label="Inventario" />
         <NavItem page="entries" icon={Zap} label="Entradas" />
-        <NavItem page="fiados" icon={Wallet} label="Fiados" />
+        <NavItem page="fiados" icon={Wallet} label="Clientes" />
 
         <div className="px-6 mb-4 mt-6">
           <p className="text-xs font-bold text-white/80 uppercase tracking-widest">Análítica</p>

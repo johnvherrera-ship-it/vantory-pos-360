@@ -32,9 +32,11 @@ export const LoginPage = ({
   setCurrentPOS 
 }: LoginPageProps) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault(); 
+    e.preventDefault();
+    setError(''); 
     const form = e.target as HTMLFormElement;
     const email = (form.elements.namedItem('usuario') as HTMLInputElement).value;
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
@@ -51,12 +53,19 @@ export const LoginPage = ({
     if (!user && email === 'duoc@gmail.com') {
       user = users[0]; // Fallback to admin if not found
     }
-    
-    if (user) {
-      setCurrentUser(user);
-    } else {
-      setCurrentUser(users[0]);
+
+    if (!user) {
+      setError('Credenciales inválidas. Verifique su correo y contraseña.');
+      return;
     }
+
+    // Check if client is suspended
+    if (user.status === 'Suspendido') {
+      setError('Acceso restringido: este negocio se encuentra suspendido. Comuníquese con soporte de Vantory para reactivar su cuenta.');
+      return;
+    }
+
+    setCurrentUser(user);
 
     // Invisible Scalability Logic
     if (stores.length === 1) {
@@ -97,7 +106,13 @@ export const LoginPage = ({
             <h2 className="font-headline font-bold text-xl text-on-surface tracking-tight mb-1">Iniciar Sesión</h2>
             <p className="text-on-surface-variant text-sm">Ingrese sus credenciales para continuar.</p>
           </header>
-          
+
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm font-semibold">
+              {error}
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleLogin}>
             {/* User Field */}
             <div className="space-y-2">
