@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Menu, TrendingUp, Package, Zap, LineChart, Cloud, Check, ArrowRight, Database, Barcode, Users, Monitor, History, ArrowLeft, Globe, Laptop, Instagram, MessageCircle, ArrowUp, ArrowDown, Calendar, X, Shield, FileText, ExternalLink, Eye, EyeOff, LayoutGrid, LayoutDashboard, LogIn, Receipt, Settings, HelpCircle, UserCog, LogOut, Bell, ScanBarcode, Plus, Banknote, CreditCard, CheckCircle, Search, Filter, ChevronLeft, ChevronRight, Edit, Trash2, UploadCloud, Download, Printer, QrCode, ShoppingBag, BarChart3, UserPlus, Info, MinusCircle, Star, Wallet, Scan, ShoppingCart, PlusCircle } from 'lucide-react';
+import { Menu, TrendingUp, Package, Zap, LineChart, Cloud, Check, ArrowRight, Database, Barcode, Users, Monitor, History, ArrowLeft, Globe, Laptop, Share2, MessageCircle, ArrowUp, ArrowDown, Calendar, X, Shield, FileText, ExternalLink, Eye, EyeOff, LayoutGrid, LayoutDashboard, LogIn, Receipt, Settings, HelpCircle, UserCog, LogOut, Bell, ScanBarcode, Plus, Banknote, CreditCard, CheckCircle, Search, Filter, ChevronLeft, ChevronRight, Edit, Trash2, UploadCloud, Download, Printer, QrCode, ShoppingBag, BarChart3, UserPlus, Info, MinusCircle, Star, Wallet, Scan, ShoppingCart, PlusCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import { LineChart as ReLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
@@ -7252,7 +7252,7 @@ export default function App() {
                 transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                 className="w-10 h-10 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-600 border border-pink-500/20 shadow-sm"
               >
-                <Instagram className="w-5 h-5" />
+                <Share2 className="w-5 h-5" />
               </motion.a>
             </div>
           </div>
