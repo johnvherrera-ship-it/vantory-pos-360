@@ -5,7 +5,7 @@ import {
   ArrowRight, Download, History, X, Info, CheckCircle,
   ArrowUp, ArrowDown, Settings, CreditCard
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SideNavBar } from '../layout/SideNavBar';
 
 export const KPIsDashboard = ({ setCurrentPage, inventory, salesHistory, cashRegister, setShowCashRegisterModal, currentUser, users, setCurrentUser, cashHistory, currentStore, currentPOS }: { setCurrentPage: (page: any) => void, inventory: any[], salesHistory: any[], cashRegister: any, setShowCashRegisterModal: any, currentUser: any, users: any[], setCurrentUser: any, cashHistory: any[], currentStore: any, currentPOS: any }) => {

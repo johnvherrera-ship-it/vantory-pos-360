@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Menu, TrendingUp, Package, Zap, LineChart, Cloud, Check, ArrowRight, Database, Barcode, Users, Monitor, History, ArrowLeft, Globe, Laptop, Instagram, MessageCircle, ArrowUp, ArrowDown, Calendar, X, Shield, FileText, ExternalLink, Eye, EyeOff, LayoutGrid, LayoutDashboard, LogIn, Receipt, Settings, HelpCircle, UserCog, LogOut, Bell, ScanBarcode, Plus, Banknote, CreditCard, CheckCircle, Search, Filter, ChevronLeft, ChevronRight, Edit, Trash2, UploadCloud, Download, Printer, QrCode, ShoppingBag, BarChart3, UserPlus, Info, MinusCircle, Star, Wallet, Scan, ShoppingCart, PlusCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import * as XLSX from 'xlsx';
 import { LineChart as ReLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 

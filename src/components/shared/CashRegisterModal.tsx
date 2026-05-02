@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertCircle, CheckCircle } from 'lucide-react';
 import { queueService } from '../../services/queueService';
 import { usePOSContext } from '../../context/POSContext';

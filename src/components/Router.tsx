@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useUIContext } from '../context/UIContext';
 import { usePOSContext } from '../context/POSContext';
 import { useAppContext } from '../context/AppContext';

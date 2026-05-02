@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bell, Package, Wallet } from 'lucide-react';
 import { useAppContexts } from '../../hooks/useAppContexts';
 

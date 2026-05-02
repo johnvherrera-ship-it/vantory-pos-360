@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Zap } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export const Logo = ({ onClick, className = "", light = false }: { onClick?: () => void, className?: string, light?: boolean }) => (
   <div 

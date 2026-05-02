@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Globe, Monitor, ArrowLeft, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Lobby = ({ stores, posMachines, setCurrentStore, setCurrentPOS, setCurrentPage, currentUser }: any) => {
   const [step, setStep] = useState<'select-store' | 'enter-pin' | 'select-pos'>('select-store');

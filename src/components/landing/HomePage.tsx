@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Package, QrCode, ShoppingBag, BarChart3, TrendingUp, Users, Cloud, Check } from 'lucide-react';
 
 interface HomePageProps {

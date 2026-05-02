@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   Bell, Settings, LogOut, UserPlus, Edit, X
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SideNavBar } from '../layout/SideNavBar';
 
 export const UsersManagement = ({ setCurrentPage, users, setUsers, currentUser, setCurrentUser, stores, currentStore, currentPOS }: { setCurrentPage: (page: any) => void, users: any[], setUsers: any, currentUser: any, setCurrentUser: any, stores: any[], currentStore: any, currentPOS: any }) => {

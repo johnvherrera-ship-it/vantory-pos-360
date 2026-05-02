@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   Search, X, Printer
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SideNavBar } from '../layout/SideNavBar';
 
 export const FiadosDashboard = ({ setCurrentPage, fiados, setFiados, currentUser, users, setCurrentUser, currentStore, currentPOS }: { setCurrentPage: (page: any) => void, fiados: any[], setFiados: any, currentUser: any, users: any[], setCurrentUser: any, currentStore: any, currentPOS: any }) => {
